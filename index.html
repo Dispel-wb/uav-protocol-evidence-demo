@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>谱航智析 · 解调数据协议分析</title>
+  <link rel="stylesheet" href="src/style.css">
+</head>
+<body>
+  <svg aria-hidden="true" class="defs"><defs>
+    <symbol id="i-wave" viewBox="0 0 24 24"><path d="M2 12h3l2-6 3 12 3-9 2 6 2-3h5"/></symbol>
+    <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/></symbol>
+    <symbol id="i-code" viewBox="0 0 24 24"><path d="m8 5-6 7 6 7M16 5l6 7-6 7M14 3 10 21"/></symbol>
+    <symbol id="i-branch" viewBox="0 0 24 24"><circle cx="6" cy="5" r="2"/><circle cx="18" cy="19" r="2"/><circle cx="6" cy="19" r="2"/><path d="M6 7v10M8 5h5a5 5 0 0 1 5 5v7"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 2.8 20 6v5.5c0 5-3.1 8-8 9.7-4.9-1.7-8-4.7-8-9.7V6l8-3.2Z"/><path d="m8.6 12 2.4 2.4 4.5-4.7"/></symbol>
+    <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24"><path d="M6 3.5h8l4 4V20.5H6z"/><path d="M14 3.5v4h4M9 12h6M9 16h6"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="m8 5 11 7-11 7V5Z"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12m-4-4 4 4 4-4M4 18v3h16v-3"/></symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 17V4m-4 4 4-4 4 4M4 17v4h16v-4"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3 2.8 19h18.4L12 3Z"/><path d="M12 9v4M12 17h.01"/></symbol>
+  </defs></svg>
+  <div class="shell">
+    <nav class="rail" aria-label="页面导航">
+      <div class="brand-mark"><svg class="ico"><use href="#i-wave"/></svg></div>
+      <a href="#overview" title="概览" aria-label="概览"><svg class="ico"><use href="#i-grid"/></svg></a>
+      <a href="#capture" title="字节输入" aria-label="字节输入"><svg class="ico"><use href="#i-code"/></svg></a>
+      <a href="#frames" title="帧解析" aria-label="帧解析"><svg class="ico"><use href="#i-branch"/></svg></a>
+      <a href="#findings-panel" title="证据报告" aria-label="证据报告"><svg class="ico"><use href="#i-shield"/></svg></a>
+      <div class="rail-spacer"></div><span class="rail-version">V0.2</span>
+    </nav>
+    <div class="shellmain">
+      <header class="topbar"><strong>谱航智析 <span>/</span> 协议验证工作台</strong><small><i></i> 解调后数据 · 本地运行</small></header>
+      <main class="content" id="overview">
+        <div class="intro"><div><div class="kicker">PROTOCOL EVIDENCE LAB</div><h1>从字节流到可复核结论</h1><p>识别 MAVLink 1/2 与 SBUS，解析帧和字段，再按可修改的规则检查会话。</p></div><div class="edition">离线演示 · 无需射频设备</div></div>
+        <div class="notice"><svg class="ico"><use href="#i-alert"/></svg><span>输入从<strong>解调后的字节</strong>开始。本程序不解调射频、不破解加密协议，也不验证 MAVLink 2 签名；未知消息保留原始字节并标出验证边界。</span></div>
+        <div class="metrics" aria-label="分析概要">
+          <div><span>输入字节</span><strong id="m-bytes">—</strong></div><div><span>识别帧</span><strong id="m-frames">—</strong></div><div><span>MAVLink</span><strong id="m-mav">—</strong></div><div><span>SBUS</span><strong id="m-sbus">—</strong></div><div><span>待复核项</span><strong id="m-findings">—</strong></div>
+        </div>
+        <div class="layout">
+          <aside>
+            <section class="panel" id="capture"><div class="panel-head"><svg class="ico"><use href="#i-code"/></svg><h2>输入捕获数据</h2></div><div class="panel-body">
+              <label for="sample">内置样本</label><select id="sample"></select>
+              <label for="hex-input">十六进制字节流</label><textarea id="hex-input" spellcheck="false" aria-label="十六进制字节流"></textarea>
+              <div class="input-meta"><span id="input-length">0 字节</span><span>支持空格、换行、逗号与 0x 前缀</span></div>
+              <div class="button-row"><button id="analyze"><svg class="ico mini"><use href="#i-play"/></svg>解析并检查</button><label class="file-button" for="file-input"><svg class="ico mini"><use href="#i-upload"/></svg>导入 .bin / .hex</label><input id="file-input" type="file" accept=".bin,.hex,.txt,application/octet-stream,text/plain"></div>
+              <p class="inline-error" id="input-error" role="alert"></p>
+            </div></section>
+            <section class="panel" id="rules"><div class="panel-head"><svg class="ico"><use href="#i-sliders"/></svg><h2>检查条件</h2><span class="panel-sub">修改后重跑同一捕获</span></div><div class="panel-body">
+              <div class="form-grid"><label for="max-altitude">起飞高度上限 <small>m</small></label><input id="max-altitude" type="number" min="1" max="10000" step="1" value="120">
+              <label for="min-gps">GPS 最低定位等级</label><select id="min-gps"><option value="0">不要求</option><option value="2">2 · 二维定位</option><option value="3" selected>3 · 三维定位</option><option value="4">4 · 更高等级</option></select>
+              <label for="lost-limit">连续丢帧提示阈值</label><input id="lost-limit" type="number" min="1" max="50" step="1" value="2"></div>
+              <label class="check"><input id="require-arm" type="checkbox" checked>起飞前要求已确认解锁</label>
+              <div class="button-row"><button id="apply-rules" class="secondary">保存条件并重跑</button><button id="reset-rules" class="quiet">恢复默认</button></div><p class="save-state" id="rules-status">条件保存在此浏览器。</p>
+            </div></section>
+          </aside>
+          <div class="results">
+            <section class="panel" id="frames"><div class="panel-head"><svg class="ico"><use href="#i-branch"/></svg><h2>帧识别与字段解析</h2><span class="panel-sub" id="parse-status">等待输入</span></div>
+              <div class="stream" id="stream" aria-label="字节流分段"></div>
+              <div class="tablewrap"><table><thead><tr><th>偏移</th><th>协议</th><th>消息 / 数据</th><th>完整性</th><th>解析重点</th><th>检查</th></tr></thead><tbody id="frame-rows"></tbody></table></div>
+              <div class="detail" id="frame-detail"><span class="muted">点击上方任意帧，查看其原始字节与解析字段。</span></div>
+            </section>
+            <section class="panel" id="findings-panel"><div class="panel-head"><svg class="ico"><use href="#i-shield"/></svg><h2>可复核证据</h2><span class="panel-sub" id="finding-count">—</span></div><div class="panel-body"><div id="findings"></div><div class="button-row"><button id="download" class="secondary" disabled><svg class="ico mini"><use href="#i-download"/></svg>导出 JSON 证据报告</button></div></div></section>
+            <section class="method"><svg class="ico"><use href="#i-file"/></svg><div><strong>演示边界</strong><p>样本字节由参考 MAVLink 编码器与 SBUS 位打包器生成。解析器只对已收录的消息定义验证 CRC_EXTRA；SBUS 没有同类 CRC，因此仅检查帧边界、通道与状态标志。所有判定均附原始字节和偏移量。</p></div></section>
+          </div>
+        </div>
+        <footer>谱航智析 · 本地离线演示 · 输入与报告仅留在当前浏览器</footer>
+      </main>
+    </div>
+  </div>
+  <script src="src/decoder.js"></script><script src="src/samples.js"></script><script src="src/app.js"></script>
+</body>
+</html>

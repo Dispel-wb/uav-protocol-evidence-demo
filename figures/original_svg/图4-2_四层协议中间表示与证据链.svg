@@ -1,0 +1,51 @@
+<svg viewBox="0 0 1600 850" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <marker id="arrow" markerWidth="11" markerHeight="8" refX="10" refY="4" orient="auto"><path d="M0,0 L11,4 L0,8 z" fill="#516B91"/></marker>
+  <marker id="arrow-red" markerWidth="11" markerHeight="8" refX="10" refY="4" orient="auto"><path d="M0,0 L11,4 L0,8 z" fill="#C00000"/></marker>
+  <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#263648" flood-opacity="0.16"/></filter>
+  <style>
+    text { font-family: 'Microsoft YaHei','Noto Sans SC','PingFang SC',Arial,sans-serif; fill:#273142; }
+    .title { font-size:28px; font-weight:700; fill:#244A7C; }
+    .subtitle { font-size:14px; fill:#667085; }
+    .head { font-size:18px; font-weight:700; }
+    .label { font-size:15px; font-weight:700; }
+    .body { font-size:13px; }
+    .small { font-size:12px; fill:#667085; }
+  </style>
+</defs>
+<rect x="0" y="0" width="1600" height="850" fill="#FFFFFF"/>
+<rect x="24" y="22" width="7" height="48" rx="3" fill="#244A7C"/>
+<text x="48" y="51" class="title">四层协议中间表示与证据链</text>
+<text x="48" y="74" class="subtitle">模型不是一张字段表，而是带证据、冲突与版本的可执行知识底座</text>
+<line x1="38" y1="91" x2="1562" y2="91" stroke="#B9C5D4" stroke-width="1"/>
+<rect x="70" y="125" width="1040" height="650" rx="12" fill="none" stroke="#244A7C" stroke-width="1.5" stroke-dasharray="10 6"/><text x="86" y="147" class="label" text-anchor="start" fill="#244A7C"><tspan x="86" dy="0">四层协议中间表示  M = &lt;F, Φ, Σ, Q, Δ, C, E&gt;</tspan></text>
+<g filter="url(#shadow)"><rect x="135" y="180" width="900" height="105" rx="8" fill="#E9E1F5" stroke="#7D5AA6" stroke-width="1.6"/><rect x="135" y="180" width="8" height="105" rx="8" fill="#7D5AA6"/></g>
+<text x="585.0" y="210" class="label" text-anchor="middle"><tspan x="585.0" dy="0">会话状态/行为层</tspan></text>
+<text x="585.0" y="238" class="body" text-anchor="middle"><tspan x="585.0" dy="0">状态Q · 转移Δ · 守卫 · 超时 · 安全约束C</tspan></text>
+<g filter="url(#shadow)"><rect x="135" y="320" width="900" height="105" rx="8" fill="#DCE8F8" stroke="#244A7C" stroke-width="1.6"/><rect x="135" y="320" width="8" height="105" rx="8" fill="#244A7C"/></g>
+<text x="585.0" y="350" class="label" text-anchor="middle"><tspan x="585.0" dy="0">消息层</tspan></text>
+<text x="585.0" y="378" class="body" text-anchor="middle"><tspan x="585.0" dy="0">类型Σ · 方向 · 请求—响应 · 序列关系</tspan></text>
+<line x1="585" y1="285" x2="585" y2="312" stroke="#516B91" stroke-width="2.4" marker-end="url(#arrow)"/><g filter="url(#shadow)"><rect x="135" y="460" width="900" height="105" rx="8" fill="#FCE4D6" stroke="#C87931" stroke-width="1.6"/><rect x="135" y="460" width="8" height="105" rx="8" fill="#C87931"/></g>
+<text x="585.0" y="490" class="label" text-anchor="middle"><tspan x="585.0" dy="0">字段层</tspan></text>
+<text x="585.0" y="518" class="body" text-anchor="middle"><tspan x="585.0" dy="0">边界Φ · 类型 · 取值域 · 长度/校验/依赖</tspan></text>
+<line x1="585" y1="425" x2="585" y2="452" stroke="#516B91" stroke-width="2.4" marker-end="url(#arrow)"/><g filter="url(#shadow)"><rect x="135" y="600" width="900" height="105" rx="8" fill="#E5F2D6" stroke="#6B8E3F" stroke-width="1.6"/><rect x="135" y="600" width="8" height="105" rx="8" fill="#6B8E3F"/></g>
+<text x="585.0" y="630" class="label" text-anchor="middle"><tspan x="585.0" dy="0">帧层</tspan></text>
+<text x="585.0" y="658" class="body" text-anchor="middle"><tspan x="585.0" dy="0">同步F · 帧长 · 头部 · 载荷 · 完整性</tspan></text>
+<line x1="585" y1="565" x2="585" y2="592" stroke="#516B91" stroke-width="2.4" marker-end="url(#arrow)"/><rect x="1170" y="125" width="360" height="650" rx="12" fill="none" stroke="#C00000" stroke-width="1.5" stroke-dasharray="10 6"/><text x="1186" y="147" class="label" text-anchor="start" fill="#C00000"><tspan x="1186" dy="0">证据与验证状态</tspan></text>
+<g filter="url(#shadow)"><rect x="1215" y="180" width="270" height="78" rx="8" fill="#EEF4FB" stroke="#244A7C" stroke-width="1.6"/></g>
+<text x="1350.0" y="210" class="label" text-anchor="middle"><tspan x="1350.0" dy="0">统计证据</tspan></text>
+<text x="1350.0" y="238" class="body" text-anchor="middle"><tspan x="1350.0" dy="0">对齐·熵·分布</tspan></text>
+<line x1="1162" y1="219" x2="1112" y2="219" stroke="#516B91" stroke-width="2.4" marker-end="url(#arrow)" stroke-dasharray="7 5"/><g filter="url(#shadow)"><rect x="1215" y="292" width="270" height="78" rx="8" fill="#FFF2CC" stroke="#244A7C" stroke-width="1.6"/></g>
+<text x="1350.0" y="322" class="label" text-anchor="middle"><tspan x="1350.0" dy="0">关系证据</tspan></text>
+<text x="1350.0" y="350" class="body" text-anchor="middle"><tspan x="1350.0" dy="0">长度·序号·校验</tspan></text>
+<line x1="1162" y1="331" x2="1112" y2="331" stroke="#516B91" stroke-width="2.4" marker-end="url(#arrow)" stroke-dasharray="7 5"/><g filter="url(#shadow)"><rect x="1215" y="404" width="270" height="78" rx="8" fill="#E9E1F5" stroke="#244A7C" stroke-width="1.6"/></g>
+<text x="1350.0" y="434" class="label" text-anchor="middle"><tspan x="1350.0" dy="0">程序证据</tspan></text>
+<text x="1350.0" y="462" class="body" text-anchor="middle"><tspan x="1350.0" dy="0">污点·变量传播</tspan></text>
+<line x1="1162" y1="443" x2="1112" y2="443" stroke="#516B91" stroke-width="2.4" marker-end="url(#arrow)" stroke-dasharray="7 5"/><g filter="url(#shadow)"><rect x="1215" y="516" width="270" height="78" rx="8" fill="#E5F2D6" stroke="#244A7C" stroke-width="1.6"/></g>
+<text x="1350.0" y="546" class="label" text-anchor="middle"><tspan x="1350.0" dy="0">实验真值</tspan></text>
+<text x="1350.0" y="574" class="body" text-anchor="middle"><tspan x="1350.0" dy="0">动作·遥测·响应</tspan></text>
+<line x1="1162" y1="555" x2="1112" y2="555" stroke="#516B91" stroke-width="2.4" marker-end="url(#arrow)" stroke-dasharray="7 5"/><g filter="url(#shadow)"><rect x="1215" y="628" width="270" height="78" rx="8" fill="#F8D7DA" stroke="#244A7C" stroke-width="1.6"/></g>
+<text x="1350.0" y="658" class="label" text-anchor="middle"><tspan x="1350.0" dy="0">人工确认</tspan></text>
+<text x="1350.0" y="686" class="body" text-anchor="middle"><tspan x="1350.0" dy="0">候选/验证/冲突</tspan></text>
+<line x1="1162" y1="667" x2="1112" y2="667" stroke="#C00000" stroke-width="2.4" marker-end="url(#arrow-red)" stroke-dasharray="7 5"/><text x="800" y="820" class="head" text-anchor="middle"><tspan x="800" dy="0">同一对象标识贯通识别、生成、状态跟踪、一致性分析与回归</tspan></text>
+</svg>

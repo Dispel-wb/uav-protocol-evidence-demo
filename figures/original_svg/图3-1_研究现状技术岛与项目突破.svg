@@ -1,0 +1,58 @@
+<svg viewBox="0 0 1600 820" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <marker id="arrow" markerWidth="11" markerHeight="8" refX="10" refY="4" orient="auto"><path d="M0,0 L11,4 L0,8 z" fill="#516B91"/></marker>
+  <marker id="arrow-red" markerWidth="11" markerHeight="8" refX="10" refY="4" orient="auto"><path d="M0,0 L11,4 L0,8 z" fill="#C00000"/></marker>
+  <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#263648" flood-opacity="0.16"/></filter>
+  <style>
+    text { font-family: 'Microsoft YaHei','Noto Sans SC','PingFang SC',Arial,sans-serif; fill:#273142; }
+    .title { font-size:28px; font-weight:700; fill:#244A7C; }
+    .subtitle { font-size:14px; fill:#667085; }
+    .head { font-size:18px; font-weight:700; }
+    .label { font-size:15px; font-weight:700; }
+    .body { font-size:13px; }
+    .small { font-size:12px; fill:#667085; }
+  </style>
+</defs>
+<rect x="0" y="0" width="1600" height="820" fill="#FFFFFF"/>
+<rect x="24" y="22" width="7" height="48" rx="3" fill="#244A7C"/>
+<text x="48" y="51" class="title">国内外技术路线与项目突破位置</text>
+<text x="48" y="74" class="subtitle">RF前端与协议逆向两座技术岛，通过统一模型连接识别、理解、生成和安全</text>
+<line x1="38" y1="91" x2="1562" y2="91" stroke="#B9C5D4" stroke-width="1"/>
+<rect x="55" y="130" width="690" height="265" rx="12" fill="none" stroke="#6B8E3F" stroke-width="1.5" stroke-dasharray="10 6"/><text x="71" y="152" class="label" text-anchor="start" fill="#6B8E3F"><tspan x="71" dy="0">技术岛A：RF/IQ识别</tspan></text>
+<g filter="url(#shadow)"><rect x="90" y="185" width="185" height="130" rx="8" fill="#E5F2D6" stroke="#6B8E3F" stroke-width="1.6"/></g>
+<text x="182.5" y="215" class="label" text-anchor="middle"><tspan x="182.5" dy="0">信号输入</tspan></text>
+<text x="182.5" y="243" class="body" text-anchor="middle"><tspan x="182.5" dy="0">IQ/频谱</tspan><tspan x="182.5" dy="20">时频图</tspan></text>
+<g filter="url(#shadow)"><rect x="310" y="185" width="185" height="130" rx="8" fill="#E5F2D6" stroke="#6B8E3F" stroke-width="1.6"/></g>
+<text x="402.5" y="215" class="label" text-anchor="middle"><tspan x="402.5" dy="0">学习方法</tspan></text>
+<text x="402.5" y="243" class="body" text-anchor="middle"><tspan x="402.5" dy="0">CNN/Transformer</tspan><tspan x="402.5" dy="20">自监督/对比</tspan></text>
+<g filter="url(#shadow)"><rect x="530" y="185" width="175" height="130" rx="8" fill="#E5F2D6" stroke="#6B8E3F" stroke-width="1.6"/></g>
+<text x="617.5" y="215" class="label" text-anchor="middle"><tspan x="617.5" dy="0">典型输出</tspan></text>
+<text x="617.5" y="243" class="body" text-anchor="middle"><tspan x="617.5" dy="0">制式/设备</tspan><tspan x="617.5" dy="20">飞行模式</tspan></text>
+<line x1="275" y1="250" x2="302" y2="250" stroke="#516B91" stroke-width="2.4" marker-end="url(#arrow)"/><line x1="495" y1="250" x2="522" y2="250" stroke="#516B91" stroke-width="2.4" marker-end="url(#arrow)"/><rect x="855" y="130" width="690" height="265" rx="12" fill="none" stroke="#7D5AA6" stroke-width="1.5" stroke-dasharray="10 6"/><text x="871" y="152" class="label" text-anchor="start" fill="#7D5AA6"><tspan x="871" dy="0">技术岛B：packet/program协议逆向</tspan></text>
+<g filter="url(#shadow)"><rect x="890" y="185" width="185" height="130" rx="8" fill="#E9E1F5" stroke="#7D5AA6" stroke-width="1.6"/></g>
+<text x="982.5" y="215" class="label" text-anchor="middle"><tspan x="982.5" dy="0">协议输入</tspan></text>
+<text x="982.5" y="243" class="body" text-anchor="middle"><tspan x="982.5" dy="0">bit/packet</tspan><tspan x="982.5" dy="20">程序/规范</tspan></text>
+<g filter="url(#shadow)"><rect x="1110" y="185" width="185" height="130" rx="8" fill="#E9E1F5" stroke="#7D5AA6" stroke-width="1.6"/></g>
+<text x="1202.5" y="215" class="label" text-anchor="middle"><tspan x="1202.5" dy="0">逆向方法</tspan></text>
+<text x="1202.5" y="243" class="body" text-anchor="middle"><tspan x="1202.5" dy="0">对齐/污点</tspan><tspan x="1202.5" dy="20">迁移/LLM</tspan></text>
+<g filter="url(#shadow)"><rect x="1330" y="185" width="175" height="130" rx="8" fill="#E9E1F5" stroke="#7D5AA6" stroke-width="1.6"/></g>
+<text x="1417.5" y="215" class="label" text-anchor="middle"><tspan x="1417.5" dy="0">典型输出</tspan></text>
+<text x="1417.5" y="243" class="body" text-anchor="middle"><tspan x="1417.5" dy="0">字段/语义</tspan><tspan x="1417.5" dy="20">状态机</tspan></text>
+<line x1="1075" y1="250" x2="1102" y2="250" stroke="#516B91" stroke-width="2.4" marker-end="url(#arrow)"/><line x1="1295" y1="250" x2="1322" y2="250" stroke="#516B91" stroke-width="2.4" marker-end="url(#arrow)"/><g filter="url(#shadow)"><rect x="565" y="450" width="470" height="105" rx="8" fill="#F8D7DA" stroke="#C00000" stroke-width="1.6"/><rect x="565" y="450" width="8" height="105" rx="8" fill="#C00000"/></g>
+<text x="800.0" y="480" class="label" text-anchor="middle"><tspan x="800.0" dy="0">尚未打通的研究空白</tspan></text>
+<text x="800.0" y="508" class="body" text-anchor="middle"><tspan x="800.0" dy="0">未知类、版本演化、连续状态与安全验证缺少统一模型</tspan></text>
+<polyline points="400,395 400,430 565,430 565,480" fill="none" stroke="#516B91" stroke-width="2.4" marker-end="url(#arrow)"/><text x="573" y="422" class="small" text-anchor="start" fill="#516B91"><tspan x="573" dy="0">输入层级不可混用</tspan></text>
+<polyline points="1200,395 1200,430 1035,430 1035,480" fill="none" stroke="#516B91" stroke-width="2.4" marker-end="url(#arrow)"/><text x="1043" y="422" class="small" text-anchor="start" fill="#516B91"><tspan x="1043" dy="0">输出模型难复用</tspan></text>
+<rect x="160" y="610" width="1280" height="145" rx="12" fill="none" stroke="#244A7C" stroke-width="1.5" stroke-dasharray="10 6"/><text x="176" y="632" class="label" text-anchor="start" fill="#244A7C"><tspan x="176" dy="0">本项目的桥接层：统一协议中间表示 + 证据与约束</tspan></text>
+<g filter="url(#shadow)"><rect x="215" y="650" width="200" height="65" rx="8" fill="#DCE8F8" stroke="#244A7C" stroke-width="1.6"/></g>
+<text x="315.0" y="680" class="label" text-anchor="middle"><tspan x="315.0" dy="0">开放集与漂移</tspan></text>
+<g filter="url(#shadow)"><rect x="460" y="650" width="200" height="65" rx="8" fill="#FCE4D6" stroke="#244A7C" stroke-width="1.6"/></g>
+<text x="560.0" y="680" class="label" text-anchor="middle"><tspan x="560.0" dy="0">字段语义</tspan></text>
+<line x1="415" y1="682" x2="452" y2="682" stroke="#516B91" stroke-width="2.4" marker-end="url(#arrow)"/><g filter="url(#shadow)"><rect x="705" y="650" width="200" height="65" rx="8" fill="#E9E1F5" stroke="#244A7C" stroke-width="1.6"/></g>
+<text x="805.0" y="680" class="label" text-anchor="middle"><tspan x="805.0" dy="0">连续状态</tspan></text>
+<line x1="660" y1="682" x2="697" y2="682" stroke="#516B91" stroke-width="2.4" marker-end="url(#arrow)"/><g filter="url(#shadow)"><rect x="950" y="650" width="200" height="65" rx="8" fill="#E5F2D6" stroke="#244A7C" stroke-width="1.6"/></g>
+<text x="1050.0" y="680" class="label" text-anchor="middle"><tspan x="1050.0" dy="0">约束生成</tspan></text>
+<line x1="905" y1="682" x2="942" y2="682" stroke="#516B91" stroke-width="2.4" marker-end="url(#arrow)"/><g filter="url(#shadow)"><rect x="1195" y="650" width="200" height="65" rx="8" fill="#FFF2CC" stroke="#244A7C" stroke-width="1.6"/></g>
+<text x="1295.0" y="680" class="label" text-anchor="middle"><tspan x="1295.0" dy="0">一致性与回归</tspan></text>
+<line x1="1150" y1="682" x2="1187" y2="682" stroke="#516B91" stroke-width="2.4" marker-end="url(#arrow)"/><line x1="800" y1="555" x2="800" y2="602" stroke="#C00000" stroke-width="2.4" marker-end="url(#arrow-red)"/><text x="800.0" y="570.5" class="small" text-anchor="middle" fill="#C00000"><tspan x="800.0" dy="0">项目突破</tspan></text>
+</svg>

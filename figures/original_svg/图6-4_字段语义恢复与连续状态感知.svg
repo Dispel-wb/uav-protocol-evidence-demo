@@ -1,0 +1,52 @@
+<svg viewBox="0 0 1600 820" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <marker id="arrow" markerWidth="11" markerHeight="8" refX="10" refY="4" orient="auto"><path d="M0,0 L11,4 L0,8 z" fill="#516B91"/></marker>
+  <marker id="arrow-red" markerWidth="11" markerHeight="8" refX="10" refY="4" orient="auto"><path d="M0,0 L11,4 L0,8 z" fill="#C00000"/></marker>
+  <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#263648" flood-opacity="0.16"/></filter>
+  <style>
+    text { font-family: 'Microsoft YaHei','Noto Sans SC','PingFang SC',Arial,sans-serif; fill:#273142; }
+    .title { font-size:28px; font-weight:700; fill:#244A7C; }
+    .subtitle { font-size:14px; fill:#667085; }
+    .head { font-size:18px; font-weight:700; }
+    .label { font-size:15px; font-weight:700; }
+    .body { font-size:13px; }
+    .small { font-size:12px; fill:#667085; }
+  </style>
+</defs>
+<rect x="0" y="0" width="1600" height="820" fill="#FFFFFF"/>
+<rect x="24" y="22" width="7" height="48" rx="3" fill="#244A7C"/>
+<text x="48" y="51" class="title">路线三：字段语义恢复与连续状态感知</text>
+<text x="48" y="74" class="subtitle">证据可降级：没有程序仍可运行统计/校验基线，有程序再增强语义</text>
+<line x1="38" y1="91" x2="1562" y2="91" stroke="#B9C5D4" stroke-width="1"/>
+<rect x="50" y="130" width="400" height="600" rx="12" fill="none" stroke="#244A7C" stroke-width="1.5" stroke-dasharray="10 6"/><text x="66" y="152" class="label" text-anchor="start" fill="#244A7C"><tspan x="66" dy="0">多源证据输入</tspan></text>
+<g filter="url(#shadow)"><rect x="95" y="190" width="310" height="80" rx="8" fill="#DCE8F8" stroke="#244A7C" stroke-width="1.6"/></g>
+<text x="250.0" y="220" class="label" text-anchor="middle"><tspan x="250.0" dy="0">流量统计</tspan></text>
+<text x="250.0" y="248" class="body" text-anchor="middle"><tspan x="250.0" dy="0">对齐·熵·分布</tspan></text>
+<g filter="url(#shadow)"><rect x="95" y="315" width="310" height="80" rx="8" fill="#FFF2CC" stroke="#244A7C" stroke-width="1.6"/></g>
+<text x="250.0" y="345" class="label" text-anchor="middle"><tspan x="250.0" dy="0">关系验证</tspan></text>
+<text x="250.0" y="373" class="body" text-anchor="middle"><tspan x="250.0" dy="0">长度·序号·CRC</tspan></text>
+<g filter="url(#shadow)"><rect x="95" y="440" width="310" height="80" rx="8" fill="#E9E1F5" stroke="#244A7C" stroke-width="1.6"/></g>
+<text x="250.0" y="470" class="label" text-anchor="middle"><tspan x="250.0" dy="0">程序证据</tspan></text>
+<text x="250.0" y="498" class="body" text-anchor="middle"><tspan x="250.0" dy="0">污点·变量传播</tspan></text>
+<g filter="url(#shadow)"><rect x="95" y="565" width="310" height="80" rx="8" fill="#E5F2D6" stroke="#244A7C" stroke-width="1.6"/></g>
+<text x="250.0" y="595" class="label" text-anchor="middle"><tspan x="250.0" dy="0">受控动作</tspan></text>
+<text x="250.0" y="623" class="body" text-anchor="middle"><tspan x="250.0" dy="0">遥测·响应·日志</tspan></text>
+<g filter="url(#shadow)"><rect x="520" y="320" width="170" height="105" rx="8" fill="#FCE4D6" stroke="#244A7C" stroke-width="1.6"/></g>
+<text x="605.0" y="350" class="label" text-anchor="middle"><tspan x="605.0" dy="0">字段边界候选</tspan></text>
+<text x="605.0" y="378" class="body" text-anchor="middle"><tspan x="605.0" dy="0">边界分数Sb(i)</tspan></text>
+<g filter="url(#shadow)"><rect x="725" y="470" width="170" height="105" rx="8" fill="#DCE8F8" stroke="#244A7C" stroke-width="1.6"/></g>
+<text x="810.0" y="500" class="label" text-anchor="middle"><tspan x="810.0" dy="0">语义与关系</tspan></text>
+<text x="810.0" y="528" class="body" text-anchor="middle"><tspan x="810.0" dy="0">类型·依赖·证据</tspan></text>
+<line x1="690" y1="372" x2="717" y2="522" stroke="#516B91" stroke-width="2.4" marker-end="url(#arrow)"/><g filter="url(#shadow)"><rect x="930" y="320" width="170" height="105" rx="8" fill="#E5F2D6" stroke="#244A7C" stroke-width="1.6"/></g>
+<text x="1015.0" y="350" class="label" text-anchor="middle"><tspan x="1015.0" dy="0">消息关联</tspan></text>
+<text x="1015.0" y="378" class="body" text-anchor="middle"><tspan x="1015.0" dy="0">方向·邻近·响应</tspan></text>
+<line x1="895" y1="522" x2="922" y2="372" stroke="#516B91" stroke-width="2.4" marker-end="url(#arrow)"/><g filter="url(#shadow)"><rect x="1135" y="470" width="170" height="105" rx="8" fill="#E9E1F5" stroke="#244A7C" stroke-width="1.6"/></g>
+<text x="1220.0" y="500" class="label" text-anchor="middle"><tspan x="1220.0" dy="0">状态机推断</tspan></text>
+<text x="1220.0" y="528" class="body" text-anchor="middle"><tspan x="1220.0" dy="0">状态·转移·守卫</tspan></text>
+<line x1="1100" y1="372" x2="1127" y2="522" stroke="#516B91" stroke-width="2.4" marker-end="url(#arrow)"/><g filter="url(#shadow)"><rect x="1340" y="320" width="170" height="105" rx="8" fill="#FFF2CC" stroke="#244A7C" stroke-width="1.6"/></g>
+<text x="1425.0" y="350" class="label" text-anchor="middle"><tspan x="1425.0" dy="0">在线跟踪</tspan></text>
+<text x="1425.0" y="378" class="body" text-anchor="middle"><tspan x="1425.0" dy="0">当前状态·下一步</tspan></text>
+<line x1="1305" y1="522" x2="1332" y2="372" stroke="#516B91" stroke-width="2.4" marker-end="url(#arrow)"/><line x1="450" y1="230" x2="510" y2="372" stroke="#516B91" stroke-width="2.4" marker-end="url(#arrow)" stroke-dasharray="7 5"/><line x1="450" y1="355" x2="510" y2="372" stroke="#516B91" stroke-width="2.4" marker-end="url(#arrow)" stroke-dasharray="7 5"/><line x1="450" y1="480" x2="510" y2="522" stroke="#516B91" stroke-width="2.4" marker-end="url(#arrow)" stroke-dasharray="7 5"/><line x1="450" y1="605" x2="510" y2="522" stroke="#516B91" stroke-width="2.4" marker-end="url(#arrow)" stroke-dasharray="7 5"/><g filter="url(#shadow)"><rect x="1050" y="650" width="470" height="75" rx="8" fill="#EEF4FB" stroke="#244A7C" stroke-width="1.6"/><rect x="1050" y="650" width="8" height="75" rx="8" fill="#244A7C"/></g>
+<text x="1285.0" y="680" class="label" text-anchor="middle"><tspan x="1285.0" dy="0">输出</tspan></text>
+<text x="1285.0" y="708" class="body" text-anchor="middle"><tspan x="1285.0" dy="0">字段/消息/状态候选 · 置信度 · 证据索引 · 歧义路径</tspan></text>
+<line x1="1510" y1="522" x2="1510" y2="642" stroke="#516B91" stroke-width="2.4" marker-end="url(#arrow)"/></svg>

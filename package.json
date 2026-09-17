@@ -1,0 +1,9 @@
+{
+  "name": "uav-protocol-evidence-demo",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test": "node tests/test_decoder.js"
+  }
+}
+

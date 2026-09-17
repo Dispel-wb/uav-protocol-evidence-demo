@@ -1,0 +1,60 @@
+<svg viewBox="0 0 1600 820" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <marker id="arrow" markerWidth="11" markerHeight="8" refX="10" refY="4" orient="auto"><path d="M0,0 L11,4 L0,8 z" fill="#516B91"/></marker>
+  <marker id="arrow-red" markerWidth="11" markerHeight="8" refX="10" refY="4" orient="auto"><path d="M0,0 L11,4 L0,8 z" fill="#C00000"/></marker>
+  <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#263648" flood-opacity="0.16"/></filter>
+  <style>
+    text { font-family: 'Microsoft YaHei','Noto Sans SC','PingFang SC',Arial,sans-serif; fill:#273142; }
+    .title { font-size:28px; font-weight:700; fill:#244A7C; }
+    .subtitle { font-size:14px; fill:#667085; }
+    .head { font-size:18px; font-weight:700; }
+    .label { font-size:15px; font-weight:700; }
+    .body { font-size:13px; }
+    .small { font-size:12px; fill:#667085; }
+  </style>
+</defs>
+<rect x="0" y="0" width="1600" height="820" fill="#FFFFFF"/>
+<rect x="24" y="22" width="7" height="48" rx="3" fill="#244A7C"/>
+<text x="48" y="51" class="title">项目痛点—研究内容—预期价值映射</text>
+<text x="48" y="74" class="subtitle">问题驱动技术选择，四项研究内容逐一回应真实需求</text>
+<line x1="38" y1="91" x2="1562" y2="91" stroke="#B9C5D4" stroke-width="1"/>
+<text x="220" y="135" class="head" text-anchor="middle" fill="#6B8E3F"><tspan x="220" dy="0">现实痛点</tspan></text>
+<text x="800" y="135" class="head" text-anchor="middle" fill="#C87931"><tspan x="800" dy="0">对应研究内容</tspan></text>
+<text x="1380" y="135" class="head" text-anchor="middle" fill="#244A7C"><tspan x="1380" dy="0">形成价值</tspan></text>
+<g filter="url(#shadow)"><rect x="55" y="170" width="400" height="112" rx="8" fill="#E5F2D6" stroke="#6B8E3F" stroke-width="1.6"/><rect x="55" y="170" width="8" height="112" rx="8" fill="#6B8E3F"/></g>
+<text x="255.0" y="200" class="label" text-anchor="middle"><tspan x="255.0" dy="0">未知协议被强制归类</tspan></text>
+<text x="255.0" y="228" class="body" text-anchor="middle"><tspan x="255.0" dy="0">新型号/新版本高置信误判</tspan></text>
+<g filter="url(#shadow)"><rect x="600" y="170" width="400" height="112" rx="8" fill="#FCE4D6" stroke="#C87931" stroke-width="1.6"/><rect x="600" y="170" width="8" height="112" rx="8" fill="#C87931"/></g>
+<text x="800.0" y="200" class="label" text-anchor="middle"><tspan x="800.0" dy="0">COPD开放集识别</tspan></text>
+<text x="800.0" y="228" class="body" text-anchor="middle"><tspan x="800.0" dy="0">校准拒识·聚类·漂移归因</tspan></text>
+<g filter="url(#shadow)"><rect x="1145" y="170" width="400" height="112" rx="8" fill="#DCE8F8" stroke="#244A7C" stroke-width="1.6"/><rect x="1145" y="170" width="8" height="112" rx="8" fill="#244A7C"/></g>
+<text x="1345.0" y="200" class="label" text-anchor="middle"><tspan x="1345.0" dy="0">持续适配</tspan></text>
+<text x="1345.0" y="228" class="body" text-anchor="middle"><tspan x="1345.0" dy="0">发现新协议与版本候选</tspan></text>
+<line x1="455" y1="226" x2="592" y2="226" stroke="#516B91" stroke-width="2.4" marker-end="url(#arrow)"/><line x1="1000" y1="226" x2="1137" y2="226" stroke="#516B91" stroke-width="2.4" marker-end="url(#arrow)"/><g filter="url(#shadow)"><rect x="55" y="315" width="400" height="112" rx="8" fill="#E5F2D6" stroke="#6B8E3F" stroke-width="1.6"/><rect x="55" y="315" width="8" height="112" rx="8" fill="#6B8E3F"/></g>
+<text x="255.0" y="345" class="label" text-anchor="middle"><tspan x="255.0" dy="0">结构与语义断裂</tspan></text>
+<text x="255.0" y="373" class="body" text-anchor="middle"><tspan x="255.0" dy="0">类别标签无法解释字段含义</tspan></text>
+<g filter="url(#shadow)"><rect x="600" y="315" width="400" height="112" rx="8" fill="#FCE4D6" stroke="#C87931" stroke-width="1.6"/><rect x="600" y="315" width="8" height="112" rx="8" fill="#C87931"/></g>
+<text x="800.0" y="345" class="label" text-anchor="middle"><tspan x="800.0" dy="0">EHM-G + MS²R</tspan></text>
+<text x="800.0" y="373" class="body" text-anchor="middle"><tspan x="800.0" dy="0">四层模型·多证据语义恢复</tspan></text>
+<g filter="url(#shadow)"><rect x="1145" y="315" width="400" height="112" rx="8" fill="#DCE8F8" stroke="#244A7C" stroke-width="1.6"/><rect x="1145" y="315" width="8" height="112" rx="8" fill="#244A7C"/></g>
+<text x="1345.0" y="345" class="label" text-anchor="middle"><tspan x="1345.0" dy="0">降低人工成本</tspan></text>
+<text x="1345.0" y="373" class="body" text-anchor="middle"><tspan x="1345.0" dy="0">字段与消息候选可追溯</tspan></text>
+<line x1="455" y1="371" x2="592" y2="371" stroke="#516B91" stroke-width="2.4" marker-end="url(#arrow)"/><line x1="1000" y1="371" x2="1137" y2="371" stroke="#516B91" stroke-width="2.4" marker-end="url(#arrow)"/><g filter="url(#shadow)"><rect x="55" y="460" width="400" height="112" rx="8" fill="#E5F2D6" stroke="#6B8E3F" stroke-width="1.6"/><rect x="55" y="460" width="8" height="112" rx="8" fill="#6B8E3F"/></g>
+<text x="255.0" y="490" class="label" text-anchor="middle"><tspan x="255.0" dy="0">单包无法理解行为</tspan></text>
+<text x="255.0" y="518" class="body" text-anchor="middle"><tspan x="255.0" dy="0">握手/控制/重连缺少状态</tspan></text>
+<g filter="url(#shadow)"><rect x="600" y="460" width="400" height="112" rx="8" fill="#FCE4D6" stroke="#C87931" stroke-width="1.6"/><rect x="600" y="460" width="8" height="112" rx="8" fill="#C87931"/></g>
+<text x="800.0" y="490" class="label" text-anchor="middle"><tspan x="800.0" dy="0">连续状态感知</tspan></text>
+<text x="800.0" y="518" class="body" text-anchor="middle"><tspan x="800.0" dy="0">FSM/EFSM·守卫·在线跟踪</tspan></text>
+<g filter="url(#shadow)"><rect x="1145" y="460" width="400" height="112" rx="8" fill="#DCE8F8" stroke="#244A7C" stroke-width="1.6"/><rect x="1145" y="460" width="8" height="112" rx="8" fill="#244A7C"/></g>
+<text x="1345.0" y="490" class="label" text-anchor="middle"><tspan x="1345.0" dy="0">行为可解释</tspan></text>
+<text x="1345.0" y="518" class="body" text-anchor="middle"><tspan x="1345.0" dy="0">当前状态与允许下一步</tspan></text>
+<line x1="455" y1="516" x2="592" y2="516" stroke="#516B91" stroke-width="2.4" marker-end="url(#arrow)"/><line x1="1000" y1="516" x2="1137" y2="516" stroke="#516B91" stroke-width="2.4" marker-end="url(#arrow)"/><g filter="url(#shadow)"><rect x="55" y="605" width="400" height="112" rx="8" fill="#E5F2D6" stroke="#6B8E3F" stroke-width="1.6"/><rect x="55" y="605" width="8" height="112" rx="8" fill="#6B8E3F"/></g>
+<text x="255.0" y="635" class="label" text-anchor="middle"><tspan x="255.0" dy="0">识别与安全测试割裂</tspan></text>
+<text x="255.0" y="663" class="body" text-anchor="middle"><tspan x="255.0" dy="0">异常分数不能直接复核</tspan></text>
+<g filter="url(#shadow)"><rect x="600" y="605" width="400" height="112" rx="8" fill="#FCE4D6" stroke="#C87931" stroke-width="1.6"/><rect x="600" y="605" width="8" height="112" rx="8" fill="#C87931"/></g>
+<text x="800.0" y="635" class="label" text-anchor="middle"><tspan x="800.0" dy="0">PCEF一致性闭环</tspan></text>
+<text x="800.0" y="663" class="body" text-anchor="middle"><tspan x="800.0" dy="0">四类检查·证据·回归</tspan></text>
+<g filter="url(#shadow)"><rect x="1145" y="605" width="400" height="112" rx="8" fill="#DCE8F8" stroke="#244A7C" stroke-width="1.6"/><rect x="1145" y="605" width="8" height="112" rx="8" fill="#244A7C"/></g>
+<text x="1345.0" y="635" class="label" text-anchor="middle"><tspan x="1345.0" dy="0">测试可复用</tspan></text>
+<text x="1345.0" y="663" class="body" text-anchor="middle"><tspan x="1345.0" dy="0">风险路径转回归用例</tspan></text>
+<line x1="455" y1="661" x2="592" y2="661" stroke="#516B91" stroke-width="2.4" marker-end="url(#arrow)"/><line x1="1000" y1="661" x2="1137" y2="661" stroke="#516B91" stroke-width="2.4" marker-end="url(#arrow)"/></svg>
