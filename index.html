@@ -27,12 +27,12 @@
       <a href="#capture" title="字节输入" aria-label="字节输入"><svg class="ico"><use href="#i-code"/></svg></a>
       <a href="#frames" title="帧解析" aria-label="帧解析"><svg class="ico"><use href="#i-branch"/></svg></a>
       <a href="#findings-panel" title="证据报告" aria-label="证据报告"><svg class="ico"><use href="#i-shield"/></svg></a>
-      <div class="rail-spacer"></div><span class="rail-version">V0.2</span>
+      <div class="rail-spacer"></div><span class="rail-version">V0.3</span>
     </nav>
     <div class="shellmain">
       <header class="topbar"><strong>谱航智析 <span>/</span> 协议验证工作台</strong><small><i></i> 解调后数据 · 本地运行</small></header>
       <main class="content" id="overview">
-        <div class="intro"><div><div class="kicker">PROTOCOL EVIDENCE LAB</div><h1>从字节流到可复核结论</h1><p>识别 MAVLink 1/2 与 SBUS，解析帧和字段，再按可修改的规则检查会话。</p></div><div class="edition">离线演示 · 无需射频设备</div></div>
+        <div class="intro"><div><div class="kicker">PROTOCOL EVIDENCE LAB</div><h1>从字节流到可复核结论</h1><p>识别已知协议；对重复出现的未知报文推断帧边界、字段规律与候选校验。</p></div><div class="edition">离线演示 · 无需射频设备</div></div>
         <div class="notice"><svg class="ico"><use href="#i-alert"/></svg><span>输入从<strong>解调后的字节</strong>开始。本程序不解调射频、不破解加密协议，也不验证 MAVLink 2 签名；未知消息保留原始字节并标出验证边界。</span></div>
         <div class="metrics" aria-label="分析概要">
           <div><span>输入字节</span><strong id="m-bytes">—</strong></div><div><span>识别帧</span><strong id="m-frames">—</strong></div><div><span>MAVLink</span><strong id="m-mav">—</strong></div><div><span>SBUS</span><strong id="m-sbus">—</strong></div><div><span>待复核项</span><strong id="m-findings">—</strong></div>
@@ -60,14 +60,15 @@
               <div class="tablewrap"><table><thead><tr><th>偏移</th><th>协议</th><th>消息 / 数据</th><th>完整性</th><th>解析重点</th><th>检查</th></tr></thead><tbody id="frame-rows"></tbody></table></div>
               <div class="detail" id="frame-detail"><span class="muted">点击上方任意帧，查看其原始字节与解析字段。</span></div>
             </section>
+            <section class="panel" id="discovery-panel"><div class="panel-head"><svg class="ico"><use href="#i-branch"/></svg><h2>未知协议结构发现</h2><span class="panel-sub" id="discovery-count">—</span></div><div class="panel-body" id="discovery"></div></section>
             <section class="panel" id="findings-panel"><div class="panel-head"><svg class="ico"><use href="#i-shield"/></svg><h2>可复核证据</h2><span class="panel-sub" id="finding-count">—</span></div><div class="panel-body"><div id="findings"></div><div class="button-row"><button id="download" class="secondary" disabled><svg class="ico mini"><use href="#i-download"/></svg>导出 JSON 证据报告</button></div></div></section>
-            <section class="method"><svg class="ico"><use href="#i-file"/></svg><div><strong>演示边界</strong><p>样本字节由参考 MAVLink 编码器与 SBUS 位打包器生成。解析器只对已收录的消息定义验证 CRC_EXTRA；SBUS 没有同类 CRC，因此仅检查帧边界、通道与状态标志。所有判定均附原始字节和偏移量。</p></div></section>
+            <section class="method"><svg class="ico"><use href="#i-file"/></svg><div><strong>演示边界</strong><p>未知结构须有多帧重复样本；程序只能提出可复核的结构假设，不能仅凭字节证明协议名称或字段业务含义。已知协议的校验和状态规则仍按各自定义执行。</p></div></section>
           </div>
         </div>
         <footer>谱航智析 · 本地离线演示 · 输入与报告仅留在当前浏览器</footer>
       </main>
     </div>
   </div>
-  <script src="src/decoder.js"></script><script src="src/samples.js"></script><script src="src/app.js"></script>
+  <script src="src/decoder.js"></script><script src="src/discovery.js"></script><script src="src/samples.js"></script><script src="src/app.js"></script>
 </body>
 </html>

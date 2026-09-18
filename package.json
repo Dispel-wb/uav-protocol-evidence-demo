@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "test": "node tests/test_decoder.js"
+    "test": "node tests/test_decoder.js && node tests/test_discovery.js"
   }
 }
-

@@ -1,0 +1,30 @@
+const assert=require('node:assert/strict');
+const samples=require('../samples/catalog.json');
+const decoder=require('../src/decoder');
+const discovery=require('../src/discovery');
+function run(id) {
+  const bytes=decoder.parseHex(samples.find(s=>s.id===id).hex);
+  const parsed=decoder.scan(bytes);
+  return {parsed,inferred:discovery.infer(bytes,parsed.gaps)};
+}
+let r=run('unknown-two-families');
+assert.equal(r.parsed.frames.length,0);
+assert.equal(r.inferred.families.length,2);
+assert.deepEqual(r.inferred.families.map(f=>f.packetCount),[4,4]);
+assert.deepEqual(r.inferred.families.map(f=>f.checksum),['sum8','xor8']);
+assert.deepEqual(r.inferred.families.map(f=>f.lengthOffset),[2,3]);
+assert.equal(r.inferred.unexplainedBytes,0);
+assert(r.inferred.families[0].columns.some(c=>c.label==='候选序号'));
+assert(r.inferred.families[0].columns.some(c=>c.label==='候选类型'));
+r=run('known-unknown-mix');
+assert.equal(r.parsed.frames.length,1);
+assert.equal(r.parsed.frames[0].family,'MAVLink 2');
+assert.equal(r.inferred.families.length,2);
+assert.equal(r.inferred.families.reduce((n,f)=>n+f.packetCount,0),8);
+r=run('mavlink2-normal');
+assert.equal(r.inferred.families.length,0);
+const single=Uint8Array.from([0xA6,0x5C,3,0x31,0,0x13,0x52,0x27,0x78]);
+assert.equal(discovery.infer(single,[{offset:0,length:single.length}]).families.length,0);
+const noise=Uint8Array.from({length:96},(_,i)=>(i*73+19)&255);
+assert.equal(discovery.infer(noise,[{offset:0,length:noise.length}]).families.length,0);
+console.log('discovery: 15 assertions across unknown, mixed, known-only, single-frame and noise captures passed');
