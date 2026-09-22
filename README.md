@@ -37,6 +37,7 @@ npm run select:iq
 npm run test:e2e
 npm run evaluate:fsk
 npm run stream:replay
+npm run stream:state
 ```
 
 固定回归样本位于 `samples/iq/fsk_demo.sigmf-*`，对应质量和解调报告为 `reports/iq_quality_fsk_demo.json` 与 `reports/fsk_demod_report.json`。当前闭环对带频偏和噪声的2-FSK样本完成频偏估计、频移校正、FIR滤波、增益归一化、符号定时、判决和同步字搜索，随后把恢复字节交给原有协议解析器，验证出CRC有效的MAVLink 2心跳帧。
@@ -62,7 +63,9 @@ python -m rf.capture_sdr --args "driver=设备驱动名" --frequency 433920000 -
 
 `rf/full_pipeline.py` 已把统一采样源、信号质量分析、2-FSK候选解调和协议CRC反馈连接成有限窗口闭环。数组回放测试能够从分块采样重新选择1200 Bd并恢复有效MAVLink帧。
 
-`rf/streaming_pipeline.py` 进一步用有界队列隔离采样线程与分析阶段，支持连续分块、背压计数、设备异常上报、逐窗口协议判定和MAVLink序号连续性检查。`npm run stream:replay` 将固定录制连续回放3次，当前3个窗口均选择1200 Bd并恢复CRC有效帧；重复序号也被记录为2次重复，而不会误报成两个新状态。报告写入 `reports/streaming_pipeline.json`。报告中的延迟来自本机数组回放，只用于软件回归，不能代替真实SDR的实时性能测量。
+`rf/streaming_pipeline.py` 进一步用有界队列隔离采样线程与分析阶段，支持连续分块、背压计数、设备异常上报、逐窗口协议判定和MAVLink序号连续性检查。`rf/protocol_state.py` 将CRC有效的心跳、命令和应答跨窗口连接成状态证据，报告缺少解锁前提、孤立应答和缺少应答；重复帧不会再次推进状态。“TAKEOFF已接受”只表示命令应答，不代表飞行器已经离地。`npm run stream:replay` 将固定录制连续回放3次，当前3个窗口均选择1200 Bd并恢复CRC有效帧；重复序号被记录为2次重复，最终状态保持为 `disarmed`。报告写入 `reports/streaming_pipeline.json`。报告中的延迟来自本机数组回放，只用于软件回归，不能代替真实SDR的实时性能测量。
+
+`npm run stream:state` 执行更完整的合成射频轨迹：未解锁心跳、解锁命令、成功应答、已解锁心跳、起飞命令和成功应答分别编码为6个2-FSK IQ窗口。当前6个窗口全部完成解调和CRC验证，最终形成2组命令—应答关系并到达 `takeoff-accepted`，没有状态违规；报告位于 `reports/streaming_state_trajectory.json`。
 
 网页交互原型仍从**已解调的字节**开始；仓库中的离线后端和有限窗口采样接口已能处理合成2-FSK IQ，但尚无真实SDR实测，也不能处理任意调制或加密流。未知字段的业务含义、协议名称及设备行为无法仅从孤立字节证明；结构发现也不能保证覆盖所有封装方式。MAVLink 2 签名位会显示，但尚未进行签名认证。规则判定是演示算法，不构成飞控安全认证；SBUS 通道值不依赖具体遥控器的校准范围解释为物理量。
 

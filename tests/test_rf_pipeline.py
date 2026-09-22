@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+import struct
 import tempfile
 import unittest
 
@@ -9,12 +10,14 @@ from rf.generate_iq_fixture import generate
 from rf.fsk_demod import demodulate, preprocess
 from rf.candidate_selector import select
 from rf.protocol_feedback import mavlink_evidence, update_mavlink_continuity
+from rf.protocol_state import ProtocolStateTracker
 from rf.ring_buffer import ComplexRingBuffer
 from rf.stream_capture import ArraySource, CaptureConfig, capture, capture_to_sigmf
 from rf.streaming_pipeline import run_streaming
 from rf.full_pipeline import run as run_full_pipeline
 from rf.sigmf_io import load
 from rf.signal_quality import analyze, remove_dc
+from rf.state_fixture import command_payload, mavlink2, synthesize_trajectory
 
 
 class RFInputTests(unittest.TestCase):
@@ -84,6 +87,79 @@ class RFInputTests(unittest.TestCase):
         self.assertEqual(observe(250)["status"], "out-of-order")
         self.assertEqual(observe(2)["status"], "continuous")
 
+    def test_protocol_state_tracks_command_ack_and_ignores_duplicate_windows(self):
+        heartbeat_disarmed = bytearray(9)
+        heartbeat_armed = bytearray(9)
+        heartbeat_armed[6] = 0x80
+        arm = struct.pack("<7fHBBB", 1, 0, 0, 0, 0, 0, 0, 400, 1, 1, 0)
+        takeoff = struct.pack("<7fHBBB", 0, 0, 0, 0, 0, 0, 20, 22, 1, 1, 0)
+        arm_ack = struct.pack("<HB", 400, 0)
+        takeoff_ack = struct.pack("<HB", 22, 0)
+        packets = [
+            mavlink2(0, heartbeat_disarmed, 0),
+            mavlink2(76, arm, 0, 255, 190),
+            mavlink2(77, arm_ack, 1),
+            mavlink2(0, heartbeat_armed, 2),
+            mavlink2(76, takeoff, 1, 255, 190),
+            mavlink2(77, takeoff_ack, 3),
+        ]
+        tracker = ProtocolStateTracker()
+        for index, packet in enumerate(packets):
+            evidence = mavlink_evidence(packet)
+            self.assertEqual(evidence["validFrames"], 1)
+            tracker.update(evidence["frames"], index)
+        tracker.update(mavlink_evidence(packets[-1])["frames"], len(packets))
+        result = tracker.finalize()
+        self.assertEqual(result["finalState"], "takeoff-accepted")
+        self.assertEqual(len(result["links"]), 2)
+        self.assertEqual(result["violations"], [])
+        self.assertEqual(result["ignoredDuplicateFrames"], 1)
+
+    def test_protocol_state_reports_takeoff_without_armed_evidence_or_ack(self):
+        takeoff = command_payload(22, param7=20)
+        packet = mavlink2(76, takeoff, 0, 255, 190)
+        tracker = ProtocolStateTracker()
+        tracker.update(mavlink_evidence(packet)["frames"], 0)
+        result = tracker.finalize()
+        types = {item["type"] for item in result["violations"]}
+        self.assertEqual(result["finalState"], "takeoff-requested")
+        self.assertEqual(types, {"precondition", "missing-ack"})
+        self.assertEqual(tracker.finalize()["violations"], result["violations"])
+
+    def test_protocol_state_duplicate_memory_expires_before_sequence_wrap(self):
+        heartbeat = bytearray(9)
+        frame = mavlink_evidence(mavlink2(0, heartbeat, 0))["frames"]
+        tracker = ProtocolStateTracker()
+        tracker.update(frame, 0)
+        tracker.update([], 1)
+        tracker.update([], 2)
+        tracker.update(frame, 3)
+        result = tracker.finalize()
+        self.assertEqual(result["ignoredDuplicateFrames"], 0)
+
+    def test_full_rf_trajectory_reaches_takeoff_accepted(self):
+        samples, truth = synthesize_trajectory()
+        config = CaptureConfig(
+            center_frequency=433_920_000,
+            sample_rate=truth["sampleRate"],
+            duration_seconds=samples.size / truth["sampleRate"],
+            chunk_samples=710,
+            ring_samples=truth["windowSamples"],
+        )
+        report = run_streaming(
+            ArraySource(samples, truth["sampleRate"]),
+            config,
+            [800, 1_200, 2_400],
+            analysis_window_samples=truth["windowSamples"],
+            hop_samples=truth["windowSamples"],
+            queue_capacity=2,
+        )
+        state = report["analysis"]["protocolState"]
+        self.assertEqual(report["analysis"]["validProtocolWindows"], truth["windows"])
+        self.assertEqual(state["finalState"], truth["expectedFinalState"])
+        self.assertEqual(len(state["links"]), 2)
+        self.assertEqual(state["violations"], [])
+
     def test_ci16_reader(self):
         with tempfile.TemporaryDirectory() as directory:
             base = Path(directory) / "ci16"
@@ -142,6 +218,8 @@ class RFInputTests(unittest.TestCase):
             self.assertEqual(report["analysis"]["validProtocolWindows"], repeats)
             self.assertEqual(report["analysis"]["protocolContinuity"]["duplicates"], 2)
             self.assertEqual(report["analysis"]["protocolContinuity"]["missingFrames"], 0)
+            self.assertEqual(report["analysis"]["protocolState"]["finalState"], "disarmed")
+            self.assertEqual(report["analysis"]["protocolState"]["ignoredDuplicateFrames"], 2)
             self.assertEqual(report["capture"]["overflows"], 0)
             self.assertIsNotNone(report["analysis"]["latencyMilliseconds"]["p95"])
             self.assertTrue(all(

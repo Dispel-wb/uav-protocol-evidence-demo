@@ -11,6 +11,7 @@ import numpy as np
 
 from rf.candidate_selector import select
 from rf.protocol_feedback import mavlink_evidence, update_mavlink_continuity
+from rf.protocol_state import ProtocolStateTracker
 from rf.ring_buffer import ComplexRingBuffer
 from rf.stream_capture import CaptureConfig, SampleSource, StreamChunk
 
@@ -132,6 +133,7 @@ def run_streaming(
     decision_latencies = []
     last_sequences: dict[tuple[int, int], int] = {}
     continuity_totals = {"missingFrames": 0, "duplicates": 0, "outOfOrder": 0}
+    state_tracker = ProtocolStateTracker()
     analysis_error = None
     try:
         while True:
@@ -156,6 +158,7 @@ def run_streaming(
                 if chosen_hex else {"frames": []}
             )
             continuity = update_mavlink_continuity(evidence, last_sequences)
+            state_delta = state_tracker.update(evidence["frames"], len(window_reports))
             for key in continuity_totals:
                 continuity_totals[key] += continuity[key]
             finished_ns = time.perf_counter_ns()
@@ -170,6 +173,7 @@ def run_streaming(
                 "validProtocolFrames": selection["validProtocolFrames"],
                 "chosenPayloadHex": chosen_hex,
                 "protocolContinuity": continuity,
+                "protocolState": state_delta,
             })
     except BaseException as error:
         analysis_error = error
@@ -185,6 +189,7 @@ def run_streaming(
 
     elapsed_ms = (time.perf_counter_ns() - started_ns) / 1e6
     valid_windows = sum(item["validProtocolFrames"] > 0 for item in window_reports)
+    state_evidence = state_tracker.finalize()
     return {
         "schema": "streaming-rf-pipeline-v1",
         "hardware": source.hardware,
@@ -206,6 +211,7 @@ def run_streaming(
                 "max": max(decision_latencies, default=None),
             },
             "protocolContinuity": continuity_totals,
+            "protocolState": state_evidence,
             "windows": window_reports,
         },
         "elapsedMilliseconds": elapsed_ms,

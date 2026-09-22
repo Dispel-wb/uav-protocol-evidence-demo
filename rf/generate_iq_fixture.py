@@ -11,6 +11,7 @@ PAYLOAD = bytes.fromhex("FD 09 00 00 00 01 01 00 00 00 00 00 00 00 02 03 00 04 0
 
 def synthesize(
     *,
+    payload: bytes = PAYLOAD,
     noise_std: float = 0.04,
     carrier_offset: float = 1_200,
     deviation: float = 3_000,
@@ -18,14 +19,18 @@ def synthesize(
     sample_rate: float = 48_000,
     symbol_rate: float = 1_200,
     seed: int = 20260923,
+    window_samples: int | None = None,
 ) -> tuple[np.ndarray, dict]:
     samples_per_symbol = int(round(sample_rate / symbol_rate))
     if samples_per_symbol <= 0 or not np.isclose(samples_per_symbol, sample_rate / symbol_rate):
         raise ValueError("synthetic fixture requires integer samples per symbol")
-    framed = PREAMBLE + PAYLOAD
+    framed = PREAMBLE + payload
     bits = np.unpackbits(np.frombuffer(framed, dtype=np.uint8), bitorder="big")
     start, burst_samples = 1_600, bits.size * samples_per_symbol
-    end, total = start + burst_samples, start + burst_samples + 1_600
+    end = start + burst_samples
+    total = window_samples or end + 1_600
+    if total < end:
+        raise ValueError("window is shorter than the encoded burst")
     rng = np.random.default_rng(seed)
     noise = rng.normal(0, noise_std, total) + 1j * rng.normal(0, noise_std, total)
     samples = noise.astype(np.complex64)
@@ -46,7 +51,7 @@ def synthesize(
         "startSample": start,
         "endSample": end,
         "preambleHex": PREAMBLE.hex(" ").upper(),
-        "payloadHex": PAYLOAD.hex(" ").upper(),
+        "payloadHex": payload.hex(" ").upper(),
     }
     return samples, truth
 

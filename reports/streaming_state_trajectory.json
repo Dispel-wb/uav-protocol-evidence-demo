@@ -1,0 +1,361 @@
+{
+  "schema": "streaming-rf-pipeline-v1",
+  "hardware": "array-replay",
+  "config": {
+    "center_frequency": 433920000,
+    "sample_rate": 48000,
+    "duration_seconds": 2.84,
+    "gain": null,
+    "bandwidth": null,
+    "channel": 0,
+    "chunk_samples": 710,
+    "ring_samples": 22720
+  },
+  "analysisWindowSamples": 22720,
+  "hopSamples": 22720,
+  "queueCapacity": 2,
+  "capture": {
+    "receivedSamples": 136320,
+    "timeouts": 0,
+    "overflows": 0,
+    "emptyReads": 0,
+    "timestampJumps": 0,
+    "queueBackpressureEvents": 0,
+    "targetSamples": 136320,
+    "complete": true
+  },
+  "analysis": {
+    "analyzedWindows": 6,
+    "validProtocolWindows": 6,
+    "latencyMilliseconds": {
+      "p50": 29.46215,
+      "p95": 52.429825,
+      "max": 52.4472
+    },
+    "protocolContinuity": {
+      "missingFrames": 0,
+      "duplicates": 0,
+      "outOfOrder": 0
+    },
+    "protocolState": {
+      "schema": "streaming-protocol-state-evidence-v1",
+      "finalState": "takeoff-accepted",
+      "timeline": [
+        {
+          "windowIndex": 0,
+          "frameOffset": 0,
+          "from": "unknown",
+          "to": "disarmed",
+          "evidence": "HEARTBEAT armed=False"
+        },
+        {
+          "windowIndex": 1,
+          "frameOffset": 0,
+          "from": "disarmed",
+          "to": "arming-requested",
+          "evidence": "COMMAND_LONG COMPONENT_ARM_DISARM"
+        },
+        {
+          "windowIndex": 2,
+          "frameOffset": 0,
+          "from": "arming-requested",
+          "to": "armed",
+          "evidence": "ARM_DISARM ACK accepted"
+        },
+        {
+          "windowIndex": 4,
+          "frameOffset": 0,
+          "from": "armed",
+          "to": "takeoff-requested",
+          "evidence": "COMMAND_LONG NAV_TAKEOFF"
+        },
+        {
+          "windowIndex": 5,
+          "frameOffset": 0,
+          "from": "takeoff-requested",
+          "to": "takeoff-accepted",
+          "evidence": "TAKEOFF ACK accepted"
+        }
+      ],
+      "links": [
+        {
+          "command": "COMPONENT_ARM_DISARM",
+          "requestWindowIndex": 1,
+          "ackWindowIndex": 2,
+          "result": "ACCEPTED"
+        },
+        {
+          "command": "NAV_TAKEOFF",
+          "requestWindowIndex": 4,
+          "ackWindowIndex": 5,
+          "result": "ACCEPTED"
+        }
+      ],
+      "violations": [],
+      "ignoredDuplicateFrames": 0,
+      "boundary": "State is inferred only from CRC-valid observed messages; an accepted TAKEOFF command does not prove that the aircraft left the ground."
+    },
+    "windows": [
+      {
+        "startSample": 0,
+        "endSample": 22720,
+        "processingMilliseconds": 30.0,
+        "ingestToDecisionMilliseconds": 30.0362,
+        "chosenSymbolRate": 1200.0,
+        "validProtocolFrames": 1,
+        "chosenPayloadHex": "FD 09 00 00 00 01 01 00 00 00 00 00 00 00 00 00 00 00 00 D9 8B",
+        "protocolContinuity": {
+          "observations": [
+            {
+              "systemId": 1,
+              "componentId": 1,
+              "sequence": 0,
+              "previousSequence": null,
+              "status": "first",
+              "missingFrames": 0
+            }
+          ],
+          "missingFrames": 0,
+          "duplicates": 0,
+          "outOfOrder": 0
+        },
+        "protocolState": {
+          "state": "disarmed",
+          "newTimeline": [
+            {
+              "windowIndex": 0,
+              "frameOffset": 0,
+              "from": "unknown",
+              "to": "disarmed",
+              "evidence": "HEARTBEAT armed=False"
+            }
+          ],
+          "newLinks": [],
+          "newViolations": [],
+          "ignoredDuplicates": 0
+        }
+      },
+      {
+        "startSample": 22720,
+        "endSample": 45440,
+        "processingMilliseconds": 52.3593,
+        "ingestToDecisionMilliseconds": 52.3777,
+        "chosenSymbolRate": 1200.0,
+        "validProtocolFrames": 1,
+        "chosenPayloadHex": "FD 21 00 00 00 FF BE 4C 00 00 00 00 80 3F 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 90 01 01 01 00 21 DD",
+        "protocolContinuity": {
+          "observations": [
+            {
+              "systemId": 255,
+              "componentId": 190,
+              "sequence": 0,
+              "previousSequence": null,
+              "status": "first",
+              "missingFrames": 0
+            }
+          ],
+          "missingFrames": 0,
+          "duplicates": 0,
+          "outOfOrder": 0
+        },
+        "protocolState": {
+          "state": "arming-requested",
+          "newTimeline": [
+            {
+              "windowIndex": 1,
+              "frameOffset": 0,
+              "from": "disarmed",
+              "to": "arming-requested",
+              "evidence": "COMMAND_LONG COMPONENT_ARM_DISARM"
+            }
+          ],
+          "newLinks": [],
+          "newViolations": [],
+          "ignoredDuplicates": 0
+        }
+      },
+      {
+        "startSample": 45440,
+        "endSample": 68160,
+        "processingMilliseconds": 22.8993,
+        "ingestToDecisionMilliseconds": 22.9927,
+        "chosenSymbolRate": 1200.0,
+        "validProtocolFrames": 1,
+        "chosenPayloadHex": "FD 03 00 00 01 01 01 4D 00 00 90 01 00 23 FF",
+        "protocolContinuity": {
+          "observations": [
+            {
+              "systemId": 1,
+              "componentId": 1,
+              "sequence": 1,
+              "previousSequence": 0,
+              "status": "continuous",
+              "missingFrames": 0
+            }
+          ],
+          "missingFrames": 0,
+          "duplicates": 0,
+          "outOfOrder": 0
+        },
+        "protocolState": {
+          "state": "armed",
+          "newTimeline": [
+            {
+              "windowIndex": 2,
+              "frameOffset": 0,
+              "from": "arming-requested",
+              "to": "armed",
+              "evidence": "ARM_DISARM ACK accepted"
+            }
+          ],
+          "newLinks": [
+            {
+              "command": "COMPONENT_ARM_DISARM",
+              "requestWindowIndex": 1,
+              "ackWindowIndex": 2,
+              "result": "ACCEPTED"
+            }
+          ],
+          "newViolations": [],
+          "ignoredDuplicates": 0
+        }
+      },
+      {
+        "startSample": 68160,
+        "endSample": 90880,
+        "processingMilliseconds": 28.852,
+        "ingestToDecisionMilliseconds": 28.8881,
+        "chosenSymbolRate": 1200.0,
+        "validProtocolFrames": 1,
+        "chosenPayloadHex": "FD 09 00 00 02 01 01 00 00 00 00 00 00 00 00 00 80 00 00 86 B2",
+        "protocolContinuity": {
+          "observations": [
+            {
+              "systemId": 1,
+              "componentId": 1,
+              "sequence": 2,
+              "previousSequence": 1,
+              "status": "continuous",
+              "missingFrames": 0
+            }
+          ],
+          "missingFrames": 0,
+          "duplicates": 0,
+          "outOfOrder": 0
+        },
+        "protocolState": {
+          "state": "armed",
+          "newTimeline": [],
+          "newLinks": [],
+          "newViolations": [],
+          "ignoredDuplicates": 0
+        }
+      },
+      {
+        "startSample": 90880,
+        "endSample": 113600,
+        "processingMilliseconds": 52.433,
+        "ingestToDecisionMilliseconds": 52.4472,
+        "chosenSymbolRate": 1200.0,
+        "validProtocolFrames": 1,
+        "chosenPayloadHex": "FD 21 00 00 01 FF BE 4C 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 A0 41 16 00 01 01 00 A0 84",
+        "protocolContinuity": {
+          "observations": [
+            {
+              "systemId": 255,
+              "componentId": 190,
+              "sequence": 1,
+              "previousSequence": 0,
+              "status": "continuous",
+              "missingFrames": 0
+            }
+          ],
+          "missingFrames": 0,
+          "duplicates": 0,
+          "outOfOrder": 0
+        },
+        "protocolState": {
+          "state": "takeoff-requested",
+          "newTimeline": [
+            {
+              "windowIndex": 4,
+              "frameOffset": 0,
+              "from": "armed",
+              "to": "takeoff-requested",
+              "evidence": "COMMAND_LONG NAV_TAKEOFF"
+            }
+          ],
+          "newLinks": [],
+          "newViolations": [],
+          "ignoredDuplicates": 0
+        }
+      },
+      {
+        "startSample": 113600,
+        "endSample": 136320,
+        "processingMilliseconds": 23.7192,
+        "ingestToDecisionMilliseconds": 23.7648,
+        "chosenSymbolRate": 1200.0,
+        "validProtocolFrames": 1,
+        "chosenPayloadHex": "FD 03 00 00 03 01 01 4D 00 00 16 00 00 45 9B",
+        "protocolContinuity": {
+          "observations": [
+            {
+              "systemId": 1,
+              "componentId": 1,
+              "sequence": 3,
+              "previousSequence": 2,
+              "status": "continuous",
+              "missingFrames": 0
+            }
+          ],
+          "missingFrames": 0,
+          "duplicates": 0,
+          "outOfOrder": 0
+        },
+        "protocolState": {
+          "state": "takeoff-accepted",
+          "newTimeline": [
+            {
+              "windowIndex": 5,
+              "frameOffset": 0,
+              "from": "takeoff-requested",
+              "to": "takeoff-accepted",
+              "evidence": "TAKEOFF ACK accepted"
+            }
+          ],
+          "newLinks": [
+            {
+              "command": "NAV_TAKEOFF",
+              "requestWindowIndex": 4,
+              "ackWindowIndex": 5,
+              "result": "ACCEPTED"
+            }
+          ],
+          "newViolations": [],
+          "ignoredDuplicates": 0
+        }
+      }
+    ]
+  },
+  "elapsedMilliseconds": 214.4861,
+  "complete": true,
+  "boundary": "采样与分析已使用有界队列隔离；结果来自有限时长回放，尚未证明真实硬件持续运行性能。",
+  "truth": {
+    "schema": "synthetic-state-trajectory-v1",
+    "sampleRate": 48000,
+    "symbolRate": 1200,
+    "windowSamples": 22720,
+    "windows": 6,
+    "expectedFinalState": "takeoff-accepted",
+    "packetHex": [
+      "FD 09 00 00 00 01 01 00 00 00 00 00 00 00 00 00 00 00 00 D9 8B",
+      "FD 21 00 00 00 FF BE 4C 00 00 00 00 80 3F 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 90 01 01 01 00 21 DD",
+      "FD 03 00 00 01 01 01 4D 00 00 90 01 00 23 FF",
+      "FD 09 00 00 02 01 01 00 00 00 00 00 00 00 00 00 80 00 00 86 B2",
+      "FD 21 00 00 01 FF BE 4C 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 A0 41 16 00 01 01 00 A0 84",
+      "FD 03 00 00 03 01 01 4D 00 00 16 00 00 45 9B"
+    ],
+    "boundary": "Deterministic synthetic 2-FSK trajectory for software regression only."
+  }
+}

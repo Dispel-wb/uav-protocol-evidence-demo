@@ -48,6 +48,7 @@ def main() -> None:
     print(json.dumps({
         "windows": report["analysis"]["analyzedWindows"],
         "validWindows": report["analysis"]["validProtocolWindows"],
+        "finalProtocolState": report["analysis"]["protocolState"]["finalState"],
         "latencyP95Ms": report["analysis"]["latencyMilliseconds"]["p95"],
     }))
     if not report["complete"]:

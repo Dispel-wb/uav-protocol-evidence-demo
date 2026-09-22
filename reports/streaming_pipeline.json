@@ -28,21 +28,38 @@
     "analyzedWindows": 3,
     "validProtocolWindows": 3,
     "latencyMilliseconds": {
-      "p50": 25.1424,
-      "p95": 25.67421,
-      "max": 25.7333
+      "p50": 25.3448,
+      "p95": 25.80641,
+      "max": 25.8577
     },
     "protocolContinuity": {
       "missingFrames": 0,
       "duplicates": 2,
       "outOfOrder": 0
     },
+    "protocolState": {
+      "schema": "streaming-protocol-state-evidence-v1",
+      "finalState": "disarmed",
+      "timeline": [
+        {
+          "windowIndex": 0,
+          "frameOffset": 0,
+          "from": "unknown",
+          "to": "disarmed",
+          "evidence": "HEARTBEAT armed=False"
+        }
+      ],
+      "links": [],
+      "violations": [],
+      "ignoredDuplicateFrames": 2,
+      "boundary": "State is inferred only from CRC-valid observed messages; an accepted TAKEOFF command does not prove that the aircraft left the ground."
+    },
     "windows": [
       {
         "startSample": 448,
         "endSample": 12288,
-        "processingMilliseconds": 25.6729,
-        "ingestToDecisionMilliseconds": 25.7333,
+        "processingMilliseconds": 25.7948,
+        "ingestToDecisionMilliseconds": 25.8577,
         "chosenSymbolRate": 1200.0,
         "validProtocolFrames": 1,
         "chosenPayloadHex": "FD 09 00 00 00 01 01 00 00 00 00 00 00 00 02 03 00 04 03 4A D7",
@@ -60,13 +77,28 @@
           "missingFrames": 0,
           "duplicates": 0,
           "outOfOrder": 0
+        },
+        "protocolState": {
+          "state": "disarmed",
+          "newTimeline": [
+            {
+              "windowIndex": 0,
+              "frameOffset": 0,
+              "from": "unknown",
+              "to": "disarmed",
+              "evidence": "HEARTBEAT armed=False"
+            }
+          ],
+          "newLinks": [],
+          "newViolations": [],
+          "ignoredDuplicates": 0
         }
       },
       {
         "startSample": 12736,
         "endSample": 24576,
-        "processingMilliseconds": 25.0839,
-        "ingestToDecisionMilliseconds": 25.1424,
+        "processingMilliseconds": 25.2623,
+        "ingestToDecisionMilliseconds": 25.3448,
         "chosenSymbolRate": 1200.0,
         "validProtocolFrames": 1,
         "chosenPayloadHex": "FD 09 00 00 00 01 01 00 00 00 00 00 00 00 02 03 00 04 03 4A D7",
@@ -84,13 +116,20 @@
           "missingFrames": 0,
           "duplicates": 1,
           "outOfOrder": 0
+        },
+        "protocolState": {
+          "state": "disarmed",
+          "newTimeline": [],
+          "newLinks": [],
+          "newViolations": [],
+          "ignoredDuplicates": 1
         }
       },
       {
         "startSample": 23680,
         "endSample": 35520,
-        "processingMilliseconds": 24.5997,
-        "ingestToDecisionMilliseconds": 24.7362,
+        "processingMilliseconds": 24.5028,
+        "ingestToDecisionMilliseconds": 24.5695,
         "chosenSymbolRate": 1200.0,
         "validProtocolFrames": 1,
         "chosenPayloadHex": "FD 09 00 00 00 01 01 00 00 00 00 00 00 00 02 03 00 04 03 4A D7",
@@ -108,11 +147,18 @@
           "missingFrames": 0,
           "duplicates": 1,
           "outOfOrder": 0
+        },
+        "protocolState": {
+          "state": "disarmed",
+          "newTimeline": [],
+          "newLinks": [],
+          "newViolations": [],
+          "ignoredDuplicates": 2
         }
       }
     ]
   },
-  "elapsedMilliseconds": 78.804,
+  "elapsedMilliseconds": 76.6453,
   "complete": true,
   "boundary": "采样与分析已使用有界队列隔离；结果来自有限时长回放，尚未证明真实硬件持续运行性能。"
 }

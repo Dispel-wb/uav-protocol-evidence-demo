@@ -1,10 +1,38 @@
 """Small protocol-validity oracle used to rank demodulation candidates."""
 from __future__ import annotations
 
+import struct
 from typing import Any
+
+from rf.protocol_state import COMMAND_NAMES, RESULT_NAMES
 
 
 CRC_EXTRA = {0: 50, 24: 24, 30: 39, 76: 152, 77: 143}
+
+
+def _state_fields(message_id: int, payload: bytes) -> dict[str, Any] | None:
+    if message_id == 0 and len(payload) >= 9:
+        return {"armed": bool(payload[6] & 0x80), "baseMode": payload[6]}
+    if message_id == 76 and len(payload) >= 33:
+        command = int.from_bytes(payload[28:30], "little")
+        return {
+            "command": command,
+            "commandName": COMMAND_NAMES.get(command, f"MAV_CMD_{command}"),
+            "param1": struct.unpack_from("<f", payload)[0],
+            "param7": struct.unpack_from("<f", payload, 24)[0],
+            "targetSystem": payload[30],
+            "targetComponent": payload[31],
+        }
+    if message_id == 77 and len(payload) >= 3:
+        command = int.from_bytes(payload[0:2], "little")
+        result = payload[2]
+        return {
+            "command": command,
+            "commandName": COMMAND_NAMES.get(command, f"MAV_CMD_{command}"),
+            "result": result,
+            "resultName": RESULT_NAMES.get(result, f"RESULT_{result}"),
+        }
+    return None
 
 
 def crc_x25(data: bytes, extra: int) -> int:
@@ -39,6 +67,7 @@ def mavlink_evidence(data: bytes) -> dict[str, Any]:
         observed = packet[header + payload_length] | packet[header + payload_length + 1] << 8
         computed = crc_x25(packet[1:header + payload_length], extra) if extra is not None else None
         valid = computed == observed if computed is not None else None
+        payload = packet[header:header + payload_length]
         frames.append({
             "offset": offset,
             "version": 2 if version2 else 1,
@@ -48,6 +77,7 @@ def mavlink_evidence(data: bytes) -> dict[str, Any]:
             "componentId": packet[6] if version2 else packet[4],
             "length": total,
             "crcValid": valid,
+            "fields": _state_fields(message_id, payload),
         })
         offset += total
     return {"frames": frames, "validFrames": sum(frame["crcValid"] is True for frame in frames), "invalidFrames": sum(frame["crcValid"] is False for frame in frames)}
