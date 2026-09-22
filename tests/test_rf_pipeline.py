@@ -9,6 +9,9 @@ from rf.generate_iq_fixture import generate
 from rf.fsk_demod import demodulate, preprocess
 from rf.candidate_selector import select
 from rf.protocol_feedback import mavlink_evidence
+from rf.ring_buffer import ComplexRingBuffer
+from rf.stream_capture import ArraySource, CaptureConfig, capture, capture_to_sigmf
+from rf.full_pipeline import run as run_full_pipeline
 from rf.sigmf_io import load
 from rf.signal_quality import analyze, remove_dc
 
@@ -46,6 +49,11 @@ class RFInputTests(unittest.TestCase):
             self.assertEqual(selection["chosenSymbolRate"], 1_200)
             self.assertEqual(selection["validProtocolFrames"], 1)
             self.assertEqual(len(selection["candidates"]), 4)
+            config = CaptureConfig(center_frequency=433_920_000, sample_rate=48_000, duration_seconds=capture.samples.size / 48_000, chunk_samples=1024, ring_samples=capture.samples.size)
+            full = run_full_pipeline(ArraySource(capture.samples, 48_000), config, [800, 1_200, 2_400])
+            self.assertTrue(full["complete"])
+            self.assertEqual(full["selection"]["chosenSymbolRate"], 1_200)
+            self.assertGreater(full["processingMilliseconds"], 0)
 
     def test_dc_removal(self):
         samples = np.array([1 + 2j, 3 + 4j], dtype=np.complex64)
@@ -63,6 +71,27 @@ class RFInputTests(unittest.TestCase):
             self.assertEqual(capture.samples.size, 2)
             self.assertAlmostEqual(float(capture.samples[0].real), 32767 / 32768)
             self.assertAlmostEqual(float(capture.samples[1].imag), -1)
+
+    def test_ring_and_replay_capture(self):
+        ring = ComplexRingBuffer(4)
+        ring.write(np.array([1, 2, 3], dtype=np.complex64))
+        ring.write(np.array([4, 5, 6], dtype=np.complex64))
+        np.testing.assert_array_equal(ring.latest(), np.array([3, 4, 5, 6], dtype=np.complex64))
+        self.assertEqual(ring.overwritten, 2)
+
+        samples = np.arange(16, dtype=np.float32).astype(np.complex64)
+        config = CaptureConfig(center_frequency=100e6, sample_rate=8, duration_seconds=2, chunk_samples=5, ring_samples=16)
+        source = ArraySource(samples, 8, start_timestamp_ns=1_000, overflow_chunks={1})
+        captured, report = capture(source, config)
+        np.testing.assert_array_equal(captured, samples)
+        self.assertTrue(report["complete"])
+        self.assertEqual(report["overflows"], 1)
+        self.assertEqual(report["timeouts"], 0)
+        with tempfile.TemporaryDirectory() as directory:
+            meta, _, stored_report = capture_to_sigmf(ArraySource(samples, 8), config, Path(directory) / "replay")
+            replayed = load(meta)
+            np.testing.assert_array_equal(replayed.samples, samples)
+            self.assertEqual(stored_report["receivedSamples"], 16)
 
 
 if __name__ == "__main__":
