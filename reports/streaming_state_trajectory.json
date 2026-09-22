@@ -22,15 +22,17 @@
     "timestampJumps": 0,
     "queueBackpressureEvents": 0,
     "targetSamples": 136320,
-    "complete": true
+    "complete": true,
+    "stoppedByRequest": false,
+    "stopReason": "target-reached"
   },
   "analysis": {
     "analyzedWindows": 6,
     "validProtocolWindows": 6,
     "latencyMilliseconds": {
-      "p50": 29.46215,
-      "p95": 52.429825,
-      "max": 52.4472
+      "p50": 27.69715,
+      "p95": 51.090875,
+      "max": 51.6965
     },
     "protocolContinuity": {
       "missingFrames": 0,
@@ -99,8 +101,8 @@
       {
         "startSample": 0,
         "endSample": 22720,
-        "processingMilliseconds": 30.0,
-        "ingestToDecisionMilliseconds": 30.0362,
+        "processingMilliseconds": 28.3175,
+        "ingestToDecisionMilliseconds": 28.4211,
         "chosenSymbolRate": 1200.0,
         "validProtocolFrames": 1,
         "chosenPayloadHex": "FD 09 00 00 00 01 01 00 00 00 00 00 00 00 00 00 00 00 00 D9 8B",
@@ -138,8 +140,8 @@
       {
         "startSample": 22720,
         "endSample": 45440,
-        "processingMilliseconds": 52.3593,
-        "ingestToDecisionMilliseconds": 52.3777,
+        "processingMilliseconds": 49.2434,
+        "ingestToDecisionMilliseconds": 49.274,
         "chosenSymbolRate": 1200.0,
         "validProtocolFrames": 1,
         "chosenPayloadHex": "FD 21 00 00 00 FF BE 4C 00 00 00 00 80 3F 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 90 01 01 01 00 21 DD",
@@ -177,8 +179,8 @@
       {
         "startSample": 45440,
         "endSample": 68160,
-        "processingMilliseconds": 22.8993,
-        "ingestToDecisionMilliseconds": 22.9927,
+        "processingMilliseconds": 24.2356,
+        "ingestToDecisionMilliseconds": 24.274,
         "chosenSymbolRate": 1200.0,
         "validProtocolFrames": 1,
         "chosenPayloadHex": "FD 03 00 00 01 01 01 4D 00 00 90 01 00 23 FF",
@@ -223,8 +225,8 @@
       {
         "startSample": 68160,
         "endSample": 90880,
-        "processingMilliseconds": 28.852,
-        "ingestToDecisionMilliseconds": 28.8881,
+        "processingMilliseconds": 26.9334,
+        "ingestToDecisionMilliseconds": 26.9732,
         "chosenSymbolRate": 1200.0,
         "validProtocolFrames": 1,
         "chosenPayloadHex": "FD 09 00 00 02 01 01 00 00 00 00 00 00 00 00 00 80 00 00 86 B2",
@@ -254,8 +256,8 @@
       {
         "startSample": 90880,
         "endSample": 113600,
-        "processingMilliseconds": 52.433,
-        "ingestToDecisionMilliseconds": 52.4472,
+        "processingMilliseconds": 51.6763,
+        "ingestToDecisionMilliseconds": 51.6965,
         "chosenSymbolRate": 1200.0,
         "validProtocolFrames": 1,
         "chosenPayloadHex": "FD 21 00 00 01 FF BE 4C 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 A0 41 16 00 01 01 00 A0 84",
@@ -293,8 +295,8 @@
       {
         "startSample": 113600,
         "endSample": 136320,
-        "processingMilliseconds": 23.7192,
-        "ingestToDecisionMilliseconds": 23.7648,
+        "processingMilliseconds": 22.9072,
+        "ingestToDecisionMilliseconds": 22.9615,
         "chosenSymbolRate": 1200.0,
         "validProtocolFrames": 1,
         "chosenPayloadHex": "FD 03 00 00 03 01 01 4D 00 00 16 00 00 45 9B",
@@ -338,9 +340,11 @@
       }
     ]
   },
-  "elapsedMilliseconds": 214.4861,
+  "elapsedMilliseconds": 207.7635,
   "complete": true,
-  "boundary": "采样与分析已使用有界队列隔离；结果来自有限时长回放，尚未证明真实硬件持续运行性能。",
+  "stoppedCleanly": true,
+  "usableProtocolEvidence": true,
+  "boundary": "采样与分析已使用有界队列隔离并支持外部安全停止；真实硬件持续运行性能仍需实测。",
   "truth": {
     "schema": "synthetic-state-trajectory-v1",
     "sampleRate": 48000,

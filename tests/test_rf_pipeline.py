@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 import struct
 import tempfile
+from threading import Event
 import unittest
 
 import numpy as np
@@ -278,6 +279,41 @@ class RFInputTests(unittest.TestCase):
                 analysis_window_samples=4_800,
                 queue_capacity=1,
             )
+
+    def test_operator_stop_finishes_partial_stream_cleanly(self):
+        with tempfile.TemporaryDirectory() as directory:
+            meta_path, _ = generate(Path(directory) / "operator-stop-stream")
+            recording = load(meta_path)
+            stop = Event()
+
+            class StoppingSource(ArraySource):
+                def read(self, count):
+                    chunk = super().read(count)
+                    if self.position >= recording.samples.size:
+                        stop.set()
+                    return chunk
+
+            samples = np.tile(recording.samples, 3)
+            config = CaptureConfig(
+                center_frequency=recording.center_frequency or 0,
+                sample_rate=recording.sample_rate,
+                duration_seconds=samples.size / recording.sample_rate,
+                chunk_samples=740,
+                ring_samples=recording.samples.size,
+            )
+            report = run_streaming(
+                StoppingSource(samples, recording.sample_rate),
+                config,
+                [1_200],
+                analysis_window_samples=recording.samples.size,
+                stop_event=stop,
+            )
+            self.assertFalse(report["complete"])
+            self.assertTrue(report["stoppedCleanly"])
+            self.assertTrue(report["usableProtocolEvidence"])
+            self.assertEqual(report["capture"]["stopReason"], "requested")
+            self.assertEqual(report["capture"]["receivedSamples"], recording.samples.size)
+            self.assertEqual(report["analysis"]["validProtocolWindows"], 1)
 
 
 if __name__ == "__main__":

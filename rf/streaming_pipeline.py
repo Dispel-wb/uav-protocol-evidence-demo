@@ -37,6 +37,7 @@ def run_streaming(
     analysis_window_samples: int,
     hop_samples: int | None = None,
     queue_capacity: int = 8,
+    stop_event: Event | None = None,
 ) -> dict:
     """Process a finite-duration source through a continuous chunk pipeline."""
     if analysis_window_samples <= 0 or queue_capacity <= 0:
@@ -60,6 +61,7 @@ def run_streaming(
     }
     counter_lock = Lock()
     stop_requested = Event()
+    operator_stop = stop_event or Event()
     reader_error: list[BaseException] = []
 
     def enqueue(item: QueuedChunk | None) -> bool:
@@ -78,7 +80,7 @@ def run_streaming(
         try:
             source.configure(config)
             source.start()
-            while counters["receivedSamples"] < target:
+            while counters["receivedSamples"] < target and not operator_stop.is_set():
                 remaining = target - counters["receivedSamples"]
                 chunk = source.read(min(config.chunk_samples, remaining))
                 if chunk.timeout:
@@ -190,6 +192,13 @@ def run_streaming(
     elapsed_ms = (time.perf_counter_ns() - started_ns) / 1e6
     valid_windows = sum(item["validProtocolFrames"] > 0 for item in window_reports)
     state_evidence = state_tracker.finalize()
+    target_reached = counters["receivedSamples"] == target
+    stopped_by_request = operator_stop.is_set() and not target_reached
+    stop_reason = (
+        "target-reached" if target_reached
+        else "requested" if stopped_by_request
+        else "source-ended"
+    )
     return {
         "schema": "streaming-rf-pipeline-v1",
         "hardware": source.hardware,
@@ -200,7 +209,9 @@ def run_streaming(
         "capture": {
             **counters,
             "targetSamples": target,
-            "complete": counters["receivedSamples"] == target,
+            "complete": target_reached,
+            "stoppedByRequest": stopped_by_request,
+            "stopReason": stop_reason,
         },
         "analysis": {
             "analyzedWindows": len(window_reports),
@@ -215,6 +226,8 @@ def run_streaming(
             "windows": window_reports,
         },
         "elapsedMilliseconds": elapsed_ms,
-        "complete": counters["receivedSamples"] == target and valid_windows > 0,
-        "boundary": "采样与分析已使用有界队列隔离；结果来自有限时长回放，尚未证明真实硬件持续运行性能。",
+        "complete": target_reached and valid_windows > 0,
+        "stoppedCleanly": (target_reached or stopped_by_request),
+        "usableProtocolEvidence": valid_windows > 0,
+        "boundary": "采样与分析已使用有界队列隔离并支持外部安全停止；真实硬件持续运行性能仍需实测。",
     }

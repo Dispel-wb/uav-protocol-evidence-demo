@@ -67,6 +67,14 @@ python -m rf.capture_sdr --args "driver=设备驱动名" --frequency 433920000 -
 
 `npm run stream:state` 执行更完整的合成射频轨迹：未解锁心跳、解锁命令、成功应答、已解锁心跳、起飞命令和成功应答分别编码为6个2-FSK IQ窗口。当前6个窗口全部完成解调和CRC验证，最终形成2组命令—应答关系并到达 `takeoff-accepted`，没有状态违规；报告位于 `reports/streaming_state_trajectory.json`。
 
+真实SDR的操作者控制入口为：
+
+```bash
+python -m rf.live_analyze --args "driver=设备驱动名" --frequency 433920000 --sample-rate 1000000 --gain 20 --symbol-rates 1200 --max-duration 3600 --output captures/live-report.json
+```
+
+运行期间按 Ctrl+C 会请求安全停止；系统完成当前已接收分块、关闭SDR流并写出停止原因、有效窗口、延迟、序号连续性和协议状态证据。该入口及停止流程已通过数组源测试，但仓库目前没有真实SDR长时间运行记录。
+
 网页交互原型仍从**已解调的字节**开始；仓库中的离线后端和有限窗口采样接口已能处理合成2-FSK IQ，但尚无真实SDR实测，也不能处理任意调制或加密流。未知字段的业务含义、协议名称及设备行为无法仅从孤立字节证明；结构发现也不能保证覆盖所有封装方式。MAVLink 2 签名位会显示，但尚未进行签名认证。规则判定是演示算法，不构成飞控安全认证；SBUS 通道值不依赖具体遥控器的校准范围解释为物理量。
 
 ## 测试与构建

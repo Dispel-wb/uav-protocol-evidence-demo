@@ -22,15 +22,17 @@
     "timestampJumps": 0,
     "queueBackpressureEvents": 0,
     "targetSamples": 35520,
-    "complete": true
+    "complete": true,
+    "stoppedByRequest": false,
+    "stopReason": "target-reached"
   },
   "analysis": {
     "analyzedWindows": 3,
     "validProtocolWindows": 3,
     "latencyMilliseconds": {
-      "p50": 25.3448,
-      "p95": 25.80641,
-      "max": 25.8577
+      "p50": 26.3415,
+      "p95": 26.410529999999998,
+      "max": 26.4182
     },
     "protocolContinuity": {
       "missingFrames": 0,
@@ -58,8 +60,8 @@
       {
         "startSample": 448,
         "endSample": 12288,
-        "processingMilliseconds": 25.7948,
-        "ingestToDecisionMilliseconds": 25.8577,
+        "processingMilliseconds": 26.2195,
+        "ingestToDecisionMilliseconds": 26.3415,
         "chosenSymbolRate": 1200.0,
         "validProtocolFrames": 1,
         "chosenPayloadHex": "FD 09 00 00 00 01 01 00 00 00 00 00 00 00 02 03 00 04 03 4A D7",
@@ -97,8 +99,8 @@
       {
         "startSample": 12736,
         "endSample": 24576,
-        "processingMilliseconds": 25.2623,
-        "ingestToDecisionMilliseconds": 25.3448,
+        "processingMilliseconds": 26.339,
+        "ingestToDecisionMilliseconds": 26.4182,
         "chosenSymbolRate": 1200.0,
         "validProtocolFrames": 1,
         "chosenPayloadHex": "FD 09 00 00 00 01 01 00 00 00 00 00 00 00 02 03 00 04 03 4A D7",
@@ -128,8 +130,8 @@
       {
         "startSample": 23680,
         "endSample": 35520,
-        "processingMilliseconds": 24.5028,
-        "ingestToDecisionMilliseconds": 24.5695,
+        "processingMilliseconds": 24.9641,
+        "ingestToDecisionMilliseconds": 25.1976,
         "chosenSymbolRate": 1200.0,
         "validProtocolFrames": 1,
         "chosenPayloadHex": "FD 09 00 00 00 01 01 00 00 00 00 00 00 00 02 03 00 04 03 4A D7",
@@ -158,7 +160,9 @@
       }
     ]
   },
-  "elapsedMilliseconds": 76.6453,
+  "elapsedMilliseconds": 78.8361,
   "complete": true,
-  "boundary": "采样与分析已使用有界队列隔离；结果来自有限时长回放，尚未证明真实硬件持续运行性能。"
+  "stoppedCleanly": true,
+  "usableProtocolEvidence": true,
+  "boundary": "采样与分析已使用有界队列隔离并支持外部安全停止；真实硬件持续运行性能仍需实测。"
 }
