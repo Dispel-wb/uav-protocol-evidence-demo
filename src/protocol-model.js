@@ -45,13 +45,24 @@
     return { schema: 'protocol-centroid-v1', labels: [...grouped.keys()], centroids, counts: Object.fromEntries([...grouped].map(([label, values]) => [label, values.length])) };
   }
 
-  function predict(model, input, options = {}) {
+  function score(model, input) {
     if (!model || model.schema !== 'protocol-centroid-v1') throw new Error('模型格式无效。');
-    const threshold = Number.isFinite(options.threshold) ? options.threshold : 0.58;
-    const marginThreshold = Number.isFinite(options.marginThreshold) ? options.marginThreshold : 0.04;
     const vector = features(input);
     const scores = model.labels.map(label => ({ label, score: similarity(vector, model.centroids[label]) })).sort((a, b) => b.score - a.score);
     const margin = scores[0].score - (scores[1]?.score || 0);
+    return {
+      topLabel: scores[0].label,
+      score: scores[0].score,
+      margin,
+      scores,
+    };
+  }
+
+  function predict(model, input, options = {}) {
+    const threshold = Number.isFinite(options.threshold) ? options.threshold : 0.58;
+    const marginThreshold = Number.isFinite(options.marginThreshold) ? options.marginThreshold : 0.04;
+    const raw = score(model, input);
+    const scores = raw.scores, margin = raw.margin;
     const accepted = scores[0].score >= threshold && margin >= marginThreshold;
     return {
       label: accepted ? scores[0].label : 'unknown',
@@ -63,5 +74,5 @@
     };
   }
 
-  return { features, train, predict };
+  return { features, train, score, predict };
 });

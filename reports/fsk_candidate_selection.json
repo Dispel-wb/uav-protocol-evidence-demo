@@ -1,0 +1,73 @@
+{
+  "schema": "demod-candidate-selection-v1",
+  "chosenSymbolRate": 1200.0,
+  "chosenPayloadHex": "FD 09 00 00 00 01 01 00 00 00 00 00 00 00 02 03 00 04 03 4A D7",
+  "validProtocolFrames": 1,
+  "candidates": [
+    {
+      "symbolRate": 800.0,
+      "status": "rejected",
+      "score": null,
+      "reason": "preamble not found after 2-FSK demodulation"
+    },
+    {
+      "symbolRate": 1000.0,
+      "status": "rejected",
+      "score": null,
+      "reason": "preamble not found after 2-FSK demodulation"
+    },
+    {
+      "symbolRate": 1200.0,
+      "status": "decoded",
+      "score": 1014.1284619123641,
+      "payloadHex": "FD 09 00 00 00 01 01 00 00 00 00 00 00 00 02 03 00 04 03 4A D7",
+      "protocolEvidence": {
+        "frames": [
+          {
+            "offset": 0,
+            "version": 2,
+            "messageId": 0,
+            "length": 21,
+            "crcValid": true
+          }
+        ],
+        "validFrames": 1,
+        "invalidFrames": 0
+      },
+      "demodulation": {
+        "schema": "fsk-demod-report-v1",
+        "payloadHex": "FD 09 00 00 00 01 01 00 00 00 00 00 00 00 02 03 00 04 03 4A D7",
+        "symbolRate": 1200.0,
+        "samplesPerSymbol": 40,
+        "timingOffset": 17,
+        "bitPolarityInverted": false,
+        "preambleBitErrors": 0,
+        "decisionConfidence": 14.12846191236405,
+        "burst": {
+          "startSample": 1541,
+          "endSample": 10300
+        },
+        "preprocess": {
+          "toneLowHz": -1797.4654640940746,
+          "toneHighHz": 4197.739467975796,
+          "carrierOffsetHz": 1200.137001940861,
+          "deviationHz": 2997.6024660349353,
+          "filterCutoffHz": 4497.602466034936,
+          "gain": 1.2634141231719909
+        },
+        "dcOffset": {
+          "i": 0.02011875808238983,
+          "q": 0.0013470184057950974
+        },
+        "boundary": "当前基线仅适用于已知符号率的2-FSK；同步字命中和协议CRC仍需共同验证。"
+      }
+    },
+    {
+      "symbolRate": 2400.0,
+      "status": "rejected",
+      "score": null,
+      "reason": "preamble not found after 2-FSK demodulation"
+    }
+  ],
+  "boundary": "候选集合当前仅改变2-FSK符号率；未覆盖其他调制方式。所有失败候选均保留原因。"
+}

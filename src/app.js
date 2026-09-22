@@ -5,6 +5,7 @@
   const discovery = window.ProtocolDiscovery;
   const intelligence = window.LinkIntelligence;
   const stateAnalysis = window.StateAnalysis;
+  const activeLearning = window.ActiveLearning;
   const samples = window.ProtocolSamples;
   let report = null, currentBytes = null;
   let rules = { maxAltitudeM: 120, minGpsFix: 3, sbusLostFrameLimit: 2, requireArmAck: true };
@@ -45,6 +46,7 @@
       report.discovery = discovery.infer(currentBytes, report.gaps);
       report.linkAssessment = intelligence.assess(currentBytes, report, report.discovery);
       report.stateAnalysis = stateAnalysis.analyze(report.frames);
+      report.activeLearning = activeLearning.recommend({ discovery: report.discovery, stateAnalysis: report.stateAnalysis });
       report.findings = report.findings.filter(f => f.title !== '未识别字节');
       for (const gap of report.discovery.unexplained) report.findings.push({offset:gap.offset,family:'未知字节',level:'info',title:'结构尚未推断',detail:`${gap.length} 字节缺少足够重复证据。`,evidence:gap.raw});
       report.summary.findings = report.findings.length;
@@ -145,7 +147,8 @@
     const state = report.stateAnalysis;
     const statePath = state.timeline.map(item => item.to).join(' → ') || '当前捕获没有可用状态证据';
     const causal = state.links.map(item => `${item.command}: +${item.requestOffset} → +${item.ackOffset} (${item.result})`).join('；') || '尚未形成命令—应答配对';
-    $('link-assessment').innerHTML = `<div class="link-grid"><div><span>字节覆盖率</span><strong>${metrics.coveragePercent}%</strong><small>已知 ${metrics.knownPercent}%</small></div><div><span>帧完整性</span><strong>${integrity}</strong><small>已知帧校验</small></div><div><span>协议组成</span><strong>${metrics.protocolCount}</strong><small>${metrics.transitions} 个切换点</small></div><div><span>字节熵</span><strong>${metrics.byteEntropy}</strong><small>bit / byte</small></div></div><div class="composition">${link.composition.map(item => `<span><b>${safe(item.family)}</b>${item.frames} 帧 · ${item.bytes} B · ${safe(item.evidence)}</span>`).join('') || '<span>尚无可解释的协议片段</span>'}</div><div class="state-evidence"><b>状态轨迹</b><span>${safe(statePath)}</span><b>因果配对</b><span>${safe(causal)}</span></div><ol class="next-actions">${link.nextActions.map(action => `<li>${safe(action)}</li>`).join('')}</ol><p class="link-boundary">${safe(link.boundary)} ${safe(state.boundary)}</p>`;
+    const experiments = report.activeLearning.slice(0, 3).map(item => `<li><b>${safe(item.action)}</b><span>${safe(item.reason)}</span><small>验收：${safe(item.acceptance)}</small></li>`).join('');
+    $('link-assessment').innerHTML = `<div class="link-grid"><div><span>字节覆盖率</span><strong>${metrics.coveragePercent}%</strong><small>已知 ${metrics.knownPercent}%</small></div><div><span>帧完整性</span><strong>${integrity}</strong><small>已知帧校验</small></div><div><span>协议组成</span><strong>${metrics.protocolCount}</strong><small>${metrics.transitions} 个切换点</small></div><div><span>字节熵</span><strong>${metrics.byteEntropy}</strong><small>bit / byte</small></div></div><div class="composition">${link.composition.map(item => `<span><b>${safe(item.family)}</b>${item.frames} 帧 · ${item.bytes} B · ${safe(item.evidence)}</span>`).join('') || '<span>尚无可解释的协议片段</span>'}</div><div class="state-evidence"><b>状态轨迹</b><span>${safe(statePath)}</span><b>因果配对</b><span>${safe(causal)}</span></div><h3 class="experiment-title">建议的下一组实验</h3><ol class="experiment-list">${experiments}</ol><p class="link-boundary">${safe(link.boundary)} ${safe(state.boundary)}</p>`;
   }
   function applyRules() {
     try {

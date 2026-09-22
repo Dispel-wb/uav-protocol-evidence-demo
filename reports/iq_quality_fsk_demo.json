@@ -1,0 +1,31 @@
+{
+  "schema": "iq-quality-report-v1",
+  "sampleRate": 48000.0,
+  "samples": 11840,
+  "durationSeconds": 0.24666666666666667,
+  "dcOffset": {
+    "i": 0.02011875808238983,
+    "q": 0.0013470184057950974,
+    "magnitude": 0.020163801361927688
+  },
+  "rms": 0.3456564247608185,
+  "noisePower": 0.0032243491150438786,
+  "detectorThresholdPower": 0.013873172096234614,
+  "estimatedSnrDb": 16.878630863184615,
+  "bursts": [
+    {
+      "startSample": 1541,
+      "endSample": 10300,
+      "startSeconds": 0.03210416666666667,
+      "endSeconds": 0.21458333333333332
+    }
+  ],
+  "peakOffsetHz": -1797.4654640940746,
+  "occupiedBandwidthHz": 24446.6263272063,
+  "boundary": "SNR为无参考估计；正式结论需使用已知序列、误码率或校准信号复核。",
+  "capture": {
+    "datatype": "cf32_le",
+    "centerFrequency": 433920000.0,
+    "hardware": "synthetic-fixture"
+  }
+}

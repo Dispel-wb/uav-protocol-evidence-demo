@@ -1,0 +1,17 @@
+{
+  "schema": "protocol-dataset-manifest-v1",
+  "purpose": "代码路径与开集评测脚手架",
+  "provenance": "仓库内生成脚本产生的合成或规范样例",
+  "records": [
+    { "capture": "mavlink2-normal", "label": "MAVLink", "partition": "train", "group": "mavlink-normal" },
+    { "capture": "sbus-healthy", "label": "SBUS", "partition": "train", "group": "sbus-healthy" },
+    { "capture": "mavlink2-anomaly", "label": "MAVLink", "partition": "validation", "group": "mavlink-anomaly" },
+    { "capture": "sbus-failsafe", "label": "SBUS", "partition": "validation", "group": "sbus-failsafe" },
+    { "capture": "unknown-two-families", "label": "unknown", "partition": "validation", "group": "unknown-synthetic" }
+  ],
+  "limitations": [
+    "当前记录不是多设备真实数据，不能用于证明跨设备泛化能力。",
+    "MAVLink样例由pymavlink生成，SBUS和未知帧由仓库测试脚本生成。",
+    "加入真实捕获时必须记录设备、固件、协议版本、任务和授权来源，并按设备分组切分。"
+  ]
+}

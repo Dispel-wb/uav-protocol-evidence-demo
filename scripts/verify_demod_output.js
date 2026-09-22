@@ -1,0 +1,11 @@
+const fs = require('node:fs');
+const assert = require('node:assert/strict');
+const decoder = require('../src/decoder');
+const file = process.argv[2] || 'reports/fsk_demo.demod.hex';
+const bytes = decoder.parseHex(fs.readFileSync(file, 'utf8'));
+const result = decoder.analyze(bytes);
+assert(result.frames.length >= 1, 'demodulated bytes must contain a protocol frame');
+assert.equal(result.frames[0].family, 'MAVLink 2');
+assert.equal(result.frames[0].name, 'HEARTBEAT');
+assert.equal(result.frames[0].crc, 'valid');
+console.log(`rf-to-protocol: recovered ${result.frames[0].family} ${result.frames[0].name} with valid CRC at +${result.frames[0].offset}`);

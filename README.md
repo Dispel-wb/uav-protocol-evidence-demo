@@ -19,8 +19,29 @@
 - 连续捕获接口：`src/stream-intelligence.js` 接收带时间戳的数据块，能够跨块恢复被拆开的帧，维护滑动窗口并报告协议出现、消失、瞬时字节率和丢块计数。
 - 状态与因果证据：从有效的 MAVLink 心跳、命令和应答中重建 `disarmed → arming-requested → armed → takeoff-requested → takeoff-accepted` 轨迹，报告缺少前置条件、缺少应答和孤立应答；“起飞命令已接受”不会被误写成“已经离地”。
 - 协议敏感度学习基线：`src/protocol-model.js` 提取字节直方图、哈希二元组和长度特征，训练可解释的质心分类器，并以相似度和类别间隔执行开集拒识。现有小样本测试只能验证代码路径，不能证明跨设备泛化能力。
+- 模型评测：`npm run evaluate:model` 根据 `samples/model-dataset.json` 完成阈值校准，报告已知准确率、未知召回率、误接收率、误拒绝率和单样本推理时间。
+- 主动调试：页面根据未知字段与状态证据给出下一组受控实验、原因和验收口径；`src/active-learning.js` 只允许人工确认后的候选样本进入训练集。
 
 完整的分阶段差距审计和实施清单见 [`docs/IMPLEMENTATION_ROADMAP.md`](docs/IMPLEMENTATION_ROADMAP.md)。实现顺序固定为：先完成连续字节链路智能分析，再做离线 IQ 接入、降噪和单一调制解调，最后接入实时 SDR 硬件。
+
+## 离线 IQ 分析
+
+`rf/` 已提供第一版可复现射频前端：读取 SigMF 的 complex float32 / complex int16 IQ 数据，执行去直流、噪声功率估计、突发检测、频谱峰值、占用带宽和无参考 SNR 估计。运行：
+
+```bash
+npm run test:rf
+npm run fixture:iq
+npm run analyze:iq
+npm run demod:iq
+npm run select:iq
+npm run test:e2e
+```
+
+固定回归样本位于 `samples/iq/fsk_demo.sigmf-*`，对应质量和解调报告为 `reports/iq_quality_fsk_demo.json` 与 `reports/fsk_demod_report.json`。当前闭环对带频偏和噪声的2-FSK样本完成频偏估计、频移校正、FIR滤波、增益归一化、符号定时、判决和同步字搜索，随后把恢复字节交给原有协议解析器，验证出CRC有效的MAVLink 2心跳帧。
+
+该样本由程序生成，只能证明处理步骤能够连通并被重复测试，不能证明真实无人机链路性能。现阶段解调器只支持2-FSK；下一步是接入真实IQ，并逐步增加其他调制候选。
+
+`npm run select:iq` 会尝试800、1000、1200和2400 Bd四个2-FSK候选。当前样本中只有1200 Bd候选找到同步字并恢复CRC有效的MAVLink帧，其余候选连同失败原因一起保存在 `reports/fsk_candidate_selection.json`。这仍然是同一调制方式内的参数搜索，尚未实现任意调制识别。
 
 本原型从**已解调的字节**开始，不进行射频接收、波形解调或加密流解密。未知字段的业务含义、协议名称及设备行为无法仅从孤立字节证明；结构发现也不能保证覆盖所有封装方式。MAVLink 2 签名位会显示，但尚未进行签名认证。规则判定是演示算法，不构成飞控安全认证；SBUS 通道值不依赖具体遥控器的校准范围解释为物理量。
 

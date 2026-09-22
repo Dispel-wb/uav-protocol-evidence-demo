@@ -1,0 +1,17 @@
+{
+  "global": {
+    "core:datatype": "cf32_le",
+    "core:sample_rate": 48000.0,
+    "core:version": "1.2.5",
+    "core:recorder": "uav-protocol-evidence-demo",
+    "core:hw": "synthetic-fixture",
+    "core:description": "Deterministic noisy 2-FSK MAVLink frame for offline regression only"
+  },
+  "captures": [
+    {
+      "core:sample_start": 0,
+      "core:frequency": 433920000.0
+    }
+  ],
+  "annotations": []
+}

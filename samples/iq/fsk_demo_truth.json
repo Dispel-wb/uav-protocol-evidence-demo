@@ -1,0 +1,12 @@
+{
+  "schema": "synthetic-fsk-truth-v1",
+  "sampleRate": 48000.0,
+  "symbolRate": 1200.0,
+  "samplesPerSymbol": 40,
+  "carrierOffsetHz": 1200.0,
+  "deviationHz": 3000.0,
+  "startSample": 1600,
+  "endSample": 10240,
+  "preambleHex": "55 55 55 55 D3 91",
+  "payloadHex": "FD 09 00 00 00 01 01 00 00 00 00 00 00 00 02 03 00 04 03 4A D7"
+}

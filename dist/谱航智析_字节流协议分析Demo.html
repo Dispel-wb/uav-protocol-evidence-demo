@@ -12,6 +12,7 @@
 .segment.inferred{background:#f4f0e9;border-color:#c8b8a0;color:#785b39}.stream-legend i.u{background:#9a7851}.discovered+.discovered{border-top:1px solid var(--line);padding-top:14px;margin-top:14px}.discovered-head{display:flex;gap:12px;align-items:baseline;flex-wrap:wrap}.discovered-head strong{font-size:14px}.discovered-head span{font-size:11px;color:var(--muted)}.discovered p{font-size:12px;margin:7px 0 10px;color:#526168}.field-list{display:flex;flex-wrap:wrap;gap:7px}.field-list>span{border:1px solid #d7ddd8;border-radius:4px;background:#fafbf9;padding:5px 8px;font-size:11px}.field-list b{font-family:Consolas,monospace;color:#785b39}.field-list small{display:block;color:var(--muted);font-size:10px;max-width:190px;overflow-wrap:anywhere}.discovered .discovery-note{font-size:11px;color:var(--muted);margin:9px 0 0}
 .link-grid{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line);border-radius:6px;overflow:hidden}.link-grid>div{padding:10px 12px;border-right:1px solid var(--line)}.link-grid>div:last-child{border-right:0}.link-grid span,.link-grid small{display:block;color:var(--muted);font-size:10px}.link-grid strong{display:block;font-size:19px;font-weight:650}.composition{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}.composition>span{border:1px solid #d7dfe1;background:#f8faf9;border-radius:4px;padding:5px 8px;font-size:10px;color:var(--muted)}.composition b{color:var(--ink);margin-right:6px}.next-actions{margin:12px 0 0;padding-left:20px;font-size:11px;color:#485860}.next-actions li+li{margin-top:3px}.link-boundary{border-top:1px solid var(--line);padding-top:9px;margin:10px 0 0;color:var(--muted);font-size:10px}
 .state-evidence{display:grid;grid-template-columns:74px 1fr;gap:5px 10px;margin-top:12px;padding:9px 11px;background:#f7f9f8;border-left:2px solid var(--accent);font-size:11px}.state-evidence b{font-weight:650}.state-evidence span{color:#53636b;overflow-wrap:anywhere}
+.experiment-title{font-size:12px;margin:13px 0 5px}.experiment-list{margin:0;padding-left:20px}.experiment-list li{padding:4px 0;font-size:11px}.experiment-list b,.experiment-list span,.experiment-list small{display:block}.experiment-list b{font-weight:650}.experiment-list span{color:#526168}.experiment-list small{color:var(--muted)}
 @media(max-width:700px){.link-grid{grid-template-columns:repeat(2,1fr)}.link-grid>div:nth-child(2){border-right:0}.link-grid>div:nth-child(-n+2){border-bottom:1px solid var(--line)}}
 
 </style>
@@ -525,6 +526,68 @@
 });
 
 </script><script>
+/* Conservative next-capture recommendations and controlled before/after diffs. */
+(function (root, factory) {
+  const api = factory();
+  if (typeof module === 'object' && module.exports) module.exports = api;
+  root.ActiveLearning = api;
+})(typeof globalThis !== 'undefined' ? globalThis : this, function () {
+  'use strict';
+  const parseRaw = raw => Uint8Array.from(String(raw).split(/\s+/).filter(Boolean).map(value => parseInt(value, 16)));
+
+  function recommend(context) {
+    const discovery = context.discovery || { families: [], unexplainedBytes: 0 };
+    const state = context.stateAnalysis || { violations: [] };
+    const actions = [];
+    for (const family of discovery.families) {
+      if (!family.checksum) actions.push({ priority: 1, family: family.id, action: '保持设备状态不变，再采集至少5帧。', reason: '当前只有重复结构，尚无一致校验依据。', acceptance: '候选帧边界稳定，并出现可重复校验或明确否定现有假设。' });
+      if (family.columns.some(column => column.label === '候选类型')) actions.push({ priority: 2, family: family.id, action: '每次只改变一个设备操作，分别采集操作前后数据。', reason: '存在候选类型字段，需要受控变量确定其与操作的关系。', acceptance: '同一偏移在组内稳定、组间变化，且能在独立重复实验中复现。' });
+      if (family.columns.some(column => column.label === '候选序号')) actions.push({ priority: 3, family: family.id, action: '保持空闲状态连续采集，再重复一次相同命令。', reason: '用于区分自然递增序号和由命令触发的字段。', acceptance: '序号在空闲和操作阶段均按同一规律递增。' });
+    }
+    if (discovery.unexplainedBytes) actions.push({ priority: 1, family: '未解释字节', action: '扩大捕获时长，并记录每次人工操作的时间点。', reason: `仍有 ${discovery.unexplainedBytes} 字节缺少重复证据。`, acceptance: '至少形成3个可对齐重复片段，或证明其为噪声/截断数据。' });
+    if (state.violations.some(item => item.type === 'missing-ack' || item.type === 'precondition')) actions.push({ priority: 1, family: '会话状态', action: '从心跳开始捕获完整的命令前、命令和应答阶段。', reason: '当前会话缺少前置状态或后续应答。', acceptance: '同一捕获中形成状态证据、命令和对应应答的完整因果链。' });
+    if (!actions.length) actions.push({ priority: 3, family: '回归验证', action: '更换设备或协议版本，重复同一任务。', reason: '当前捕获内证据闭环，需要验证跨设备与跨版本复用。', acceptance: '独立捕获保持解析、状态和规则结论一致，或明确记录版本漂移。' });
+    const merged = new Map();
+    for (const item of actions) {
+      const key = `${item.action}|${item.reason}|${item.acceptance}`;
+      if (!merged.has(key)) merged.set(key, { ...item });
+      else merged.get(key).family = `${merged.get(key).family}、${item.family}`;
+    }
+    return [...merged.values()].sort((a, b) => a.priority - b.priority);
+  }
+
+  function controlledDiff(beforePackets, afterPackets) {
+    const before = beforePackets.map(packet => packet instanceof Uint8Array ? packet : parseRaw(packet.raw || packet));
+    const after = afterPackets.map(packet => packet instanceof Uint8Array ? packet : parseRaw(packet.raw || packet));
+    if (before.length < 2 || after.length < 2) throw new Error('操作前后各至少需要2帧，才能区分组内波动和组间变化。');
+    const width = Math.min(...[...before, ...after].map(packet => packet.length));
+    const candidates = [];
+    for (let offset = 0; offset < width; offset++) {
+      const left = [...new Set(before.map(packet => packet[offset]))];
+      const right = [...new Set(after.map(packet => packet[offset]))];
+      if (left.length === 1 && right.length === 1 && left[0] !== right[0]) candidates.push({ offset, before: left[0], after: right[0], evidence: '操作前后组内稳定且组间改变' });
+    }
+    return { schema: 'controlled-diff-v1', beforeCount: before.length, afterCount: after.length, comparedBytes: width, candidates };
+  }
+
+  function propose(candidate, evidence) {
+    return { schema: 'knowledge-candidate-v1', status: 'candidate', candidate, evidence, createdAt: new Date().toISOString() };
+  }
+  function approve(record, reviewer) {
+    if (!record || record.status !== 'candidate') throw new Error('只能确认候选知识。');
+    if (!reviewer) throw new Error('确认人不能为空。');
+    return { ...record, status: 'approved', approvedBy: reviewer, approvedAt: new Date().toISOString() };
+  }
+  function appendApprovedExample(examples, record) {
+    if (!record || record.status !== 'approved') throw new Error('未经人工确认的候选不能进入训练集。');
+    if (!record.candidate?.label || !record.candidate?.bytes) throw new Error('候选训练样本必须包含 label 和 bytes。');
+    return [...examples, { label: record.candidate.label, bytes: record.candidate.bytes, evidence: record.evidence, approvedBy: record.approvedBy }];
+  }
+
+  return { recommend, controlledDiff, propose, approve, appendApprovedExample };
+});
+
+</script><script>
 window.ProtocolSamples = [
   {
     "id": "mavlink2-normal",
@@ -596,6 +659,7 @@ window.ProtocolSamples = [
   const discovery = window.ProtocolDiscovery;
   const intelligence = window.LinkIntelligence;
   const stateAnalysis = window.StateAnalysis;
+  const activeLearning = window.ActiveLearning;
   const samples = window.ProtocolSamples;
   let report = null, currentBytes = null;
   let rules = { maxAltitudeM: 120, minGpsFix: 3, sbusLostFrameLimit: 2, requireArmAck: true };
@@ -636,6 +700,7 @@ window.ProtocolSamples = [
       report.discovery = discovery.infer(currentBytes, report.gaps);
       report.linkAssessment = intelligence.assess(currentBytes, report, report.discovery);
       report.stateAnalysis = stateAnalysis.analyze(report.frames);
+      report.activeLearning = activeLearning.recommend({ discovery: report.discovery, stateAnalysis: report.stateAnalysis });
       report.findings = report.findings.filter(f => f.title !== '未识别字节');
       for (const gap of report.discovery.unexplained) report.findings.push({offset:gap.offset,family:'未知字节',level:'info',title:'结构尚未推断',detail:`${gap.length} 字节缺少足够重复证据。`,evidence:gap.raw});
       report.summary.findings = report.findings.length;
@@ -736,7 +801,8 @@ window.ProtocolSamples = [
     const state = report.stateAnalysis;
     const statePath = state.timeline.map(item => item.to).join(' → ') || '当前捕获没有可用状态证据';
     const causal = state.links.map(item => `${item.command}: +${item.requestOffset} → +${item.ackOffset} (${item.result})`).join('；') || '尚未形成命令—应答配对';
-    $('link-assessment').innerHTML = `<div class="link-grid"><div><span>字节覆盖率</span><strong>${metrics.coveragePercent}%</strong><small>已知 ${metrics.knownPercent}%</small></div><div><span>帧完整性</span><strong>${integrity}</strong><small>已知帧校验</small></div><div><span>协议组成</span><strong>${metrics.protocolCount}</strong><small>${metrics.transitions} 个切换点</small></div><div><span>字节熵</span><strong>${metrics.byteEntropy}</strong><small>bit / byte</small></div></div><div class="composition">${link.composition.map(item => `<span><b>${safe(item.family)}</b>${item.frames} 帧 · ${item.bytes} B · ${safe(item.evidence)}</span>`).join('') || '<span>尚无可解释的协议片段</span>'}</div><div class="state-evidence"><b>状态轨迹</b><span>${safe(statePath)}</span><b>因果配对</b><span>${safe(causal)}</span></div><ol class="next-actions">${link.nextActions.map(action => `<li>${safe(action)}</li>`).join('')}</ol><p class="link-boundary">${safe(link.boundary)} ${safe(state.boundary)}</p>`;
+    const experiments = report.activeLearning.slice(0, 3).map(item => `<li><b>${safe(item.action)}</b><span>${safe(item.reason)}</span><small>验收：${safe(item.acceptance)}</small></li>`).join('');
+    $('link-assessment').innerHTML = `<div class="link-grid"><div><span>字节覆盖率</span><strong>${metrics.coveragePercent}%</strong><small>已知 ${metrics.knownPercent}%</small></div><div><span>帧完整性</span><strong>${integrity}</strong><small>已知帧校验</small></div><div><span>协议组成</span><strong>${metrics.protocolCount}</strong><small>${metrics.transitions} 个切换点</small></div><div><span>字节熵</span><strong>${metrics.byteEntropy}</strong><small>bit / byte</small></div></div><div class="composition">${link.composition.map(item => `<span><b>${safe(item.family)}</b>${item.frames} 帧 · ${item.bytes} B · ${safe(item.evidence)}</span>`).join('') || '<span>尚无可解释的协议片段</span>'}</div><div class="state-evidence"><b>状态轨迹</b><span>${safe(statePath)}</span><b>因果配对</b><span>${safe(causal)}</span></div><h3 class="experiment-title">建议的下一组实验</h3><ol class="experiment-list">${experiments}</ol><p class="link-boundary">${safe(link.boundary)} ${safe(state.boundary)}</p>`;
   }
   function applyRules() {
     try {
