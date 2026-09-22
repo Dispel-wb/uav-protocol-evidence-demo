@@ -8,6 +8,7 @@ import unittest
 import numpy as np
 
 from rf.generate_iq_fixture import PAYLOAD, generate, synthesize
+from rf.generate_psk_fixture import synthesize_bpsk
 from rf.fsk_demod import demodulate, preprocess
 from rf.candidate_selector import select
 from rf.protocol_feedback import mavlink_evidence, update_mavlink_continuity
@@ -15,6 +16,7 @@ from rf.protocol_state import ProtocolStateTracker
 from rf.ring_buffer import ComplexRingBuffer
 from rf.stream_capture import ArraySource, CaptureConfig, capture, capture_to_sigmf
 from rf.streaming_pipeline import run_streaming
+from rf.waveform_selector import select_waveform
 from rf.full_pipeline import run as run_full_pipeline
 from rf.sigmf_io import load
 from rf.signal_quality import analyze, remove_dc
@@ -76,6 +78,46 @@ class RFInputTests(unittest.TestCase):
         self.assertEqual(gaussian_result["chosenModulation"], "GFSK")
         self.assertEqual(bytes.fromhex(gaussian_result["chosenPayloadHex"]), PAYLOAD)
         self.assertEqual(gaussian_result["validProtocolFrames"], 1)
+        unified_rectangular = select_waveform(
+            rectangular, rectangular_truth["sampleRate"], [1_200], ["fsk", "bpsk"]
+        )
+        unified_gaussian = select_waveform(
+            gaussian, gaussian_truth["sampleRate"], [1_200], ["fsk", "bpsk"]
+        )
+        self.assertEqual(unified_rectangular["chosenModulation"], "2-FSK")
+        self.assertEqual(unified_gaussian["chosenModulation"], "GFSK")
+
+    def test_bpsk_is_selected_over_fsk_and_streams_to_protocol_state(self):
+        samples, truth = synthesize_bpsk(carrier_offset=350, carrier_phase=1.1, seed=73)
+        selection = select_waveform(
+            samples,
+            truth["sampleRate"],
+            [800, 1_200, 2_400],
+            ["fsk", "bpsk"],
+        )
+        self.assertEqual(selection["chosenModulation"], "BPSK")
+        self.assertEqual(selection["chosenSymbolRate"], 1_200)
+        self.assertEqual(selection["validProtocolFrames"], 1)
+        self.assertEqual(bytes.fromhex(selection["chosenPayloadHex"]), PAYLOAD)
+
+        config = CaptureConfig(
+            center_frequency=433_920_000,
+            sample_rate=truth["sampleRate"],
+            duration_seconds=samples.size / truth["sampleRate"],
+            chunk_samples=740,
+            ring_samples=samples.size,
+        )
+        report = run_streaming(
+            ArraySource(samples, truth["sampleRate"]),
+            config,
+            [800, 1_200, 2_400],
+            analysis_window_samples=samples.size,
+            modulations=["fsk", "bpsk"],
+        )
+        window = report["analysis"]["windows"][0]
+        self.assertEqual(window["chosenModulation"], "BPSK")
+        self.assertEqual(window["chosenDemodulator"], "BPSK")
+        self.assertEqual(report["analysis"]["protocolState"]["finalState"], "disarmed")
 
     def test_mavlink_sequence_continuity_handles_wrap_gap_and_reordering(self):
         state = {}

@@ -25,6 +25,7 @@ def main() -> None:
     parser.add_argument("--hop-seconds", type=float, default=0.5)
     parser.add_argument("--queue-capacity", type=int, default=8)
     parser.add_argument("--symbol-rates", type=float, nargs="+", default=[1200])
+    parser.add_argument("--modulations", nargs="+", default=["fsk"])
     parser.add_argument("--max-duration", type=float, default=3600)
     parser.add_argument("--output", required=True)
     args = parser.parse_args()
@@ -60,6 +61,7 @@ def main() -> None:
             hop_samples=round(args.sample_rate * args.hop_seconds),
             queue_capacity=args.queue_capacity,
             stop_event=stop,
+            modulations=args.modulations,
         )
     finally:
         for name, handler in previous_handlers.items():

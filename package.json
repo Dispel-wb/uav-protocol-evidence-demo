@@ -12,6 +12,7 @@
     "select:iq": "python -m rf.select_demod samples/iq/fsk_demo.sigmf-meta --symbol-rates 800 1000 1200 2400 --output reports/fsk_candidate_selection.json",
     "evaluate:fsk": "python scripts/evaluate_fsk_robustness.py",
     "evaluate:modulation": "python scripts/evaluate_modulation_shape.py",
+    "evaluate:bpsk": "python scripts/evaluate_bpsk.py",
     "stream:replay": "python -m rf.stream_replay samples/iq/fsk_demo.sigmf-meta --repeat 3 --output reports/streaming_pipeline.json",
     "stream:state": "python -m rf.stream_state_demo --output reports/streaming_state_trajectory.json",
     "test:e2e": "npm run fixture:iq && npm run analyze:iq && npm run demod:iq && node scripts/verify_demod_output.js reports/fsk_demo.demod.hex"

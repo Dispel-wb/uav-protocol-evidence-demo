@@ -30,9 +30,9 @@
     "analyzedWindows": 3,
     "validProtocolWindows": 3,
     "latencyMilliseconds": {
-      "p50": 26.8882,
-      "p95": 27.03229,
-      "max": 27.0483
+      "p50": 27.5747,
+      "p95": 27.909769999999998,
+      "max": 27.947
     },
     "protocolContinuity": {
       "missingFrames": 0,
@@ -60,10 +60,11 @@
       {
         "startSample": 448,
         "endSample": 12288,
-        "processingMilliseconds": 26.8277,
-        "ingestToDecisionMilliseconds": 26.8882,
+        "processingMilliseconds": 27.8519,
+        "ingestToDecisionMilliseconds": 27.947,
         "chosenSymbolRate": 1200.0,
         "chosenModulation": "2-FSK",
+        "chosenDemodulator": "FSK",
         "validProtocolFrames": 1,
         "chosenPayloadHex": "FD 09 00 00 00 01 01 00 00 00 00 00 00 00 02 03 00 04 03 4A D7",
         "protocolContinuity": {
@@ -100,10 +101,11 @@
       {
         "startSample": 12736,
         "endSample": 24576,
-        "processingMilliseconds": 26.7873,
-        "ingestToDecisionMilliseconds": 26.8807,
+        "processingMilliseconds": 26.7777,
+        "ingestToDecisionMilliseconds": 26.9351,
         "chosenSymbolRate": 1200.0,
         "chosenModulation": "2-FSK",
+        "chosenDemodulator": "FSK",
         "validProtocolFrames": 1,
         "chosenPayloadHex": "FD 09 00 00 00 01 01 00 00 00 00 00 00 00 02 03 00 04 03 4A D7",
         "protocolContinuity": {
@@ -132,10 +134,11 @@
       {
         "startSample": 23680,
         "endSample": 35520,
-        "processingMilliseconds": 27.0065,
-        "ingestToDecisionMilliseconds": 27.0483,
+        "processingMilliseconds": 27.527,
+        "ingestToDecisionMilliseconds": 27.5747,
         "chosenSymbolRate": 1200.0,
         "chosenModulation": "2-FSK",
+        "chosenDemodulator": "FSK",
         "validProtocolFrames": 1,
         "chosenPayloadHex": "FD 09 00 00 00 01 01 00 00 00 00 00 00 00 02 03 00 04 03 4A D7",
         "protocolContinuity": {
@@ -163,7 +166,7 @@
       }
     ]
   },
-  "elapsedMilliseconds": 81.7524,
+  "elapsedMilliseconds": 83.5711,
   "complete": true,
   "stoppedCleanly": true,
   "usableProtocolEvidence": true,

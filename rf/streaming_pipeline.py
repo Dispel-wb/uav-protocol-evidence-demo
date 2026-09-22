@@ -9,11 +9,11 @@ from typing import Iterable
 
 import numpy as np
 
-from rf.candidate_selector import select
 from rf.protocol_feedback import mavlink_evidence, update_mavlink_continuity
 from rf.protocol_state import ProtocolStateTracker
 from rf.ring_buffer import ComplexRingBuffer
 from rf.stream_capture import CaptureConfig, SampleSource, StreamChunk
+from rf.waveform_selector import select_waveform
 
 
 @dataclass(frozen=True)
@@ -38,6 +38,7 @@ def run_streaming(
     hop_samples: int | None = None,
     queue_capacity: int = 8,
     stop_event: Event | None = None,
+    modulations: Iterable[str] = ("fsk",),
 ) -> dict:
     """Process a finite-duration source through a continuous chunk pipeline."""
     if analysis_window_samples <= 0 or queue_capacity <= 0:
@@ -48,6 +49,7 @@ def run_streaming(
     rates = tuple(symbol_rates)
     if not rates:
         raise ValueError("at least one symbol-rate candidate is required")
+    modulation_candidates = tuple(modulations)
 
     target = int(round(config.sample_rate * config.duration_seconds))
     queue: Queue[QueuedChunk | None] = Queue(maxsize=queue_capacity)
@@ -149,10 +151,11 @@ def run_streaming(
                 continue
             samples_since_analysis %= hop
             analysis_started_ns = time.perf_counter_ns()
-            selection = select(
+            selection = select_waveform(
                 ring.latest(analysis_window_samples),
                 config.sample_rate,
                 rates,
+                modulation_candidates,
             )
             chosen_hex = selection["chosenPayloadHex"]
             evidence = (
@@ -173,6 +176,7 @@ def run_streaming(
                 "ingestToDecisionMilliseconds": decision_ms,
                 "chosenSymbolRate": selection["chosenSymbolRate"],
                 "chosenModulation": selection["chosenModulation"],
+                "chosenDemodulator": selection["chosenDemodulator"],
                 "validProtocolFrames": selection["validProtocolFrames"],
                 "chosenPayloadHex": chosen_hex,
                 "protocolContinuity": continuity,

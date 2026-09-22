@@ -7,6 +7,8 @@
   "deviationHz": 3000,
   "noiseStd": 0.04,
   "amplitude": 0.4,
+  "modulation": "2-FSK",
+  "gaussianBt": null,
   "startSample": 1600,
   "endSample": 10240,
   "preambleHex": "55 55 55 55 D3 91",
