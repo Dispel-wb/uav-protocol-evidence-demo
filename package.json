@@ -11,6 +11,7 @@
     "demod:iq": "python -m rf.demodulate_iq samples/iq/fsk_demo.sigmf-meta --symbol-rate 1200 --truth samples/iq/fsk_demo_truth.json --output reports/fsk_demod_report.json --hex-output reports/fsk_demo.demod.hex",
     "select:iq": "python -m rf.select_demod samples/iq/fsk_demo.sigmf-meta --symbol-rates 800 1000 1200 2400 --output reports/fsk_candidate_selection.json",
     "evaluate:fsk": "python scripts/evaluate_fsk_robustness.py",
+    "stream:replay": "python -m rf.stream_replay samples/iq/fsk_demo.sigmf-meta --repeat 3 --output reports/streaming_pipeline.json",
     "test:e2e": "npm run fixture:iq && npm run analyze:iq && npm run demod:iq && node scripts/verify_demod_output.js reports/fsk_demo.demod.hex"
   }
 }

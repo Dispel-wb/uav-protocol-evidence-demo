@@ -39,6 +39,56 @@ def mavlink_evidence(data: bytes) -> dict[str, Any]:
         observed = packet[header + payload_length] | packet[header + payload_length + 1] << 8
         computed = crc_x25(packet[1:header + payload_length], extra) if extra is not None else None
         valid = computed == observed if computed is not None else None
-        frames.append({"offset": offset, "version": 2 if version2 else 1, "messageId": message_id, "length": total, "crcValid": valid})
+        frames.append({
+            "offset": offset,
+            "version": 2 if version2 else 1,
+            "messageId": message_id,
+            "sequence": packet[4] if version2 else packet[2],
+            "systemId": packet[5] if version2 else packet[3],
+            "componentId": packet[6] if version2 else packet[4],
+            "length": total,
+            "crcValid": valid,
+        })
         offset += total
     return {"frames": frames, "validFrames": sum(frame["crcValid"] is True for frame in frames), "invalidFrames": sum(frame["crcValid"] is False for frame in frames)}
+
+
+def update_mavlink_continuity(
+    evidence: dict[str, Any],
+    last_sequences: dict[tuple[int, int], int],
+) -> dict[str, Any]:
+    """Update per-source MAVLink sequence continuity using CRC-valid frames."""
+    observations = []
+    for frame in evidence["frames"]:
+        if frame["crcValid"] is not True:
+            continue
+        key = (frame["systemId"], frame["componentId"])
+        previous = last_sequences.get(key)
+        sequence = frame["sequence"]
+        status, missing = "first", 0
+        if previous is not None:
+            delta = (sequence - previous) % 256
+            if delta == 0:
+                status = "duplicate"
+            elif delta == 1:
+                status = "continuous"
+            elif delta <= 127:
+                status, missing = "gap", delta - 1
+            else:
+                status = "out-of-order"
+        if status != "out-of-order":
+            last_sequences[key] = sequence
+        observations.append({
+            "systemId": key[0],
+            "componentId": key[1],
+            "sequence": sequence,
+            "previousSequence": previous,
+            "status": status,
+            "missingFrames": missing,
+        })
+    return {
+        "observations": observations,
+        "missingFrames": sum(item["missingFrames"] for item in observations),
+        "duplicates": sum(item["status"] == "duplicate" for item in observations),
+        "outOfOrder": sum(item["status"] == "out-of-order" for item in observations),
+    }

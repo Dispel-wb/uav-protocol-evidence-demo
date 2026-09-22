@@ -1,0 +1,118 @@
+{
+  "schema": "streaming-rf-pipeline-v1",
+  "hardware": "array-replay",
+  "config": {
+    "center_frequency": 433920000.0,
+    "sample_rate": 48000.0,
+    "duration_seconds": 0.74,
+    "gain": null,
+    "bandwidth": null,
+    "channel": 0,
+    "chunk_samples": 1024,
+    "ring_samples": 11840
+  },
+  "analysisWindowSamples": 11840,
+  "hopSamples": 11840,
+  "queueCapacity": 8,
+  "capture": {
+    "receivedSamples": 35520,
+    "timeouts": 0,
+    "overflows": 0,
+    "emptyReads": 0,
+    "timestampJumps": 0,
+    "queueBackpressureEvents": 0,
+    "targetSamples": 35520,
+    "complete": true
+  },
+  "analysis": {
+    "analyzedWindows": 3,
+    "validProtocolWindows": 3,
+    "latencyMilliseconds": {
+      "p50": 25.1424,
+      "p95": 25.67421,
+      "max": 25.7333
+    },
+    "protocolContinuity": {
+      "missingFrames": 0,
+      "duplicates": 2,
+      "outOfOrder": 0
+    },
+    "windows": [
+      {
+        "startSample": 448,
+        "endSample": 12288,
+        "processingMilliseconds": 25.6729,
+        "ingestToDecisionMilliseconds": 25.7333,
+        "chosenSymbolRate": 1200.0,
+        "validProtocolFrames": 1,
+        "chosenPayloadHex": "FD 09 00 00 00 01 01 00 00 00 00 00 00 00 02 03 00 04 03 4A D7",
+        "protocolContinuity": {
+          "observations": [
+            {
+              "systemId": 1,
+              "componentId": 1,
+              "sequence": 0,
+              "previousSequence": null,
+              "status": "first",
+              "missingFrames": 0
+            }
+          ],
+          "missingFrames": 0,
+          "duplicates": 0,
+          "outOfOrder": 0
+        }
+      },
+      {
+        "startSample": 12736,
+        "endSample": 24576,
+        "processingMilliseconds": 25.0839,
+        "ingestToDecisionMilliseconds": 25.1424,
+        "chosenSymbolRate": 1200.0,
+        "validProtocolFrames": 1,
+        "chosenPayloadHex": "FD 09 00 00 00 01 01 00 00 00 00 00 00 00 02 03 00 04 03 4A D7",
+        "protocolContinuity": {
+          "observations": [
+            {
+              "systemId": 1,
+              "componentId": 1,
+              "sequence": 0,
+              "previousSequence": 0,
+              "status": "duplicate",
+              "missingFrames": 0
+            }
+          ],
+          "missingFrames": 0,
+          "duplicates": 1,
+          "outOfOrder": 0
+        }
+      },
+      {
+        "startSample": 23680,
+        "endSample": 35520,
+        "processingMilliseconds": 24.5997,
+        "ingestToDecisionMilliseconds": 24.7362,
+        "chosenSymbolRate": 1200.0,
+        "validProtocolFrames": 1,
+        "chosenPayloadHex": "FD 09 00 00 00 01 01 00 00 00 00 00 00 00 02 03 00 04 03 4A D7",
+        "protocolContinuity": {
+          "observations": [
+            {
+              "systemId": 1,
+              "componentId": 1,
+              "sequence": 0,
+              "previousSequence": 0,
+              "status": "duplicate",
+              "missingFrames": 0
+            }
+          ],
+          "missingFrames": 0,
+          "duplicates": 1,
+          "outOfOrder": 0
+        }
+      }
+    ]
+  },
+  "elapsedMilliseconds": 78.804,
+  "complete": true,
+  "boundary": "采样与分析已使用有界队列隔离；结果来自有限时长回放，尚未证明真实硬件持续运行性能。"
+}

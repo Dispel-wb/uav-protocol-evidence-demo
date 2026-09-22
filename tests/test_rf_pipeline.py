@@ -8,9 +8,10 @@ import numpy as np
 from rf.generate_iq_fixture import generate
 from rf.fsk_demod import demodulate, preprocess
 from rf.candidate_selector import select
-from rf.protocol_feedback import mavlink_evidence
+from rf.protocol_feedback import mavlink_evidence, update_mavlink_continuity
 from rf.ring_buffer import ComplexRingBuffer
 from rf.stream_capture import ArraySource, CaptureConfig, capture, capture_to_sigmf
+from rf.streaming_pipeline import run_streaming
 from rf.full_pipeline import run as run_full_pipeline
 from rf.sigmf_io import load
 from rf.signal_quality import analyze, remove_dc
@@ -62,6 +63,27 @@ class RFInputTests(unittest.TestCase):
         self.assertAlmostEqual(offset.imag, 3)
         self.assertAlmostEqual(abs(np.mean(cleaned)), 0)
 
+    def test_mavlink_sequence_continuity_handles_wrap_gap_and_reordering(self):
+        state = {}
+
+        def observe(sequence):
+            evidence = {"frames": [{
+                "crcValid": True,
+                "systemId": 1,
+                "componentId": 1,
+                "sequence": sequence,
+            }]}
+            return update_mavlink_continuity(evidence, state)["observations"][0]
+
+        self.assertEqual(observe(254)["status"], "first")
+        self.assertEqual(observe(255)["status"], "continuous")
+        wrapped_gap = observe(1)
+        self.assertEqual(wrapped_gap["status"], "gap")
+        self.assertEqual(wrapped_gap["missingFrames"], 1)
+        self.assertEqual(observe(1)["status"], "duplicate")
+        self.assertEqual(observe(250)["status"], "out-of-order")
+        self.assertEqual(observe(2)["status"], "continuous")
+
     def test_ci16_reader(self):
         with tempfile.TemporaryDirectory() as directory:
             base = Path(directory) / "ci16"
@@ -92,6 +114,92 @@ class RFInputTests(unittest.TestCase):
             replayed = load(meta)
             np.testing.assert_array_equal(replayed.samples, samples)
             self.assertEqual(stored_report["receivedSamples"], 16)
+
+    def test_streaming_replay_isolates_capture_and_recovers_each_window(self):
+        with tempfile.TemporaryDirectory() as directory:
+            meta_path, _ = generate(Path(directory) / "stream")
+            recording = load(meta_path)
+            repeats = 3
+            samples = np.tile(recording.samples, repeats)
+            config = CaptureConfig(
+                center_frequency=recording.center_frequency or 0,
+                sample_rate=recording.sample_rate,
+                duration_seconds=samples.size / recording.sample_rate,
+                chunk_samples=731,
+                ring_samples=recording.samples.size,
+            )
+            report = run_streaming(
+                ArraySource(samples, recording.sample_rate),
+                config,
+                [800, 1_200, 2_400],
+                analysis_window_samples=recording.samples.size,
+                hop_samples=recording.samples.size,
+                queue_capacity=2,
+            )
+            self.assertTrue(report["complete"])
+            self.assertEqual(report["capture"]["receivedSamples"], samples.size)
+            self.assertEqual(report["analysis"]["analyzedWindows"], repeats)
+            self.assertEqual(report["analysis"]["validProtocolWindows"], repeats)
+            self.assertEqual(report["analysis"]["protocolContinuity"]["duplicates"], 2)
+            self.assertEqual(report["analysis"]["protocolContinuity"]["missingFrames"], 0)
+            self.assertEqual(report["capture"]["overflows"], 0)
+            self.assertIsNotNone(report["analysis"]["latencyMilliseconds"]["p95"])
+            self.assertTrue(all(
+                window["chosenSymbolRate"] == 1_200
+                for window in report["analysis"]["windows"]
+            ))
+
+    def test_streaming_capture_failure_is_reported_without_hanging(self):
+        class FailingSource:
+            hardware = "failing-test-source"
+
+            def __init__(self):
+                self.stopped = False
+
+            def configure(self, config):
+                pass
+
+            def start(self):
+                pass
+
+            def read(self, count):
+                raise OSError("device disconnected")
+
+            def stop(self):
+                self.stopped = True
+
+        source = FailingSource()
+        config = CaptureConfig(
+            center_frequency=100e6,
+            sample_rate=48_000,
+            duration_seconds=1,
+        )
+        with self.assertRaisesRegex(RuntimeError, "capture stage failed"):
+            run_streaming(
+                source,
+                config,
+                [1_200],
+                analysis_window_samples=4_800,
+            )
+        self.assertTrue(source.stopped)
+
+    def test_streaming_analysis_failure_stops_capture_thread(self):
+        samples = np.ones(9_600, dtype=np.complex64)
+        source = ArraySource(samples, 48_000)
+        config = CaptureConfig(
+            center_frequency=100e6,
+            sample_rate=48_000,
+            duration_seconds=samples.size / 48_000,
+            chunk_samples=512,
+        )
+        with self.assertRaisesRegex(RuntimeError, "analysis stage failed"):
+            run_streaming(
+                source,
+                config,
+                [object()],
+                analysis_window_samples=4_800,
+                queue_capacity=1,
+            )
 
 
 if __name__ == "__main__":
