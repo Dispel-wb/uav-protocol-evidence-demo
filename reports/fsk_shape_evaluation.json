@@ -1,0 +1,371 @@
+{
+  "schema": "fsk-shape-evaluation-v1",
+  "cases": 40,
+  "correct": 30,
+  "rejected": 10,
+  "wrong": 0,
+  "validProtocolCases": 40,
+  "records": [
+    {
+      "expected": "2-FSK",
+      "observed": "2-FSK",
+      "noiseStd": 0.02,
+      "carrierOffsetHz": -4000,
+      "validProtocolFrames": 1,
+      "correct": true,
+      "rejected": false
+    },
+    {
+      "expected": "2-FSK",
+      "observed": "2-FSK",
+      "noiseStd": 0.02,
+      "carrierOffsetHz": -2000,
+      "validProtocolFrames": 1,
+      "correct": true,
+      "rejected": false
+    },
+    {
+      "expected": "2-FSK",
+      "observed": "2-FSK",
+      "noiseStd": 0.02,
+      "carrierOffsetHz": 0,
+      "validProtocolFrames": 1,
+      "correct": true,
+      "rejected": false
+    },
+    {
+      "expected": "2-FSK",
+      "observed": "2-FSK",
+      "noiseStd": 0.02,
+      "carrierOffsetHz": 2000,
+      "validProtocolFrames": 1,
+      "correct": true,
+      "rejected": false
+    },
+    {
+      "expected": "2-FSK",
+      "observed": "2-FSK",
+      "noiseStd": 0.02,
+      "carrierOffsetHz": 4000,
+      "validProtocolFrames": 1,
+      "correct": true,
+      "rejected": false
+    },
+    {
+      "expected": "2-FSK",
+      "observed": "2-FSK",
+      "noiseStd": 0.04,
+      "carrierOffsetHz": -4000,
+      "validProtocolFrames": 1,
+      "correct": true,
+      "rejected": false
+    },
+    {
+      "expected": "2-FSK",
+      "observed": "2-FSK",
+      "noiseStd": 0.04,
+      "carrierOffsetHz": -2000,
+      "validProtocolFrames": 1,
+      "correct": true,
+      "rejected": false
+    },
+    {
+      "expected": "2-FSK",
+      "observed": "2-FSK",
+      "noiseStd": 0.04,
+      "carrierOffsetHz": 0,
+      "validProtocolFrames": 1,
+      "correct": true,
+      "rejected": false
+    },
+    {
+      "expected": "2-FSK",
+      "observed": "2-FSK",
+      "noiseStd": 0.04,
+      "carrierOffsetHz": 2000,
+      "validProtocolFrames": 1,
+      "correct": true,
+      "rejected": false
+    },
+    {
+      "expected": "2-FSK",
+      "observed": "2-FSK",
+      "noiseStd": 0.04,
+      "carrierOffsetHz": 4000,
+      "validProtocolFrames": 1,
+      "correct": true,
+      "rejected": false
+    },
+    {
+      "expected": "2-FSK",
+      "observed": "2-FSK",
+      "noiseStd": 0.08,
+      "carrierOffsetHz": -4000,
+      "validProtocolFrames": 1,
+      "correct": true,
+      "rejected": false
+    },
+    {
+      "expected": "2-FSK",
+      "observed": "2-FSK",
+      "noiseStd": 0.08,
+      "carrierOffsetHz": -2000,
+      "validProtocolFrames": 1,
+      "correct": true,
+      "rejected": false
+    },
+    {
+      "expected": "2-FSK",
+      "observed": "2-FSK",
+      "noiseStd": 0.08,
+      "carrierOffsetHz": 0,
+      "validProtocolFrames": 1,
+      "correct": true,
+      "rejected": false
+    },
+    {
+      "expected": "2-FSK",
+      "observed": "2-FSK",
+      "noiseStd": 0.08,
+      "carrierOffsetHz": 2000,
+      "validProtocolFrames": 1,
+      "correct": true,
+      "rejected": false
+    },
+    {
+      "expected": "2-FSK",
+      "observed": "2-FSK",
+      "noiseStd": 0.08,
+      "carrierOffsetHz": 4000,
+      "validProtocolFrames": 1,
+      "correct": true,
+      "rejected": false
+    },
+    {
+      "expected": "2-FSK",
+      "observed": null,
+      "noiseStd": 0.12,
+      "carrierOffsetHz": -4000,
+      "validProtocolFrames": 1,
+      "correct": false,
+      "rejected": true
+    },
+    {
+      "expected": "2-FSK",
+      "observed": null,
+      "noiseStd": 0.12,
+      "carrierOffsetHz": -2000,
+      "validProtocolFrames": 1,
+      "correct": false,
+      "rejected": true
+    },
+    {
+      "expected": "2-FSK",
+      "observed": null,
+      "noiseStd": 0.12,
+      "carrierOffsetHz": 0,
+      "validProtocolFrames": 1,
+      "correct": false,
+      "rejected": true
+    },
+    {
+      "expected": "2-FSK",
+      "observed": null,
+      "noiseStd": 0.12,
+      "carrierOffsetHz": 2000,
+      "validProtocolFrames": 1,
+      "correct": false,
+      "rejected": true
+    },
+    {
+      "expected": "2-FSK",
+      "observed": null,
+      "noiseStd": 0.12,
+      "carrierOffsetHz": 4000,
+      "validProtocolFrames": 1,
+      "correct": false,
+      "rejected": true
+    },
+    {
+      "expected": "GFSK",
+      "observed": "GFSK",
+      "noiseStd": 0.02,
+      "carrierOffsetHz": -4000,
+      "validProtocolFrames": 1,
+      "correct": true,
+      "rejected": false
+    },
+    {
+      "expected": "GFSK",
+      "observed": "GFSK",
+      "noiseStd": 0.02,
+      "carrierOffsetHz": -2000,
+      "validProtocolFrames": 1,
+      "correct": true,
+      "rejected": false
+    },
+    {
+      "expected": "GFSK",
+      "observed": "GFSK",
+      "noiseStd": 0.02,
+      "carrierOffsetHz": 0,
+      "validProtocolFrames": 1,
+      "correct": true,
+      "rejected": false
+    },
+    {
+      "expected": "GFSK",
+      "observed": "GFSK",
+      "noiseStd": 0.02,
+      "carrierOffsetHz": 2000,
+      "validProtocolFrames": 1,
+      "correct": true,
+      "rejected": false
+    },
+    {
+      "expected": "GFSK",
+      "observed": "GFSK",
+      "noiseStd": 0.02,
+      "carrierOffsetHz": 4000,
+      "validProtocolFrames": 1,
+      "correct": true,
+      "rejected": false
+    },
+    {
+      "expected": "GFSK",
+      "observed": "GFSK",
+      "noiseStd": 0.04,
+      "carrierOffsetHz": -4000,
+      "validProtocolFrames": 1,
+      "correct": true,
+      "rejected": false
+    },
+    {
+      "expected": "GFSK",
+      "observed": "GFSK",
+      "noiseStd": 0.04,
+      "carrierOffsetHz": -2000,
+      "validProtocolFrames": 1,
+      "correct": true,
+      "rejected": false
+    },
+    {
+      "expected": "GFSK",
+      "observed": "GFSK",
+      "noiseStd": 0.04,
+      "carrierOffsetHz": 0,
+      "validProtocolFrames": 1,
+      "correct": true,
+      "rejected": false
+    },
+    {
+      "expected": "GFSK",
+      "observed": "GFSK",
+      "noiseStd": 0.04,
+      "carrierOffsetHz": 2000,
+      "validProtocolFrames": 1,
+      "correct": true,
+      "rejected": false
+    },
+    {
+      "expected": "GFSK",
+      "observed": "GFSK",
+      "noiseStd": 0.04,
+      "carrierOffsetHz": 4000,
+      "validProtocolFrames": 1,
+      "correct": true,
+      "rejected": false
+    },
+    {
+      "expected": "GFSK",
+      "observed": "GFSK",
+      "noiseStd": 0.08,
+      "carrierOffsetHz": -4000,
+      "validProtocolFrames": 1,
+      "correct": true,
+      "rejected": false
+    },
+    {
+      "expected": "GFSK",
+      "observed": "GFSK",
+      "noiseStd": 0.08,
+      "carrierOffsetHz": -2000,
+      "validProtocolFrames": 1,
+      "correct": true,
+      "rejected": false
+    },
+    {
+      "expected": "GFSK",
+      "observed": "GFSK",
+      "noiseStd": 0.08,
+      "carrierOffsetHz": 0,
+      "validProtocolFrames": 1,
+      "correct": true,
+      "rejected": false
+    },
+    {
+      "expected": "GFSK",
+      "observed": "GFSK",
+      "noiseStd": 0.08,
+      "carrierOffsetHz": 2000,
+      "validProtocolFrames": 1,
+      "correct": true,
+      "rejected": false
+    },
+    {
+      "expected": "GFSK",
+      "observed": "GFSK",
+      "noiseStd": 0.08,
+      "carrierOffsetHz": 4000,
+      "validProtocolFrames": 1,
+      "correct": true,
+      "rejected": false
+    },
+    {
+      "expected": "GFSK",
+      "observed": null,
+      "noiseStd": 0.12,
+      "carrierOffsetHz": -4000,
+      "validProtocolFrames": 1,
+      "correct": false,
+      "rejected": true
+    },
+    {
+      "expected": "GFSK",
+      "observed": null,
+      "noiseStd": 0.12,
+      "carrierOffsetHz": -2000,
+      "validProtocolFrames": 1,
+      "correct": false,
+      "rejected": true
+    },
+    {
+      "expected": "GFSK",
+      "observed": null,
+      "noiseStd": 0.12,
+      "carrierOffsetHz": 0,
+      "validProtocolFrames": 1,
+      "correct": false,
+      "rejected": true
+    },
+    {
+      "expected": "GFSK",
+      "observed": null,
+      "noiseStd": 0.12,
+      "carrierOffsetHz": 2000,
+      "validProtocolFrames": 1,
+      "correct": false,
+      "rejected": true
+    },
+    {
+      "expected": "GFSK",
+      "observed": null,
+      "noiseStd": 0.12,
+      "carrierOffsetHz": 4000,
+      "validProtocolFrames": 1,
+      "correct": false,
+      "rejected": true
+    }
+  ],
+  "boundary": "All cases are deterministic synthetic 2-FSK or BT=0.5 GFSK. This does not establish recognition performance for real radios or other pulse shapes."
+}

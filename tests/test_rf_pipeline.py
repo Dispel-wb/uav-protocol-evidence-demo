@@ -7,7 +7,7 @@ import unittest
 
 import numpy as np
 
-from rf.generate_iq_fixture import generate
+from rf.generate_iq_fixture import PAYLOAD, generate, synthesize
 from rf.fsk_demod import demodulate, preprocess
 from rf.candidate_selector import select
 from rf.protocol_feedback import mavlink_evidence, update_mavlink_continuity
@@ -66,6 +66,16 @@ class RFInputTests(unittest.TestCase):
         self.assertAlmostEqual(offset.real, 2)
         self.assertAlmostEqual(offset.imag, 3)
         self.assertAlmostEqual(abs(np.mean(cleaned)), 0)
+
+    def test_gfsk_decodes_and_is_distinguished_from_rectangular_fsk(self):
+        rectangular, rectangular_truth = synthesize(seed=71)
+        gaussian, gaussian_truth = synthesize(gaussian_bt=0.5, seed=72)
+        rectangular_result = select(rectangular, rectangular_truth["sampleRate"], [1_200])
+        gaussian_result = select(gaussian, gaussian_truth["sampleRate"], [1_200])
+        self.assertEqual(rectangular_result["chosenModulation"], "2-FSK")
+        self.assertEqual(gaussian_result["chosenModulation"], "GFSK")
+        self.assertEqual(bytes.fromhex(gaussian_result["chosenPayloadHex"]), PAYLOAD)
+        self.assertEqual(gaussian_result["validProtocolFrames"], 1)
 
     def test_mavlink_sequence_continuity_handles_wrap_gap_and_reordering(self):
         state = {}

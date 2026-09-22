@@ -54,6 +54,16 @@ def preprocess(samples: np.ndarray, sample_rate: float, symbol_rate: float) -> d
         raise ValueError("no burst detected")
     start, end = max(bursts, key=lambda item: item[1] - item[0])
     low, high = estimate_tones(cleaned[start:end], sample_rate, minimum_separation_hz=max(symbol_rate * 0.75, 200))
+    if (high - low) / 2 < symbol_rate:
+        segment = cleaned[start:end]
+        instantaneous = np.angle(segment[1:] * np.conj(segment[:-1])) * sample_rate / (2 * np.pi)
+        smoothing = max(3, round(sample_rate / symbol_rate / 6))
+        smoothed = np.convolve(
+            instantaneous,
+            np.ones(smoothing, dtype=np.float32) / smoothing,
+            mode="valid",
+        )
+        low, high = map(float, np.quantile(smoothed, [0.1, 0.9]))
     carrier_offset = (low + high) / 2
     deviation = (high - low) / 2
     corrected = frequency_shift(cleaned, sample_rate, carrier_offset)

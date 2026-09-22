@@ -172,6 +172,7 @@ def run_streaming(
                 "processingMilliseconds": (finished_ns - analysis_started_ns) / 1e6,
                 "ingestToDecisionMilliseconds": decision_ms,
                 "chosenSymbolRate": selection["chosenSymbolRate"],
+                "chosenModulation": selection["chosenModulation"],
                 "validProtocolFrames": selection["validProtocolFrames"],
                 "chosenPayloadHex": chosen_hex,
                 "protocolContinuity": continuity,

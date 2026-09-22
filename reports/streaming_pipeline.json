@@ -30,9 +30,9 @@
     "analyzedWindows": 3,
     "validProtocolWindows": 3,
     "latencyMilliseconds": {
-      "p50": 26.3415,
-      "p95": 26.410529999999998,
-      "max": 26.4182
+      "p50": 26.8882,
+      "p95": 27.03229,
+      "max": 27.0483
     },
     "protocolContinuity": {
       "missingFrames": 0,
@@ -60,9 +60,10 @@
       {
         "startSample": 448,
         "endSample": 12288,
-        "processingMilliseconds": 26.2195,
-        "ingestToDecisionMilliseconds": 26.3415,
+        "processingMilliseconds": 26.8277,
+        "ingestToDecisionMilliseconds": 26.8882,
         "chosenSymbolRate": 1200.0,
+        "chosenModulation": "2-FSK",
         "validProtocolFrames": 1,
         "chosenPayloadHex": "FD 09 00 00 00 01 01 00 00 00 00 00 00 00 02 03 00 04 03 4A D7",
         "protocolContinuity": {
@@ -99,9 +100,10 @@
       {
         "startSample": 12736,
         "endSample": 24576,
-        "processingMilliseconds": 26.339,
-        "ingestToDecisionMilliseconds": 26.4182,
+        "processingMilliseconds": 26.7873,
+        "ingestToDecisionMilliseconds": 26.8807,
         "chosenSymbolRate": 1200.0,
+        "chosenModulation": "2-FSK",
         "validProtocolFrames": 1,
         "chosenPayloadHex": "FD 09 00 00 00 01 01 00 00 00 00 00 00 00 02 03 00 04 03 4A D7",
         "protocolContinuity": {
@@ -130,9 +132,10 @@
       {
         "startSample": 23680,
         "endSample": 35520,
-        "processingMilliseconds": 24.9641,
-        "ingestToDecisionMilliseconds": 25.1976,
+        "processingMilliseconds": 27.0065,
+        "ingestToDecisionMilliseconds": 27.0483,
         "chosenSymbolRate": 1200.0,
+        "chosenModulation": "2-FSK",
         "validProtocolFrames": 1,
         "chosenPayloadHex": "FD 09 00 00 00 01 01 00 00 00 00 00 00 00 02 03 00 04 03 4A D7",
         "protocolContinuity": {
@@ -160,7 +163,7 @@
       }
     ]
   },
-  "elapsedMilliseconds": 78.8361,
+  "elapsedMilliseconds": 81.7524,
   "complete": true,
   "stoppedCleanly": true,
   "usableProtocolEvidence": true,

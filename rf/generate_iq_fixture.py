@@ -20,6 +20,7 @@ def synthesize(
     symbol_rate: float = 1_200,
     seed: int = 20260923,
     window_samples: int | None = None,
+    gaussian_bt: float | None = None,
 ) -> tuple[np.ndarray, dict]:
     samples_per_symbol = int(round(sample_rate / symbol_rate))
     if samples_per_symbol <= 0 or not np.isclose(samples_per_symbol, sample_rate / symbol_rate):
@@ -35,8 +36,18 @@ def synthesize(
     noise = rng.normal(0, noise_std, total) + 1j * rng.normal(0, noise_std, total)
     samples = noise.astype(np.complex64)
     samples += np.complex64(0.02 + 0.01j)
-    tones = np.where(bits > 0, carrier_offset + deviation, carrier_offset - deviation)
-    frequencies = np.repeat(tones, samples_per_symbol)
+    symbols = np.where(bits > 0, 1.0, -1.0)
+    shaped = np.repeat(symbols, samples_per_symbol)
+    if gaussian_bt is not None:
+        if gaussian_bt <= 0:
+            raise ValueError("Gaussian BT must be positive")
+        sigma = samples_per_symbol * 0.175 / gaussian_bt
+        half = max(1, round(3 * sigma))
+        positions = np.arange(-half, half + 1)
+        kernel = np.exp(-0.5 * (positions / sigma) ** 2)
+        kernel /= np.sum(kernel)
+        shaped = np.convolve(shaped, kernel, mode="same")
+    frequencies = carrier_offset + deviation * shaped
     phase = 2 * np.pi * np.cumsum(frequencies) / sample_rate
     samples[start:end] += (amplitude * np.exp(1j * phase)).astype(np.complex64)
     truth = {
@@ -48,6 +59,8 @@ def synthesize(
         "deviationHz": deviation,
         "noiseStd": noise_std,
         "amplitude": amplitude,
+        "modulation": "GFSK" if gaussian_bt is not None else "2-FSK",
+        "gaussianBt": gaussian_bt,
         "startSample": start,
         "endSample": end,
         "preambleHex": PREAMBLE.hex(" ").upper(),

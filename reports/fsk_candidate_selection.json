@@ -1,6 +1,7 @@
 {
   "schema": "demod-candidate-selection-v1",
   "chosenSymbolRate": 1200.0,
+  "chosenModulation": "2-FSK",
   "chosenPayloadHex": "FD 09 00 00 00 01 01 00 00 00 00 00 00 00 02 03 00 04 03 4A D7",
   "validProtocolFrames": 1,
   "candidates": [
@@ -27,12 +28,31 @@
             "offset": 0,
             "version": 2,
             "messageId": 0,
+            "sequence": 0,
+            "systemId": 1,
+            "componentId": 1,
             "length": 21,
-            "crcValid": true
+            "crcValid": true,
+            "fields": {
+              "armed": false,
+              "baseMode": 0
+            }
           }
         ],
         "validFrames": 1,
         "invalidFrames": 0
+      },
+      "modulationEvidence": {
+        "schema": "fsk-shape-evidence-v1",
+        "label": "2-FSK",
+        "reason": "frequency samples cluster near two abrupt tone levels",
+        "estimatedSnrDb": 16.878630863184615,
+        "frequencyCenterHz": 1112.3176757812498,
+        "frequencyDeviationHz": 3096.33447265625,
+        "smoothingSamples": 7,
+        "intermediateFraction": 0.04524680073126142,
+        "nearToneFraction": 0.9397851919561243,
+        "boundary": "Thresholds are validated only on deterministic synthetic 2-FSK and BT=0.5 GFSK; low-SNR or out-of-family signals are rejected."
       },
       "demodulation": {
         "schema": "fsk-demod-report-v1",

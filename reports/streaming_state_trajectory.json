@@ -30,9 +30,9 @@
     "analyzedWindows": 6,
     "validProtocolWindows": 6,
     "latencyMilliseconds": {
-      "p50": 27.69715,
-      "p95": 51.090875,
-      "max": 51.6965
+      "p50": 30.8873,
+      "p95": 54.58185,
+      "max": 55.0999
     },
     "protocolContinuity": {
       "missingFrames": 0,
@@ -101,9 +101,10 @@
       {
         "startSample": 0,
         "endSample": 22720,
-        "processingMilliseconds": 28.3175,
-        "ingestToDecisionMilliseconds": 28.4211,
+        "processingMilliseconds": 30.5261,
+        "ingestToDecisionMilliseconds": 30.5442,
         "chosenSymbolRate": 1200.0,
+        "chosenModulation": "2-FSK",
         "validProtocolFrames": 1,
         "chosenPayloadHex": "FD 09 00 00 00 01 01 00 00 00 00 00 00 00 00 00 00 00 00 D9 8B",
         "protocolContinuity": {
@@ -140,9 +141,10 @@
       {
         "startSample": 22720,
         "endSample": 45440,
-        "processingMilliseconds": 49.2434,
-        "ingestToDecisionMilliseconds": 49.274,
+        "processingMilliseconds": 55.0698,
+        "ingestToDecisionMilliseconds": 55.0999,
         "chosenSymbolRate": 1200.0,
+        "chosenModulation": "2-FSK",
         "validProtocolFrames": 1,
         "chosenPayloadHex": "FD 21 00 00 00 FF BE 4C 00 00 00 00 80 3F 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 90 01 01 01 00 21 DD",
         "protocolContinuity": {
@@ -179,9 +181,10 @@
       {
         "startSample": 45440,
         "endSample": 68160,
-        "processingMilliseconds": 24.2356,
-        "ingestToDecisionMilliseconds": 24.274,
+        "processingMilliseconds": 24.606,
+        "ingestToDecisionMilliseconds": 24.6191,
         "chosenSymbolRate": 1200.0,
+        "chosenModulation": "2-FSK",
         "validProtocolFrames": 1,
         "chosenPayloadHex": "FD 03 00 00 01 01 01 4D 00 00 90 01 00 23 FF",
         "protocolContinuity": {
@@ -225,9 +228,10 @@
       {
         "startSample": 68160,
         "endSample": 90880,
-        "processingMilliseconds": 26.9334,
-        "ingestToDecisionMilliseconds": 26.9732,
+        "processingMilliseconds": 31.1825,
+        "ingestToDecisionMilliseconds": 31.2304,
         "chosenSymbolRate": 1200.0,
+        "chosenModulation": "2-FSK",
         "validProtocolFrames": 1,
         "chosenPayloadHex": "FD 09 00 00 02 01 01 00 00 00 00 00 00 00 00 00 80 00 00 86 B2",
         "protocolContinuity": {
@@ -256,9 +260,10 @@
       {
         "startSample": 90880,
         "endSample": 113600,
-        "processingMilliseconds": 51.6763,
-        "ingestToDecisionMilliseconds": 51.6965,
+        "processingMilliseconds": 53.0144,
+        "ingestToDecisionMilliseconds": 53.0277,
         "chosenSymbolRate": 1200.0,
+        "chosenModulation": "2-FSK",
         "validProtocolFrames": 1,
         "chosenPayloadHex": "FD 21 00 00 01 FF BE 4C 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 A0 41 16 00 01 01 00 A0 84",
         "protocolContinuity": {
@@ -295,9 +300,10 @@
       {
         "startSample": 113600,
         "endSample": 136320,
-        "processingMilliseconds": 22.9072,
-        "ingestToDecisionMilliseconds": 22.9615,
+        "processingMilliseconds": 23.7727,
+        "ingestToDecisionMilliseconds": 23.826,
         "chosenSymbolRate": 1200.0,
+        "chosenModulation": "2-FSK",
         "validProtocolFrames": 1,
         "chosenPayloadHex": "FD 03 00 00 03 01 01 4D 00 00 16 00 00 45 9B",
         "protocolContinuity": {
@@ -340,7 +346,7 @@
       }
     ]
   },
-  "elapsedMilliseconds": 207.7635,
+  "elapsedMilliseconds": 222.8009,
   "complete": true,
   "stoppedCleanly": true,
   "usableProtocolEvidence": true,
