@@ -11,6 +11,7 @@
 @media(max-width:1100px){.layout{grid-template-columns:1fr}.metrics{grid-template-columns:repeat(5,1fr)}}@media(max-width:700px){.shell{grid-template-columns:1fr}.rail{display:none}.topbar{height:55px}.intro{display:block}.edition{display:inline-block;margin-top:10px}.metrics{grid-template-columns:repeat(2,1fr)}.metrics>div{border-bottom:1px solid var(--line)}.metrics>div:nth-child(even){border-right:0}.detail-grid{grid-template-columns:1fr}.content{padding:22px 16px}.input-meta{display:block}}
 .segment.inferred{background:#f4f0e9;border-color:#c8b8a0;color:#785b39}.stream-legend i.u{background:#9a7851}.discovered+.discovered{border-top:1px solid var(--line);padding-top:14px;margin-top:14px}.discovered-head{display:flex;gap:12px;align-items:baseline;flex-wrap:wrap}.discovered-head strong{font-size:14px}.discovered-head span{font-size:11px;color:var(--muted)}.discovered p{font-size:12px;margin:7px 0 10px;color:#526168}.field-list{display:flex;flex-wrap:wrap;gap:7px}.field-list>span{border:1px solid #d7ddd8;border-radius:4px;background:#fafbf9;padding:5px 8px;font-size:11px}.field-list b{font-family:Consolas,monospace;color:#785b39}.field-list small{display:block;color:var(--muted);font-size:10px;max-width:190px;overflow-wrap:anywhere}.discovered .discovery-note{font-size:11px;color:var(--muted);margin:9px 0 0}
 .link-grid{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line);border-radius:6px;overflow:hidden}.link-grid>div{padding:10px 12px;border-right:1px solid var(--line)}.link-grid>div:last-child{border-right:0}.link-grid span,.link-grid small{display:block;color:var(--muted);font-size:10px}.link-grid strong{display:block;font-size:19px;font-weight:650}.composition{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}.composition>span{border:1px solid #d7dfe1;background:#f8faf9;border-radius:4px;padding:5px 8px;font-size:10px;color:var(--muted)}.composition b{color:var(--ink);margin-right:6px}.next-actions{margin:12px 0 0;padding-left:20px;font-size:11px;color:#485860}.next-actions li+li{margin-top:3px}.link-boundary{border-top:1px solid var(--line);padding-top:9px;margin:10px 0 0;color:var(--muted);font-size:10px}
+.state-evidence{display:grid;grid-template-columns:74px 1fr;gap:5px 10px;margin-top:12px;padding:9px 11px;background:#f7f9f8;border-left:2px solid var(--accent);font-size:11px}.state-evidence b{font-weight:650}.state-evidence span{color:#53636b;overflow-wrap:anywhere}
 @media(max-width:700px){.link-grid{grid-template-columns:repeat(2,1fr)}.link-grid>div:nth-child(2){border-right:0}.link-grid>div:nth-child(-n+2){border-bottom:1px solid var(--line)}}
 
 </style>
@@ -455,6 +456,75 @@
 });
 
 </script><script>
+/* Evidence-based MAVLink command/state reconstruction.
+   Accepted takeoff means the command was accepted; it does not prove airborne state. */
+(function (root, factory) {
+  const api = factory();
+  if (typeof module === 'object' && module.exports) module.exports = api;
+  root.StateAnalysis = api;
+})(typeof globalThis !== 'undefined' ? globalThis : this, function () {
+  'use strict';
+
+  function analyze(frames) {
+    const ordered = [...(frames || [])].sort((a, b) => a.offset - b.offset);
+    const timeline = [], links = [], violations = [], pending = new Map();
+    let state = 'unknown';
+
+    function transition(frame, next, evidence) {
+      if (next === state) return;
+      timeline.push({ offset: frame.offset, from: state, to: next, evidence });
+      state = next;
+    }
+    function enqueue(command, frame) {
+      if (!pending.has(command)) pending.set(command, []);
+      pending.get(command).push(frame);
+    }
+
+    for (const frame of ordered) {
+      if (!frame.family.startsWith('MAVLink') || frame.crc === 'invalid' || !frame.fields) continue;
+      const fields = frame.fields;
+      if (frame.messageId === 0 && frame.componentId === 1) {
+        transition(frame, fields.armed ? 'armed' : 'disarmed', `HEARTBEAT armed=${fields.armed}`);
+      }
+      if (frame.messageId === 76) {
+        enqueue(fields.command, frame);
+        if (fields.command === 400) transition(frame, fields.param1 >= 0.5 ? 'arming-requested' : 'disarming-requested', `COMMAND_LONG ${fields.commandName}`);
+        if (fields.command === 22) {
+          if (state !== 'armed') violations.push({ offset: frame.offset, type: 'precondition', detail: `TAKEOFF 出现时状态为 ${state}，未获得已解锁证据。` });
+          transition(frame, 'takeoff-requested', `COMMAND_LONG ${fields.commandName}`);
+        }
+      }
+      if (frame.messageId === 77) {
+        const queue = pending.get(fields.command) || [];
+        const request = queue.shift();
+        if (request) {
+          links.push({ command: fields.commandName, requestOffset: request.offset, ackOffset: frame.offset, result: fields.resultName });
+          if (fields.result === 0 && fields.command === 400) transition(frame, 'armed', 'ARM_DISARM ACK accepted');
+          else if (fields.result === 0 && fields.command === 22) transition(frame, 'takeoff-accepted', 'TAKEOFF ACK accepted');
+          else if (fields.result !== 5) transition(frame, 'command-rejected', `${fields.commandName} ACK ${fields.resultName}`);
+        } else {
+          violations.push({ offset: frame.offset, type: 'orphan-ack', detail: `${fields.commandName} 应答之前未发现对应命令。` });
+        }
+      }
+    }
+
+    for (const queue of pending.values()) {
+      for (const request of queue) violations.push({ offset: request.offset, type: 'missing-ack', detail: `${request.fields.commandName} 在当前捕获结束前没有对应应答。` });
+    }
+    return {
+      schema: 'protocol-state-evidence-v1',
+      finalState: state,
+      timeline,
+      links,
+      violations,
+      boundary: '状态只来自当前捕获中的有效报文；TAKEOFF 被接受不等于飞行器已经离地。',
+    };
+  }
+
+  return { analyze };
+});
+
+</script><script>
 window.ProtocolSamples = [
   {
     "id": "mavlink2-normal",
@@ -525,6 +595,7 @@ window.ProtocolSamples = [
   const decoder = window.ProtocolLab;
   const discovery = window.ProtocolDiscovery;
   const intelligence = window.LinkIntelligence;
+  const stateAnalysis = window.StateAnalysis;
   const samples = window.ProtocolSamples;
   let report = null, currentBytes = null;
   let rules = { maxAltitudeM: 120, minGpsFix: 3, sbusLostFrameLimit: 2, requireArmAck: true };
@@ -564,6 +635,7 @@ window.ProtocolSamples = [
       report = decoder.analyze(currentBytes, rules);
       report.discovery = discovery.infer(currentBytes, report.gaps);
       report.linkAssessment = intelligence.assess(currentBytes, report, report.discovery);
+      report.stateAnalysis = stateAnalysis.analyze(report.frames);
       report.findings = report.findings.filter(f => f.title !== '未识别字节');
       for (const gap of report.discovery.unexplained) report.findings.push({offset:gap.offset,family:'未知字节',level:'info',title:'结构尚未推断',detail:`${gap.length} 字节缺少足够重复证据。`,evidence:gap.raw});
       report.summary.findings = report.findings.length;
@@ -661,7 +733,10 @@ window.ProtocolSamples = [
     const link = report.linkAssessment, metrics = link.metrics;
     $('link-confidence').textContent = `${link.classification} · ${link.confidence}置信度`;
     const integrity = metrics.integrityPercent === null ? '无已知帧' : `${metrics.integrityPercent}%`;
-    $('link-assessment').innerHTML = `<div class="link-grid"><div><span>字节覆盖率</span><strong>${metrics.coveragePercent}%</strong><small>已知 ${metrics.knownPercent}%</small></div><div><span>帧完整性</span><strong>${integrity}</strong><small>已知帧校验</small></div><div><span>协议组成</span><strong>${metrics.protocolCount}</strong><small>${metrics.transitions} 个切换点</small></div><div><span>字节熵</span><strong>${metrics.byteEntropy}</strong><small>bit / byte</small></div></div><div class="composition">${link.composition.map(item => `<span><b>${safe(item.family)}</b>${item.frames} 帧 · ${item.bytes} B · ${safe(item.evidence)}</span>`).join('') || '<span>尚无可解释的协议片段</span>'}</div><ol class="next-actions">${link.nextActions.map(action => `<li>${safe(action)}</li>`).join('')}</ol><p class="link-boundary">${safe(link.boundary)}</p>`;
+    const state = report.stateAnalysis;
+    const statePath = state.timeline.map(item => item.to).join(' → ') || '当前捕获没有可用状态证据';
+    const causal = state.links.map(item => `${item.command}: +${item.requestOffset} → +${item.ackOffset} (${item.result})`).join('；') || '尚未形成命令—应答配对';
+    $('link-assessment').innerHTML = `<div class="link-grid"><div><span>字节覆盖率</span><strong>${metrics.coveragePercent}%</strong><small>已知 ${metrics.knownPercent}%</small></div><div><span>帧完整性</span><strong>${integrity}</strong><small>已知帧校验</small></div><div><span>协议组成</span><strong>${metrics.protocolCount}</strong><small>${metrics.transitions} 个切换点</small></div><div><span>字节熵</span><strong>${metrics.byteEntropy}</strong><small>bit / byte</small></div></div><div class="composition">${link.composition.map(item => `<span><b>${safe(item.family)}</b>${item.frames} 帧 · ${item.bytes} B · ${safe(item.evidence)}</span>`).join('') || '<span>尚无可解释的协议片段</span>'}</div><div class="state-evidence"><b>状态轨迹</b><span>${safe(statePath)}</span><b>因果配对</b><span>${safe(causal)}</span></div><ol class="next-actions">${link.nextActions.map(action => `<li>${safe(action)}</li>`).join('')}</ol><p class="link-boundary">${safe(link.boundary)} ${safe(state.boundary)}</p>`;
   }
   function applyRules() {
     try {

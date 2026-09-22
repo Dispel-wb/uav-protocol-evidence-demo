@@ -3,6 +3,6 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "test": "node tests/test_decoder.js && node tests/test_discovery.js && node tests/test_link_intelligence.js && node tests/test_stream_intelligence.js"
+    "test": "node tests/test_decoder.js && node tests/test_discovery.js && node tests/test_link_intelligence.js && node tests/test_stream_intelligence.js && node tests/test_state_analysis.js"
   }
 }
