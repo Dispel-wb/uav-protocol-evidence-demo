@@ -3,6 +3,7 @@
   const $ = id => document.getElementById(id);
   const decoder = window.ProtocolLab;
   const discovery = window.ProtocolDiscovery;
+  const intelligence = window.LinkIntelligence;
   const samples = window.ProtocolSamples;
   let report = null, currentBytes = null;
   let rules = { maxAltitudeM: 120, minGpsFix: 3, sbusLostFrameLimit: 2, requireArmAck: true };
@@ -41,6 +42,7 @@
       if (!currentBytes.length) throw new Error('请粘贴解调后的十六进制字节，或选择内置样本。');
       report = decoder.analyze(currentBytes, rules);
       report.discovery = discovery.infer(currentBytes, report.gaps);
+      report.linkAssessment = intelligence.assess(currentBytes, report, report.discovery);
       report.findings = report.findings.filter(f => f.title !== '未识别字节');
       for (const gap of report.discovery.unexplained) report.findings.push({offset:gap.offset,family:'未知字节',level:'info',title:'结构尚未推断',detail:`${gap.length} 字节缺少足够重复证据。`,evidence:gap.raw});
       report.summary.findings = report.findings.length;
@@ -129,9 +131,16 @@
     if (frames.length) showFrame(0);
     $('discovery-count').textContent = `${report.discovery.families.length} 族`;
     $('discovery').innerHTML = report.discovery.families.length ? report.discovery.families.map(f => `<article class="discovered"><div class="discovered-head"><strong>${safe(f.id)}</strong><span>${f.packetCount} 帧 · ${safe(f.confidence)}</span></div><p>${f.observations.map(safe).join('；')}。</p><div class="field-list">${f.columns.map(c => `<span><b>${typeof c.offset === 'number' ? '+'+c.offset : c.offset}</b> ${safe(c.label)}<small>${safe(c.evidence)}</small></span>`).join('')}</div><p class="discovery-note">各帧起始偏移：${f.packets.map(p=>`+${p.offset}`).join('、')} B。字段名称均为候选，需结合设备操作和更多捕获数据验证。</p></article>`).join('') : `<div class="empty">未形成可重复的未知帧结构。${safe(report.discovery.minimumEvidence)}剩余 ${report.discovery.unexplainedBytes} 字节。</div>`;
+    renderLinkAssessment();
     $('finding-count').textContent = `${s.findings} 项`;
     $('findings').innerHTML = report.findings.length ? report.findings.map(f => `<div class="finding ${safe(f.level)}"><strong>${safe(f.title)} · +${f.offset} B</strong><div>${safe(f.detail)}</div><span>${safe(f.family)} · 原始证据：</span> <code>${safe(f.evidence.slice(0,100))}${f.evidence.length>100?' …':''}</code></div>`).join('') : '<div class="empty">当前规则范围内未发现待复核项。此结论不覆盖未收录的消息定义或射频链路。</div>';
     $('download').disabled = false;
+  }
+  function renderLinkAssessment() {
+    const link = report.linkAssessment, metrics = link.metrics;
+    $('link-confidence').textContent = `${link.classification} · ${link.confidence}置信度`;
+    const integrity = metrics.integrityPercent === null ? '无已知帧' : `${metrics.integrityPercent}%`;
+    $('link-assessment').innerHTML = `<div class="link-grid"><div><span>字节覆盖率</span><strong>${metrics.coveragePercent}%</strong><small>已知 ${metrics.knownPercent}%</small></div><div><span>帧完整性</span><strong>${integrity}</strong><small>已知帧校验</small></div><div><span>协议组成</span><strong>${metrics.protocolCount}</strong><small>${metrics.transitions} 个切换点</small></div><div><span>字节熵</span><strong>${metrics.byteEntropy}</strong><small>bit / byte</small></div></div><div class="composition">${link.composition.map(item => `<span><b>${safe(item.family)}</b>${item.frames} 帧 · ${item.bytes} B · ${safe(item.evidence)}</span>`).join('') || '<span>尚无可解释的协议片段</span>'}</div><ol class="next-actions">${link.nextActions.map(action => `<li>${safe(action)}</li>`).join('')}</ol><p class="link-boundary">${safe(link.boundary)}</p>`;
   }
   function applyRules() {
     try {

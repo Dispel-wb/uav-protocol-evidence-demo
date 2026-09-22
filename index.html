@@ -61,6 +61,7 @@
               <div class="detail" id="frame-detail"><span class="muted">点击上方任意帧，查看其原始字节与解析字段。</span></div>
             </section>
             <section class="panel" id="discovery-panel"><div class="panel-head"><svg class="ico"><use href="#i-branch"/></svg><h2>未知协议结构发现</h2><span class="panel-sub" id="discovery-count">—</span></div><div class="panel-body" id="discovery"></div></section>
+            <section class="panel" id="intelligence-panel"><div class="panel-head"><svg class="ico"><use href="#i-wave"/></svg><h2>链路智能分析</h2><span class="panel-sub" id="link-confidence">—</span></div><div class="panel-body" id="link-assessment"></div></section>
             <section class="panel" id="findings-panel"><div class="panel-head"><svg class="ico"><use href="#i-shield"/></svg><h2>可复核证据</h2><span class="panel-sub" id="finding-count">—</span></div><div class="panel-body"><div id="findings"></div><div class="button-row"><button id="download" class="secondary" disabled><svg class="ico mini"><use href="#i-download"/></svg>导出 JSON 证据报告</button></div></div></section>
             <section class="method"><svg class="ico"><use href="#i-file"/></svg><div><strong>演示边界</strong><p>未知结构须有多帧重复样本；程序只能提出可复核的结构假设，不能仅凭字节证明协议名称或字段业务含义。已知协议的校验和状态规则仍按各自定义执行。</p></div></section>
           </div>
@@ -69,6 +70,6 @@
       </main>
     </div>
   </div>
-  <script src="src/decoder.js"></script><script src="src/discovery.js"></script><script src="src/samples.js"></script><script src="src/app.js"></script>
+  <script src="src/decoder.js"></script><script src="src/discovery.js"></script><script src="src/link-intelligence.js"></script><script src="src/samples.js"></script><script src="src/app.js"></script>
 </body>
 </html>
