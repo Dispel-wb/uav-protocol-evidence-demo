@@ -1,0 +1,269 @@
+{
+  "schema": "fsk-robustness-sweep-v1",
+  "cases": 25,
+  "exactCases": 20,
+  "exactRate": 0.8,
+  "falseValidProtocolFrames": 0,
+  "noiseLevels": [
+    0.02,
+    0.04,
+    0.08,
+    0.12,
+    0.18
+  ],
+  "carrierOffsetsHz": [
+    -4000,
+    -2000,
+    0,
+    2000,
+    4000
+  ],
+  "records": [
+    {
+      "noiseStd": 0.02,
+      "carrierOffsetHz": -4000,
+      "status": "decoded",
+      "exactPayload": true,
+      "validProtocolFrames": 1,
+      "estimatedCarrierOffsetHz": -4000.456360524815,
+      "preambleBitErrors": 0,
+      "processingMilliseconds": 7.4034999997820705
+    },
+    {
+      "noiseStd": 0.02,
+      "carrierOffsetHz": -2000,
+      "status": "decoded",
+      "exactPayload": true,
+      "validProtocolFrames": 1,
+      "estimatedCarrierOffsetHz": -1998.859098687964,
+      "preambleBitErrors": 0,
+      "processingMilliseconds": 6.875700026284903
+    },
+    {
+      "noiseStd": 0.02,
+      "carrierOffsetHz": 0,
+      "status": "decoded",
+      "exactPayload": true,
+      "validProtocolFrames": 1,
+      "estimatedCarrierOffsetHz": 0.0,
+      "preambleBitErrors": 0,
+      "processingMilliseconds": 6.684499996481463
+    },
+    {
+      "noiseStd": 0.02,
+      "carrierOffsetHz": 2000,
+      "status": "decoded",
+      "exactPayload": true,
+      "validProtocolFrames": 1,
+      "estimatedCarrierOffsetHz": 1998.859098687964,
+      "preambleBitErrors": 0,
+      "processingMilliseconds": 6.663700012722984
+    },
+    {
+      "noiseStd": 0.02,
+      "carrierOffsetHz": 4000,
+      "status": "decoded",
+      "exactPayload": true,
+      "validProtocolFrames": 1,
+      "estimatedCarrierOffsetHz": 4000.0000000000005,
+      "preambleBitErrors": 0,
+      "processingMilliseconds": 6.78719999268651
+    },
+    {
+      "noiseStd": 0.04,
+      "carrierOffsetHz": -4000,
+      "status": "decoded",
+      "exactPayload": true,
+      "validProtocolFrames": 1,
+      "estimatedCarrierOffsetHz": -3997.7166343189865,
+      "preambleBitErrors": 0,
+      "processingMilliseconds": 6.6433000029064715
+    },
+    {
+      "noiseStd": 0.04,
+      "carrierOffsetHz": -2000,
+      "status": "decoded",
+      "exactPayload": true,
+      "validProtocolFrames": 1,
+      "estimatedCarrierOffsetHz": -2000.2283365681014,
+      "preambleBitErrors": 0,
+      "processingMilliseconds": 6.736300012562424
+    },
+    {
+      "noiseStd": 0.04,
+      "carrierOffsetHz": 0,
+      "status": "decoded",
+      "exactPayload": true,
+      "validProtocolFrames": 1,
+      "estimatedCarrierOffsetHz": 0.0,
+      "preambleBitErrors": 0,
+      "processingMilliseconds": 6.503800017526373
+    },
+    {
+      "noiseStd": 0.04,
+      "carrierOffsetHz": 2000,
+      "status": "decoded",
+      "exactPayload": true,
+      "validProtocolFrames": 1,
+      "estimatedCarrierOffsetHz": 1997.2602739726026,
+      "preambleBitErrors": 0,
+      "processingMilliseconds": 5.919399991398677
+    },
+    {
+      "noiseStd": 0.04,
+      "carrierOffsetHz": 4000,
+      "status": "decoded",
+      "exactPayload": true,
+      "validProtocolFrames": 1,
+      "estimatedCarrierOffsetHz": 3997.7166343189865,
+      "preambleBitErrors": 0,
+      "processingMilliseconds": 6.987600005231798
+    },
+    {
+      "noiseStd": 0.08,
+      "carrierOffsetHz": -4000,
+      "status": "decoded",
+      "exactPayload": true,
+      "validProtocolFrames": 1,
+      "estimatedCarrierOffsetHz": -3999.084458686198,
+      "preambleBitErrors": 0,
+      "processingMilliseconds": 6.52199998148717
+    },
+    {
+      "noiseStd": 0.08,
+      "carrierOffsetHz": -2000,
+      "status": "decoded",
+      "exactPayload": true,
+      "validProtocolFrames": 1,
+      "estimatedCarrierOffsetHz": -2000.916170407696,
+      "preambleBitErrors": 0,
+      "processingMilliseconds": 5.925500008743256
+    },
+    {
+      "noiseStd": 0.08,
+      "carrierOffsetHz": 0,
+      "status": "decoded",
+      "exactPayload": true,
+      "validProtocolFrames": 1,
+      "estimatedCarrierOffsetHz": 0.0,
+      "preambleBitErrors": 0,
+      "processingMilliseconds": 5.720999994082376
+    },
+    {
+      "noiseStd": 0.08,
+      "carrierOffsetHz": 2000,
+      "status": "decoded",
+      "exactPayload": true,
+      "validProtocolFrames": 1,
+      "estimatedCarrierOffsetHz": 2000.916170407696,
+      "preambleBitErrors": 0,
+      "processingMilliseconds": 5.838700017193332
+    },
+    {
+      "noiseStd": 0.08,
+      "carrierOffsetHz": 4000,
+      "status": "decoded",
+      "exactPayload": true,
+      "validProtocolFrames": 1,
+      "estimatedCarrierOffsetHz": 4000.4579278763595,
+      "preambleBitErrors": 0,
+      "processingMilliseconds": 6.360400002449751
+    },
+    {
+      "noiseStd": 0.12,
+      "carrierOffsetHz": -4000,
+      "status": "decoded",
+      "exactPayload": true,
+      "validProtocolFrames": 1,
+      "estimatedCarrierOffsetHz": -3999.540282726124,
+      "preambleBitErrors": 0,
+      "processingMilliseconds": 5.772999982582405
+    },
+    {
+      "noiseStd": 0.12,
+      "carrierOffsetHz": -2000,
+      "status": "decoded",
+      "exactPayload": true,
+      "validProtocolFrames": 1,
+      "estimatedCarrierOffsetHz": -1999.7698239152953,
+      "preambleBitErrors": 0,
+      "processingMilliseconds": 6.352199998218566
+    },
+    {
+      "noiseStd": 0.12,
+      "carrierOffsetHz": 0,
+      "status": "decoded",
+      "exactPayload": true,
+      "validProtocolFrames": 1,
+      "estimatedCarrierOffsetHz": 0.0,
+      "preambleBitErrors": 0,
+      "processingMilliseconds": 5.785299988929182
+    },
+    {
+      "noiseStd": 0.12,
+      "carrierOffsetHz": 2000,
+      "status": "decoded",
+      "exactPayload": true,
+      "validProtocolFrames": 1,
+      "estimatedCarrierOffsetHz": 1999.3096306523992,
+      "preambleBitErrors": 0,
+      "processingMilliseconds": 6.4686999830883
+    },
+    {
+      "noiseStd": 0.12,
+      "carrierOffsetHz": 4000,
+      "status": "decoded",
+      "exactPayload": true,
+      "validProtocolFrames": 1,
+      "estimatedCarrierOffsetHz": 4000.0,
+      "preambleBitErrors": 0,
+      "processingMilliseconds": 5.771800002548844
+    },
+    {
+      "noiseStd": 0.18,
+      "carrierOffsetHz": -4000,
+      "status": "rejected",
+      "exactPayload": false,
+      "validProtocolFrames": 0,
+      "reason": "no burst detected",
+      "processingMilliseconds": 0.3358999965712428
+    },
+    {
+      "noiseStd": 0.18,
+      "carrierOffsetHz": -2000,
+      "status": "rejected",
+      "exactPayload": false,
+      "validProtocolFrames": 0,
+      "reason": "no burst detected",
+      "processingMilliseconds": 0.3184000088367611
+    },
+    {
+      "noiseStd": 0.18,
+      "carrierOffsetHz": 0,
+      "status": "rejected",
+      "exactPayload": false,
+      "validProtocolFrames": 0,
+      "reason": "no burst detected",
+      "processingMilliseconds": 0.3023000026587397
+    },
+    {
+      "noiseStd": 0.18,
+      "carrierOffsetHz": 2000,
+      "status": "rejected",
+      "exactPayload": false,
+      "validProtocolFrames": 0,
+      "reason": "no burst detected",
+      "processingMilliseconds": 0.31980001949705184
+    },
+    {
+      "noiseStd": 0.18,
+      "carrierOffsetHz": 4000,
+      "status": "rejected",
+      "exactPayload": false,
+      "validProtocolFrames": 0,
+      "reason": "no burst detected",
+      "processingMilliseconds": 0.3155000158585608
+    }
+  ],
+  "boundary": "全部为确定性合成信号；结果用于回归和寻找失败边界，不代表真实射频环境。"
+}
