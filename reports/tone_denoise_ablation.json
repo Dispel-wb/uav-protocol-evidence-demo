@@ -1,0 +1,144 @@
+{
+  "schema": "tone-denoise-ablation-v1",
+  "cases": 12,
+  "rawRecovered": 5,
+  "cleanedRecovered": 12,
+  "improvedCases": 7,
+  "regressedCases": 0,
+  "falseAppliedCleanCases": 0,
+  "records": [
+    {
+      "modulation": "2-FSK",
+      "frequencyOffsetHz": 7000,
+      "amplitude": 0.15,
+      "rawValidFrames": 1,
+      "cleanedValidFrames": 1,
+      "suppressionApplied": true,
+      "estimatedFrequencyHz": 7000.036951013513,
+      "coherenceDb": 8.762178894041423,
+      "cleanSignalSuppressionApplied": false
+    },
+    {
+      "modulation": "2-FSK",
+      "frequencyOffsetHz": 9000,
+      "amplitude": 0.15,
+      "rawValidFrames": 1,
+      "cleanedValidFrames": 1,
+      "suppressionApplied": true,
+      "estimatedFrequencyHz": 9000.0,
+      "coherenceDb": 8.495217850524238,
+      "cleanSignalSuppressionApplied": false
+    },
+    {
+      "modulation": "2-FSK",
+      "frequencyOffsetHz": 11000,
+      "amplitude": 0.15,
+      "rawValidFrames": 0,
+      "cleanedValidFrames": 1,
+      "suppressionApplied": true,
+      "estimatedFrequencyHz": 10999.963048986487,
+      "coherenceDb": 8.537828738382377,
+      "cleanSignalSuppressionApplied": false
+    },
+    {
+      "modulation": "GFSK",
+      "frequencyOffsetHz": 7000,
+      "amplitude": 0.15,
+      "rawValidFrames": 0,
+      "cleanedValidFrames": 1,
+      "suppressionApplied": true,
+      "estimatedFrequencyHz": 7000.036951013513,
+      "coherenceDb": 8.76217887727907,
+      "cleanSignalSuppressionApplied": false
+    },
+    {
+      "modulation": "GFSK",
+      "frequencyOffsetHz": 9000,
+      "amplitude": 0.15,
+      "rawValidFrames": 0,
+      "cleanedValidFrames": 1,
+      "suppressionApplied": true,
+      "estimatedFrequencyHz": 9000.0,
+      "coherenceDb": 8.495217804966186,
+      "cleanSignalSuppressionApplied": false
+    },
+    {
+      "modulation": "GFSK",
+      "frequencyOffsetHz": 11000,
+      "amplitude": 0.15,
+      "rawValidFrames": 0,
+      "cleanedValidFrames": 1,
+      "suppressionApplied": true,
+      "estimatedFrequencyHz": 10999.963048986487,
+      "coherenceDb": 8.53782873370841,
+      "cleanSignalSuppressionApplied": false
+    },
+    {
+      "modulation": "BPSK",
+      "frequencyOffsetHz": 7000,
+      "amplitude": 0.15,
+      "rawValidFrames": 1,
+      "cleanedValidFrames": 1,
+      "suppressionApplied": true,
+      "estimatedFrequencyHz": 7000.036951013513,
+      "coherenceDb": 8.762178899154335,
+      "cleanSignalSuppressionApplied": false
+    },
+    {
+      "modulation": "BPSK",
+      "frequencyOffsetHz": 9000,
+      "amplitude": 0.15,
+      "rawValidFrames": 1,
+      "cleanedValidFrames": 1,
+      "suppressionApplied": true,
+      "estimatedFrequencyHz": 9000.0,
+      "coherenceDb": 8.495217858567528,
+      "cleanSignalSuppressionApplied": false
+    },
+    {
+      "modulation": "BPSK",
+      "frequencyOffsetHz": 11000,
+      "amplitude": 0.15,
+      "rawValidFrames": 1,
+      "cleanedValidFrames": 1,
+      "suppressionApplied": true,
+      "estimatedFrequencyHz": 10999.963048986487,
+      "coherenceDb": 8.537828704188653,
+      "cleanSignalSuppressionApplied": false
+    },
+    {
+      "modulation": "QPSK",
+      "frequencyOffsetHz": 7000,
+      "amplitude": 0.15,
+      "rawValidFrames": 0,
+      "cleanedValidFrames": 1,
+      "suppressionApplied": true,
+      "estimatedFrequencyHz": 7000.357380319149,
+      "coherenceDb": 7.619823285494974,
+      "cleanSignalSuppressionApplied": false
+    },
+    {
+      "modulation": "QPSK",
+      "frequencyOffsetHz": 9000,
+      "amplitude": 0.15,
+      "rawValidFrames": 0,
+      "cleanedValidFrames": 1,
+      "suppressionApplied": true,
+      "estimatedFrequencyHz": 9000.0,
+      "coherenceDb": 8.452911603895396,
+      "cleanSignalSuppressionApplied": false
+    },
+    {
+      "modulation": "QPSK",
+      "frequencyOffsetHz": 11000,
+      "amplitude": 0.15,
+      "rawValidFrames": 0,
+      "cleanedValidFrames": 1,
+      "suppressionApplied": true,
+      "estimatedFrequencyHz": 10999.642619680852,
+      "coherenceDb": 7.8010147362247455,
+      "cleanSignalSuppressionApplied": false
+    }
+  ],
+  "boundary": "Synthetic tone present in both capture edges; cancellation must be rejected when edge-stationarity is not established."
+}

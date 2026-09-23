@@ -6,7 +6,7 @@ from typing import Any
 
 import numpy as np
 
-from rf.denoise import suppress_impulses
+from rf.denoise import suppress_edge_stationary_tone, suppress_impulses
 from rf.signal_quality import detect_bursts, remove_dc
 
 
@@ -54,8 +54,12 @@ def preprocess(
     symbol_rate: float,
     *,
     suppress_impulsive: bool = True,
+    suppress_tone: bool = True,
 ) -> dict[str, Any]:
     cleaned, dc = remove_dc(samples)
+    tone_report = {"applied": False, "reason": "disabled"}
+    if suppress_tone:
+        cleaned, tone_report = suppress_edge_stationary_tone(cleaned, sample_rate)
     bursts, _, _ = detect_bursts(cleaned)
     if not bursts:
         raise ValueError("no burst detected")
@@ -82,7 +86,7 @@ def preprocess(
     active_rms = float(np.sqrt(np.mean(np.abs(filtered[start:end]) ** 2)))
     gain = 0.5 / active_rms if active_rms > 0 else 1.0
     normalized = (filtered * gain).astype(np.complex64)
-    return {"samples": normalized, "burst": (start, end), "dcOffset": dc, "toneLowHz": low, "toneHighHz": high, "carrierOffsetHz": carrier_offset, "deviationHz": deviation, "filterCutoffHz": cutoff, "gain": gain, "impulseSuppression": impulse_report}
+    return {"samples": normalized, "burst": (start, end), "dcOffset": dc, "toneLowHz": low, "toneHighHz": high, "carrierOffsetHz": carrier_offset, "deviationHz": deviation, "filterCutoffHz": cutoff, "gain": gain, "impulseSuppression": impulse_report, "toneSuppression": tone_report}
 
 
 def _bits_to_bytes(bits: np.ndarray) -> bytes:
@@ -90,8 +94,8 @@ def _bits_to_bytes(bits: np.ndarray) -> bytes:
     return np.packbits(usable.astype(np.uint8), bitorder="big").tobytes()
 
 
-def demodulate(samples: np.ndarray, sample_rate: float, symbol_rate: float, *, preamble: bytes = bytes.fromhex("55 55 55 55 D3 91"), suppress_impulsive: bool = True) -> dict[str, Any]:
-    processed = preprocess(samples, sample_rate, symbol_rate, suppress_impulsive=suppress_impulsive)
+def demodulate(samples: np.ndarray, sample_rate: float, symbol_rate: float, *, preamble: bytes = bytes.fromhex("55 55 55 55 D3 91"), suppress_impulsive: bool = True, suppress_tone: bool = True) -> dict[str, Any]:
+    processed = preprocess(samples, sample_rate, symbol_rate, suppress_impulsive=suppress_impulsive, suppress_tone=suppress_tone)
     start, end = processed["burst"]
     segment = processed["samples"][start:end]
     instantaneous = np.angle(segment[1:] * np.conj(segment[:-1])) * sample_rate / (2 * np.pi)
@@ -133,9 +137,10 @@ def demodulate(samples: np.ndarray, sample_rate: float, symbol_rate: float, *, p
         "preprocess": {
             key: (float(value.real) if isinstance(value, complex) else float(value))
             for key, value in processed.items()
-            if key not in {"samples", "burst", "dcOffset", "impulseSuppression"}
+            if key not in {"samples", "burst", "dcOffset", "impulseSuppression", "toneSuppression"}
         },
         "impulseSuppression": processed["impulseSuppression"],
+        "toneSuppression": processed["toneSuppression"],
         "dcOffset": {"i": processed["dcOffset"].real, "q": processed["dcOffset"].imag},
         "boundary": "当前基线仅适用于已知符号率的2-FSK；同步字命中和协议CRC仍需共同验证。",
     }

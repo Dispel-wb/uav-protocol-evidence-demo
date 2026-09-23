@@ -31,3 +31,25 @@ def add_impulsive_noise(
         "seed": seed,
         "indices": indices.tolist(),
     }
+
+
+def add_tone_interference(
+    samples: np.ndarray,
+    sample_rate: float,
+    *,
+    frequency_offset: float = 9_000,
+    amplitude: float = 0.25,
+    phase: float = 0.4,
+) -> tuple[np.ndarray, dict]:
+    if amplitude <= 0 or abs(frequency_offset) >= sample_rate / 2:
+        raise ValueError("tone amplitude and frequency must lie inside Nyquist")
+    iq = np.asarray(samples, dtype=np.complex64).reshape(-1).copy()
+    time_axis = np.arange(iq.size) / sample_rate
+    tone = amplitude * np.exp(1j * (2 * np.pi * frequency_offset * time_axis + phase))
+    iq += tone.astype(np.complex64)
+    return iq, {
+        "schema": "continuous-tone-interference-v1",
+        "frequencyOffsetHz": frequency_offset,
+        "amplitude": amplitude,
+        "phaseRadians": phase,
+    }

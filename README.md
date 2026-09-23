@@ -41,6 +41,7 @@ npm run evaluate:modulation
 npm run evaluate:bpsk
 npm run evaluate:qpsk
 npm run evaluate:denoise
+npm run evaluate:tone-denoise
 npm run stream:replay
 npm run stream:state
 ```
@@ -60,6 +61,8 @@ BPSK使用独立的相位调制链：平方去除数据符号、相位线性回�
 QPSK进一步使用四次方法消除数据符号、相位线性回归恢复载波，并遍历四种象限模糊和全部符号定时。`npm run evaluate:qpsk` 的20组合成测试中，噪声标准差0.02～0.04、频偏±400 Hz的10例全部精确恢复；0.08和0.12档10例未达到精确验收。错误调制选择和错误CRC接收均为0，逐例结果位于 `reports/qpsk_robustness.json`。当前四次载波恢复对噪声较敏感。
 
 `rf/denoise.py` 提供稀疏脉冲干扰抑制：只在已检测突发内部，以幅度中位数和MAD形成稳健阈值，将占比不超过5%的离群采样用相邻正常复数采样插值；异常比例过高时拒绝处理。`npm run evaluate:denoise` 对四种波形各5组注入1%、幅度3.0的脉冲干扰。未处理链恢复12/20组，启用抑制后恢复20/20组，改善8组且回退0组。完整消融记录位于 `reports/impulse_denoise_ablation.json`。
+
+连续窄带干扰采用边缘相干音抵消：只使用窗口首尾各10%的样本估计持续音调，通过零填充频谱获得粗频率、非均匀投影细化频率，再估计复幅度并从全窗相减；边缘相干度低于5 dB时拒绝处理。`npm run evaluate:tone-denoise` 在7、9、11 kHz和四种波形组成的12组案例中，将CRC有效恢复从5/12提高到12/12，改善7组、回退0组；对12组干净信号的错误启用为0。报告位于 `reports/tone_denoise_ablation.json`。
 
 ## SDR实时接收接口
 

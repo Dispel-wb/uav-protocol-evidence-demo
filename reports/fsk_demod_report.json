@@ -26,6 +26,13 @@
     "applied": false,
     "reason": "no sparse impulses"
   },
+  "toneSuppression": {
+    "applied": false,
+    "frequencyOffsetHz": 3450.9501689189187,
+    "amplitude": 0.0029790295750424054,
+    "coherenceDb": -25.513312583413118,
+    "reason": "edge tone is below the coherence threshold"
+  },
   "dcOffset": {
     "i": 0.02011875808238983,
     "q": 0.0013470184057950974

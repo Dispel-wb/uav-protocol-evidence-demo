@@ -7,7 +7,7 @@ import unittest
 
 import numpy as np
 
-from rf.channel_impairments import add_impulsive_noise
+from rf.channel_impairments import add_impulsive_noise, add_tone_interference
 from rf.generate_iq_fixture import PAYLOAD, generate, synthesize
 from rf.generate_psk_fixture import synthesize_bpsk, synthesize_qpsk
 from rf.fsk_demod import demodulate, preprocess
@@ -184,6 +184,40 @@ class RFInputTests(unittest.TestCase):
         self.assertEqual(
             cleaned["impulseSuppression"]["suppressedSamples"],
             impairment["count"],
+        )
+
+    def test_stationary_tone_cancellation_recovers_a_qpsk_frame(self):
+        samples, truth = synthesize_qpsk(seed=301)
+        impaired, impairment = add_tone_interference(
+            samples,
+            truth["sampleRate"],
+            frequency_offset=9_000,
+            amplitude=0.15,
+            phase=1.3,
+        )
+        try:
+            raw = demodulate_qpsk(
+                impaired,
+                truth["sampleRate"],
+                truth["symbolRate"],
+                suppress_tone=False,
+            )
+            raw_valid = mavlink_evidence(raw["payload"])["validFrames"]
+        except ValueError:
+            raw_valid = 0
+        cleaned = demodulate_qpsk(
+            impaired,
+            truth["sampleRate"],
+            truth["symbolRate"],
+            suppress_tone=True,
+        )
+        suppression = cleaned["toneSuppression"]
+        self.assertEqual(raw_valid, 0)
+        self.assertEqual(mavlink_evidence(cleaned["payload"])["validFrames"], 1)
+        self.assertTrue(suppression["applied"])
+        self.assertLess(
+            abs(suppression["frequencyOffsetHz"] - impairment["frequencyOffsetHz"]),
+            1.0,
         )
 
     def test_mavlink_sequence_continuity_handles_wrap_gap_and_reordering(self):

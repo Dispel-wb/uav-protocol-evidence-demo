@@ -6,7 +6,7 @@ from typing import Any
 
 import numpy as np
 
-from rf.denoise import suppress_impulses
+from rf.denoise import suppress_edge_stationary_tone, suppress_impulses
 from rf.signal_quality import detect_bursts
 
 
@@ -22,8 +22,12 @@ def demodulate_bpsk(
     *,
     preamble: bytes = bytes.fromhex("55 55 55 55 D3 91"),
     suppress_impulsive: bool = True,
+    suppress_tone: bool = True,
 ) -> dict[str, Any]:
     iq = np.asarray(samples, dtype=np.complex64).reshape(-1)
+    tone_report = {"applied": False, "reason": "disabled"}
+    if suppress_tone:
+        iq, tone_report = suppress_edge_stationary_tone(iq, sample_rate)
     bursts, _, _ = detect_bursts(iq)
     if not bursts:
         raise ValueError("no burst detected")
@@ -106,5 +110,6 @@ def demodulate_bpsk(
         "burst": {"startSample": start, "endSample": end},
         "dcOffset": {"i": dc.real, "q": dc.imag},
         "impulseSuppression": impulse_report,
+        "toneSuppression": tone_report,
         "boundary": "Current BPSK baseline assumes a burst, integer samples per symbol and a known preamble; real oscillator drift and pulse shaping remain to be validated.",
     }
