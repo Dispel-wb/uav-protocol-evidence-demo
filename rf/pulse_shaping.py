@@ -71,6 +71,34 @@ def apply_sample_clock_offset(
     return (real + 1j * imag).astype(np.complex64)
 
 
+def apply_sample_clock_drift(
+    samples: np.ndarray,
+    start_offset_ppm: float,
+    end_offset_ppm: float,
+) -> np.ndarray:
+    """Resample using a clock offset that changes linearly through the burst."""
+    source = np.asarray(samples, dtype=np.complex64).reshape(-1)
+    if source.size < 2:
+        return source.copy()
+    if min(start_offset_ppm, end_offset_ppm) <= -1_000_000:
+        raise ValueError("sample clock drift must keep a positive sampling scale")
+    positions = []
+    position = 0.0
+    last = source.size - 1
+    while position < last:
+        positions.append(position)
+        progress = position / last
+        offset_ppm = start_offset_ppm + (
+            end_offset_ppm - start_offset_ppm
+        ) * progress
+        position += 1 + offset_ppm * 1e-6
+    positions = np.asarray(positions, dtype=np.float64)
+    source_positions = np.arange(source.size, dtype=np.float64)
+    real = np.interp(positions, source_positions, source.real)
+    imag = np.interp(positions, source_positions, source.imag)
+    return (real + 1j * imag).astype(np.complex64)
+
+
 def sample_symbols(
     samples: np.ndarray,
     first_sample: float,

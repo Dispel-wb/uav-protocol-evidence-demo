@@ -2,13 +2,14 @@
 from __future__ import annotations
 
 import math
-from typing import Any
+from typing import Any, Callable
 
 import numpy as np
 
 from rf.denoise import suppress_edge_stationary_tone, suppress_impulses
 from rf.pulse_shaping import root_raised_cosine, sample_symbols
 from rf.signal_quality import detect_bursts
+from rf.timing_recovery import gardner_recover
 
 
 def _symbols_to_bits(symbols: np.ndarray) -> np.ndarray:
@@ -37,6 +38,8 @@ def demodulate_qpsk(
         -10_000, -5_000, -2_000, -1_000, -500,
         0, 500, 1_000, 2_000, 5_000, 10_000,
     ),
+    use_gardner: bool = True,
+    payload_score: Callable[[bytes], float] | None = None,
 ) -> dict[str, Any]:
     if any(1 + offset * 1e-6 <= 0 for offset in clock_offsets_ppm):
         raise ValueError("clock offset candidates must keep a positive symbol period")
@@ -88,6 +91,42 @@ def demodulate_qpsk(
     )
     receive_branches.append(("rrc-0.35", matched, False))
     candidates = []
+
+    def consider(
+        means: np.ndarray,
+        receive_filter: str,
+        clock_offset_ppm: float,
+        timing: int,
+        timing_report: dict[str, Any],
+    ) -> None:
+        for quadrant in range(4):
+            rotated = means * np.exp(-1j * quadrant * np.pi / 2)
+            bits = _symbols_to_bits(rotated)
+            for position in range(bits.size - preamble_bits.size + 1):
+                errors = int(np.count_nonzero(
+                    bits[position:position + preamble_bits.size] != preamble_bits
+                ))
+                if errors <= 2:
+                    axis_margin = np.minimum(
+                        np.abs(rotated.real), np.abs(rotated.imag)
+                    )
+                    confidence = float(
+                        np.mean(axis_margin) /
+                        (np.std(np.abs(rotated)) + 1e-9)
+                    )
+                    candidates.append((
+                        errors,
+                        -confidence,
+                        receive_filter,
+                        clock_offset_ppm,
+                        timing,
+                        quadrant,
+                        position,
+                        bits,
+                        timing_report,
+                    ))
+                    break
+
     for receive_filter, branch, integrate in receive_branches:
         drift_candidates = (0.0,) if integrate else clock_offsets_ppm
         for clock_offset_ppm in drift_candidates:
@@ -103,40 +142,59 @@ def demodulate_qpsk(
                     means = sample_symbols(branch, timing, effective_period)
                     if means.size * 2 < preamble_bits.size:
                         continue
-                for quadrant in range(4):
-                    rotated = means * np.exp(-1j * quadrant * np.pi / 2)
-                    bits = _symbols_to_bits(rotated)
-                    for position in range(bits.size - preamble_bits.size + 1):
-                        errors = int(np.count_nonzero(
-                            bits[position:position + preamble_bits.size] != preamble_bits
-                        ))
-                        if errors <= 2:
-                            axis_margin = np.minimum(
-                                np.abs(rotated.real), np.abs(rotated.imag)
-                            )
-                            confidence = float(
-                                np.mean(axis_margin) /
-                                (np.std(np.abs(rotated)) + 1e-9)
-                            )
-                            candidates.append((
-                                errors,
-                                -confidence,
-                                receive_filter,
-                                clock_offset_ppm,
-                                timing,
-                                quadrant,
-                                position,
-                                bits,
-                            ))
-                            break
+                consider(
+                    means,
+                    receive_filter,
+                    clock_offset_ppm,
+                    timing,
+                    {
+                        "method": "fixed" if integrate else "clock-grid",
+                        "samplesPerSymbol": float(effective_period),
+                    },
+                )
+    if use_gardner:
+        acquisition_offsets = (
+            clock_offsets_ppm[0], 0.0, clock_offsets_ppm[-1]
+        ) if clock_offsets_ppm else (0.0,)
+        for acquisition_offset in dict.fromkeys(acquisition_offsets):
+            initial_period = samples_per_symbol / (
+                1 + acquisition_offset * 1e-6
+            )
+            for timing in range(samples_per_symbol):
+                means, gardner_report = gardner_recover(
+                    matched,
+                    samples_per_symbol,
+                    timing,
+                    initial_samples_per_symbol=initial_period,
+                )
+                if means.size * 2 < preamble_bits.size:
+                    continue
+                consider(
+                    means,
+                    "rrc-0.35",
+                    gardner_report["estimatedClockOffsetPpm"],
+                    timing,
+                    {
+                        "method": "gardner",
+                        "acquisitionClockOffsetPpm": acquisition_offset,
+                        **gardner_report,
+                    },
+                )
     if not candidates:
         raise ValueError("preamble not found after QPSK demodulation")
-    errors, negative_confidence, receive_filter, clock_offset_ppm, timing, quadrant, position, bits = min(
+    def selection_key(item: tuple) -> tuple:
+        payload_bits = item[7][item[6] + preamble_bits.size:]
+        payload = _bits_to_bytes(payload_bits)
+        validation_score = float(payload_score(payload)) if payload_score else 0.0
+        return (-validation_score, item[0], item[1], item[6])
+
+    errors, negative_confidence, receive_filter, clock_offset_ppm, timing, quadrant, position, bits, timing_report = min(
         candidates,
-        key=lambda item: (item[0], item[1], item[6]),
+        key=selection_key,
     )
     payload_bits = bits[position + preamble_bits.size:]
     payload = _bits_to_bytes(payload_bits)
+    validation_score = float(payload_score(payload)) if payload_score else 0.0
     return {
         "schema": "qpsk-demod-report-v1",
         "payload": payload,
@@ -148,12 +206,14 @@ def demodulate_qpsk(
         "timingOffset": timing,
         "receiveFilter": receive_filter,
         "sampleClockOffsetPpm": clock_offset_ppm,
+        "timingRecovery": timing_report,
         "quadrantRotation": quadrant,
         "preambleBitErrors": errors,
         "decisionConfidence": -negative_confidence,
+        "payloadValidationScore": validation_score,
         "burst": {"startSample": start, "endSample": end},
         "dcOffset": {"i": dc.real, "q": dc.imag},
         "impulseSuppression": impulse_report,
         "toneSuppression": tone_report,
-        "boundary": "Current QPSK baseline assumes a burst and a known preamble; RRC timing-drift candidates are synthetic-only and are not a continuous timing loop.",
+        "boundary": "Current QPSK baseline assumes a burst and a known preamble; clock-grid and Gardner branches are validated only on synthetic captures.",
     }

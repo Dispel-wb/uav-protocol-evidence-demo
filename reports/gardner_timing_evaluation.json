@@ -1,0 +1,100 @@
+{
+  "schema": "gardner-variable-clock-evaluation-v1",
+  "cases": 8,
+  "gridCompletePayloads": 0,
+  "gardnerCompletePayloads": 8,
+  "improvedCases": 8,
+  "regressions": 0,
+  "allGardnerUsed": true,
+  "records": [
+    {
+      "noiseStd": 0.02,
+      "seed": 20261600,
+      "startClockOffsetPpm": -10000,
+      "endClockOffsetPpm": 10000,
+      "gridCompletePayload": false,
+      "gridValidProtocolFrames": 3,
+      "trackedCompletePayload": true,
+      "trackedValidProtocolFrames": 4,
+      "selectedTimingMethod": "gardner"
+    },
+    {
+      "noiseStd": 0.02,
+      "seed": 20261601,
+      "startClockOffsetPpm": -10000,
+      "endClockOffsetPpm": 10000,
+      "gridCompletePayload": false,
+      "gridValidProtocolFrames": 3,
+      "trackedCompletePayload": true,
+      "trackedValidProtocolFrames": 4,
+      "selectedTimingMethod": "gardner"
+    },
+    {
+      "noiseStd": 0.04,
+      "seed": 20261610,
+      "startClockOffsetPpm": -10000,
+      "endClockOffsetPpm": 10000,
+      "gridCompletePayload": false,
+      "gridValidProtocolFrames": 3,
+      "trackedCompletePayload": true,
+      "trackedValidProtocolFrames": 4,
+      "selectedTimingMethod": "gardner"
+    },
+    {
+      "noiseStd": 0.04,
+      "seed": 20261611,
+      "startClockOffsetPpm": -10000,
+      "endClockOffsetPpm": 10000,
+      "gridCompletePayload": false,
+      "gridValidProtocolFrames": 3,
+      "trackedCompletePayload": true,
+      "trackedValidProtocolFrames": 4,
+      "selectedTimingMethod": "gardner"
+    },
+    {
+      "noiseStd": 0.06,
+      "seed": 20261620,
+      "startClockOffsetPpm": -10000,
+      "endClockOffsetPpm": 10000,
+      "gridCompletePayload": false,
+      "gridValidProtocolFrames": 3,
+      "trackedCompletePayload": true,
+      "trackedValidProtocolFrames": 4,
+      "selectedTimingMethod": "gardner"
+    },
+    {
+      "noiseStd": 0.06,
+      "seed": 20261621,
+      "startClockOffsetPpm": -10000,
+      "endClockOffsetPpm": 10000,
+      "gridCompletePayload": false,
+      "gridValidProtocolFrames": 3,
+      "trackedCompletePayload": true,
+      "trackedValidProtocolFrames": 4,
+      "selectedTimingMethod": "gardner"
+    },
+    {
+      "noiseStd": 0.08,
+      "seed": 20261630,
+      "startClockOffsetPpm": -10000,
+      "endClockOffsetPpm": 10000,
+      "gridCompletePayload": false,
+      "gridValidProtocolFrames": 3,
+      "trackedCompletePayload": true,
+      "trackedValidProtocolFrames": 4,
+      "selectedTimingMethod": "gardner"
+    },
+    {
+      "noiseStd": 0.08,
+      "seed": 20261631,
+      "startClockOffsetPpm": -10000,
+      "endClockOffsetPpm": 10000,
+      "gridCompletePayload": false,
+      "gridValidProtocolFrames": 3,
+      "trackedCompletePayload": true,
+      "trackedValidProtocolFrames": 4,
+      "selectedTimingMethod": "gardner"
+    }
+  ],
+  "boundary": "Deterministic four-frame RRC QPSK captures with clock offset ramping from -10000 to +10000 ppm. This validates software timing-loop behavior on synthetic data, not real oscillator or multipath performance."
+}

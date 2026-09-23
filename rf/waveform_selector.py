@@ -17,6 +17,7 @@ def select_waveform(
     symbol_rates: Iterable[float],
     modulations: Iterable[str] = ("fsk",),
     clock_offsets_ppm: Iterable[float] | None = None,
+    use_gardner: bool = True,
 ) -> dict[str, Any]:
     rates = tuple(float(rate) for rate in symbol_rates)
     families = tuple(dict.fromkeys(name.lower() for name in modulations))
@@ -25,9 +26,15 @@ def select_waveform(
         else tuple(float(offset) for offset in clock_offsets_ppm)
     )
     timing_options = (
-        {} if clock_candidates is None
-        else {"clock_offsets_ppm": clock_candidates}
+        {"use_gardner": use_gardner} if clock_candidates is None
+        else {
+            "clock_offsets_ppm": clock_candidates,
+            "use_gardner": use_gardner,
+        }
     )
+    timing_options["payload_score"] = lambda payload: mavlink_evidence(payload)[
+        "validFrames"
+    ]
     unsupported = set(families) - {"fsk", "bpsk", "qpsk"}
     if not rates:
         raise ValueError("at least one symbol-rate candidate is required")
@@ -124,5 +131,5 @@ def select_waveform(
         "chosenPayloadHex": chosen["payloadHex"] if chosen else None,
         "validProtocolFrames": chosen["protocolEvidence"]["validFrames"] if chosen else 0,
         "candidates": candidates,
-        "boundary": "Selection covers FSK-family, BPSK and QPSK burst baselines; CRC-valid protocol evidence dominates confidence scores.",
+        "boundary": "Selection covers FSK-family, BPSK and QPSK burst baselines; CRC-valid protocol evidence is used both within PSK timing candidates and across demodulators.",
     }

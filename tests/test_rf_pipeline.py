@@ -207,22 +207,67 @@ class RFInputTests(unittest.TestCase):
                     [1_200],
                     ["bpsk", "qpsk"],
                     clock_offsets_ppm=(0,),
+                    use_gardner=False,
                 )
                 fixed_payload = (
                     bytes.fromhex(fixed["chosenPayloadHex"])
                     if fixed["chosenPayloadHex"] else b""
                 )
-                self.assertNotEqual(fixed_payload[:len(PAYLOAD)], PAYLOAD)
+                if expected == "BPSK":
+                    self.assertNotEqual(fixed_payload[:len(PAYLOAD)], PAYLOAD)
                 adaptive = select_waveform(
                     samples,
                     truth["sampleRate"],
                     [1_200],
                     ["bpsk", "qpsk"],
+                    use_gardner=False,
                 )
                 self.assertEqual(adaptive["chosenModulation"], expected)
                 self.assertEqual(adaptive["validProtocolFrames"], 1)
                 payload = bytes.fromhex(adaptive["chosenPayloadHex"])
                 self.assertEqual(payload[:len(PAYLOAD)], PAYLOAD)
+
+    def test_gardner_loop_recovers_complete_variable_drift_qpsk_capture(self):
+        expected = PAYLOAD * 4
+        samples, truth = synthesize_qpsk(
+            payload=expected,
+            guard_samples=40_000,
+            noise_std=0.04,
+            rolloff=0.35,
+            sample_clock_offset_ppm=-10_000,
+            sample_clock_end_offset_ppm=10_000,
+            seed=85,
+        )
+        grid_only = select_waveform(
+            samples,
+            truth["sampleRate"],
+            [1_200],
+            ["qpsk"],
+            use_gardner=False,
+        )
+        grid_payload = bytes.fromhex(grid_only["chosenPayloadHex"])
+        self.assertNotEqual(grid_payload[:len(expected)], expected)
+        self.assertEqual(grid_only["validProtocolFrames"], 3)
+
+        tracked = select_waveform(
+            samples,
+            truth["sampleRate"],
+            [1_200],
+            ["qpsk"],
+            use_gardner=True,
+        )
+        tracked_payload = bytes.fromhex(tracked["chosenPayloadHex"])
+        self.assertEqual(tracked_payload[:len(expected)], expected)
+        self.assertEqual(tracked["validProtocolFrames"], 4)
+        candidate = next(
+            item for item in tracked["candidates"]
+            if item["status"] == "decoded"
+        )
+        self.assertEqual(
+            candidate["demodulation"]["timingRecovery"]["method"],
+            "gardner",
+        )
+        self.assertEqual(candidate["demodulation"]["payloadValidationScore"], 4)
 
     def test_impulse_suppression_recovers_a_qpsk_frame(self):
         samples, truth = synthesize_qpsk(seed=102)

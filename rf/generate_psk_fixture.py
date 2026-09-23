@@ -4,7 +4,11 @@ from __future__ import annotations
 import numpy as np
 
 from rf.generate_iq_fixture import PAYLOAD, PREAMBLE
-from rf.pulse_shaping import apply_sample_clock_offset, shape_symbols
+from rf.pulse_shaping import (
+    apply_sample_clock_drift,
+    apply_sample_clock_offset,
+    shape_symbols,
+)
 
 
 def synthesize_bpsk(
@@ -19,6 +23,8 @@ def synthesize_bpsk(
     seed: int = 20261200,
     rolloff: float | None = None,
     sample_clock_offset_ppm: float = 0,
+    sample_clock_end_offset_ppm: float | None = None,
+    guard_samples: int = 1_600,
 ) -> tuple[np.ndarray, dict]:
     samples_per_symbol = int(round(sample_rate / symbol_rate))
     if samples_per_symbol <= 0 or not np.isclose(
@@ -33,10 +39,20 @@ def synthesize_bpsk(
         shape_symbols(symbols.astype(np.complex64), samples_per_symbol, rolloff)
         if rolloff is not None else np.repeat(symbols, samples_per_symbol)
     )
-    baseband = apply_sample_clock_offset(baseband, sample_clock_offset_ppm)
-    start = 1_600
+    baseband = (
+        apply_sample_clock_offset(baseband, sample_clock_offset_ppm)
+        if sample_clock_end_offset_ppm is None
+        else apply_sample_clock_drift(
+            baseband,
+            sample_clock_offset_ppm,
+            sample_clock_end_offset_ppm,
+        )
+    )
+    if guard_samples < 1:
+        raise ValueError("guard_samples must be positive")
+    start = guard_samples
     end = start + baseband.size
-    total = end + 1_600
+    total = end + guard_samples
     rng = np.random.default_rng(seed)
     noise = rng.normal(0, noise_std, total) + 1j * rng.normal(0, noise_std, total)
     samples = noise.astype(np.complex64)
@@ -61,6 +77,7 @@ def synthesize_bpsk(
         "pulseShape": "RRC" if rolloff is not None else "rectangular",
         "rolloff": rolloff,
         "sampleClockOffsetPpm": sample_clock_offset_ppm,
+        "sampleClockEndOffsetPpm": sample_clock_end_offset_ppm,
     }
     return samples, truth
 
@@ -77,6 +94,8 @@ def synthesize_qpsk(
     seed: int = 20261300,
     rolloff: float | None = None,
     sample_clock_offset_ppm: float = 0,
+    sample_clock_end_offset_ppm: float | None = None,
+    guard_samples: int = 1_600,
 ) -> tuple[np.ndarray, dict]:
     samples_per_symbol = int(round(sample_rate / symbol_rate))
     if samples_per_symbol <= 0 or not np.isclose(
@@ -94,10 +113,20 @@ def synthesize_qpsk(
         shape_symbols(symbols.astype(np.complex64), samples_per_symbol, rolloff)
         if rolloff is not None else np.repeat(symbols, samples_per_symbol)
     )
-    baseband = apply_sample_clock_offset(baseband, sample_clock_offset_ppm)
-    start = 1_600
+    baseband = (
+        apply_sample_clock_offset(baseband, sample_clock_offset_ppm)
+        if sample_clock_end_offset_ppm is None
+        else apply_sample_clock_drift(
+            baseband,
+            sample_clock_offset_ppm,
+            sample_clock_end_offset_ppm,
+        )
+    )
+    if guard_samples < 1:
+        raise ValueError("guard_samples must be positive")
+    start = guard_samples
     end = start + baseband.size
-    total = end + 1_600
+    total = end + guard_samples
     rng = np.random.default_rng(seed)
     noise = rng.normal(0, noise_std, total) + 1j * rng.normal(0, noise_std, total)
     samples = noise.astype(np.complex64)
@@ -122,5 +151,6 @@ def synthesize_qpsk(
         "pulseShape": "RRC" if rolloff is not None else "rectangular",
         "rolloff": rolloff,
         "sampleClockOffsetPpm": sample_clock_offset_ppm,
+        "sampleClockEndOffsetPpm": sample_clock_end_offset_ppm,
     }
     return samples, truth

@@ -1,9 +1,9 @@
 {
   "schema": "psk-clock-drift-ablation-v1",
   "cases": 10,
-  "fixedClockExactPayloads": 4,
+  "fixedClockExactPayloads": 6,
   "adaptiveExactPayloads": 10,
-  "improvedCases": 6,
+  "improvedCases": 4,
   "regressions": 0,
   "wrongModulation": 0,
   "falseValidProtocolFrames": 0,
@@ -56,7 +56,7 @@
     {
       "transmitModulation": "QPSK",
       "injectedClockOffsetPpm": -10000,
-      "fixedClockExactPayload": false,
+      "fixedClockExactPayload": true,
       "adaptiveExactPayload": true,
       "chosenModulation": "QPSK",
       "selectedClockOffsetPpm": -10000,
@@ -92,7 +92,7 @@
     {
       "transmitModulation": "QPSK",
       "injectedClockOffsetPpm": 10000,
-      "fixedClockExactPayload": false,
+      "fixedClockExactPayload": true,
       "adaptiveExactPayload": true,
       "chosenModulation": "QPSK",
       "selectedClockOffsetPpm": 10000,
