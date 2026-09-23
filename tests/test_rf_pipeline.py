@@ -8,7 +8,7 @@ import unittest
 import numpy as np
 
 from rf.generate_iq_fixture import PAYLOAD, generate, synthesize
-from rf.generate_psk_fixture import synthesize_bpsk
+from rf.generate_psk_fixture import synthesize_bpsk, synthesize_qpsk
 from rf.fsk_demod import demodulate, preprocess
 from rf.candidate_selector import select
 from rf.protocol_feedback import mavlink_evidence, update_mavlink_continuity
@@ -117,6 +117,38 @@ class RFInputTests(unittest.TestCase):
         window = report["analysis"]["windows"][0]
         self.assertEqual(window["chosenModulation"], "BPSK")
         self.assertEqual(window["chosenDemodulator"], "BPSK")
+        self.assertEqual(report["analysis"]["protocolState"]["finalState"], "disarmed")
+
+    def test_qpsk_is_selected_across_all_waveform_candidates(self):
+        samples, truth = synthesize_qpsk(carrier_offset=-300, carrier_phase=0.8, seed=74)
+        selection = select_waveform(
+            samples,
+            truth["sampleRate"],
+            [800, 1_200, 2_400],
+            ["fsk", "bpsk", "qpsk"],
+        )
+        self.assertEqual(selection["chosenModulation"], "QPSK")
+        self.assertEqual(selection["chosenSymbolRate"], 1_200)
+        self.assertEqual(selection["validProtocolFrames"], 1)
+        self.assertEqual(bytes.fromhex(selection["chosenPayloadHex"]), PAYLOAD)
+
+        config = CaptureConfig(
+            center_frequency=433_920_000,
+            sample_rate=truth["sampleRate"],
+            duration_seconds=samples.size / truth["sampleRate"],
+            chunk_samples=470,
+            ring_samples=samples.size,
+        )
+        report = run_streaming(
+            ArraySource(samples, truth["sampleRate"]),
+            config,
+            [800, 1_200, 2_400],
+            analysis_window_samples=samples.size,
+            modulations=["fsk", "bpsk", "qpsk"],
+        )
+        window = report["analysis"]["windows"][0]
+        self.assertEqual(window["chosenModulation"], "QPSK")
+        self.assertEqual(window["chosenDemodulator"], "QPSK")
         self.assertEqual(report["analysis"]["protocolState"]["finalState"], "disarmed")
 
     def test_mavlink_sequence_continuity_handles_wrap_gap_and_reordering(self):

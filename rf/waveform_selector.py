@@ -8,6 +8,7 @@ import numpy as np
 from rf.bpsk_demod import demodulate_bpsk
 from rf.candidate_selector import select as select_fsk
 from rf.protocol_feedback import mavlink_evidence
+from rf.qpsk_demod import demodulate_qpsk
 
 
 def select_waveform(
@@ -18,7 +19,7 @@ def select_waveform(
 ) -> dict[str, Any]:
     rates = tuple(float(rate) for rate in symbol_rates)
     families = tuple(dict.fromkeys(name.lower() for name in modulations))
-    unsupported = set(families) - {"fsk", "bpsk"}
+    unsupported = set(families) - {"fsk", "bpsk", "qpsk"}
     if not rates:
         raise ValueError("at least one symbol-rate candidate is required")
     if not families or unsupported:
@@ -65,6 +66,37 @@ def select_waveform(
                     "reason": str(error),
                 })
 
+    if "qpsk" in families:
+        for rate in rates:
+            try:
+                report = demodulate_qpsk(samples, sample_rate, rate)
+                payload = report.pop("payload")
+                protocol = mavlink_evidence(payload)
+                score = (
+                    protocol["validFrames"] * 1_000
+                    - report["preambleBitErrors"] * 100
+                    + min(report["decisionConfidence"], 99)
+                )
+                candidates.append({
+                    "demodulator": "QPSK",
+                    "modulation": "QPSK",
+                    "symbolRate": rate,
+                    "status": "decoded",
+                    "score": score,
+                    "payloadHex": payload.hex(" ").upper(),
+                    "protocolEvidence": protocol,
+                    "demodulation": report,
+                })
+            except (ValueError, ArithmeticError) as error:
+                candidates.append({
+                    "demodulator": "QPSK",
+                    "modulation": "QPSK",
+                    "symbolRate": rate,
+                    "status": "rejected",
+                    "score": None,
+                    "reason": str(error),
+                })
+
     decoded = [item for item in candidates if item["status"] == "decoded"]
     decoded.sort(
         key=lambda item: (item["protocolEvidence"]["validFrames"], item["score"]),
@@ -79,5 +111,5 @@ def select_waveform(
         "chosenPayloadHex": chosen["payloadHex"] if chosen else None,
         "validProtocolFrames": chosen["protocolEvidence"]["validFrames"] if chosen else 0,
         "candidates": candidates,
-        "boundary": "Selection covers FSK-family and BPSK burst baselines only; CRC-valid protocol evidence dominates confidence scores.",
+        "boundary": "Selection covers FSK-family, BPSK and QPSK burst baselines; CRC-valid protocol evidence dominates confidence scores.",
     }

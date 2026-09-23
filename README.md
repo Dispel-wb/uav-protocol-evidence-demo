@@ -38,6 +38,7 @@ npm run test:e2e
 npm run evaluate:fsk
 npm run evaluate:modulation
 npm run evaluate:bpsk
+npm run evaluate:qpsk
 npm run stream:replay
 npm run stream:state
 ```
@@ -53,6 +54,8 @@ npm run stream:state
 GFSK作为第二种波形沿用同一频率判决主链，但在调制前加入BT=0.5的高斯脉冲整形。`rf/modulation_features.py` 根据瞬时频率中过渡区域的比例区分矩形2-FSK与GFSK，并在低SNR或模糊区间拒绝给出标签。`npm run evaluate:modulation` 的40组合成测试全部恢复CRC有效帧：30个较高SNR案例分类正确，10个低SNR案例拒识，错误分类为0。逐例证据位于 `reports/fsk_shape_evaluation.json`；该阈值尚未经过真实发射机和其他BT参数验证。
 
 BPSK使用独立的相位调制链：平方去除数据符号、相位线性回归估计载波频偏、二阶相位估计、全符号定时搜索和同步字检验。`rf/waveform_selector.py` 同时尝试FSK族与BPSK，再以协议CRC为首要证据选路。`npm run evaluate:bpsk` 的20组合成测试中，噪声标准差0.02～0.08、频偏±500 Hz的15例全部精确恢复；0.12档5例均未达到精确验收。错误调制选择和错误CRC接收均为0，逐例结果位于 `reports/bpsk_robustness.json`。
+
+QPSK进一步使用四次方法消除数据符号、相位线性回归恢复载波，并遍历四种象限模糊和全部符号定时。`npm run evaluate:qpsk` 的20组合成测试中，噪声标准差0.02～0.04、频偏±400 Hz的10例全部精确恢复；0.08和0.12档10例未达到精确验收。错误调制选择和错误CRC接收均为0，逐例结果位于 `reports/qpsk_robustness.json`。当前四次载波恢复对噪声较敏感。
 
 ## SDR实时接收接口
 
@@ -76,12 +79,12 @@ python -m rf.capture_sdr --args "driver=设备驱动名" --frequency 433920000 -
 真实SDR的操作者控制入口为：
 
 ```bash
-python -m rf.live_analyze --args "driver=设备驱动名" --frequency 433920000 --sample-rate 1000000 --gain 20 --symbol-rates 1200 --modulations fsk bpsk --max-duration 3600 --output captures/live-report.json
+python -m rf.live_analyze --args "driver=设备驱动名" --frequency 433920000 --sample-rate 1000000 --gain 20 --symbol-rates 1200 --modulations fsk bpsk qpsk --max-duration 3600 --output captures/live-report.json
 ```
 
 运行期间按 Ctrl+C 会请求安全停止；系统完成当前已接收分块、关闭SDR流并写出停止原因、有效窗口、延迟、序号连续性和协议状态证据。该入口及停止流程已通过数组源测试，但仓库目前没有真实SDR长时间运行记录。
 
-网页交互原型仍从**已解调的字节**开始；仓库中的离线后端和流式采样接口已能处理合成2-FSK、BT=0.5 GFSK和BPSK IQ，但尚无真实SDR实测，也不能处理任意调制或加密流。未知字段的业务含义、协议名称及设备行为无法仅从孤立字节证明；结构发现也不能保证覆盖所有封装方式。MAVLink 2 签名位会显示，但尚未进行签名认证。规则判定是演示算法，不构成飞控安全认证；SBUS 通道值不依赖具体遥控器的校准范围解释为物理量。
+网页交互原型仍从**已解调的字节**开始；仓库中的离线后端和流式采样接口已能处理合成2-FSK、BT=0.5 GFSK、BPSK和QPSK IQ，但尚无真实SDR实测，也不能处理任意调制或加密流。未知字段的业务含义、协议名称及设备行为无法仅从孤立字节证明；结构发现也不能保证覆盖所有封装方式。MAVLink 2 签名位会显示，但尚未进行签名认证。规则判定是演示算法，不构成飞控安全认证；SBUS 通道值不依赖具体遥控器的校准范围解释为物理量。
 
 ## 测试与构建
 
