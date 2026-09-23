@@ -17,6 +17,7 @@ def synthesize_bpsk(
     payload: bytes = PAYLOAD,
     noise_std: float = 0.04,
     carrier_offset: float = 150,
+    carrier_end_offset: float | None = None,
     carrier_phase: float = 0.7,
     amplitude: float = 0.4,
     sample_rate: float = 48_000,
@@ -60,7 +61,13 @@ def synthesize_bpsk(
     samples = noise.astype(np.complex64)
     samples += np.complex64(0.02 + 0.01j)
     time_axis = np.arange(baseband.size) / sample_rate
-    carrier = np.exp(1j * (2 * np.pi * carrier_offset * time_axis + carrier_phase))
+    end_offset = carrier_offset if carrier_end_offset is None else carrier_end_offset
+    duration = baseband.size / sample_rate
+    carrier = np.exp(1j * (
+        2 * np.pi * (carrier_offset * time_axis
+                     + (end_offset - carrier_offset) * time_axis**2 / (2 * duration))
+        + carrier_phase
+    ))
     transmitted = (amplitude * baseband * carrier).astype(np.complex64)
     if multipath_paths is not None:
         transmitted = apply_multipath(transmitted, multipath_paths)
@@ -76,6 +83,7 @@ def synthesize_bpsk(
         "symbolRate": symbol_rate,
         "samplesPerSymbol": samples_per_symbol,
         "carrierOffsetHz": carrier_offset,
+        "carrierEndOffsetHz": end_offset,
         "carrierPhaseRadians": carrier_phase,
         "noiseStd": noise_std,
         "amplitude": amplitude,
@@ -103,6 +111,7 @@ def synthesize_qpsk(
     payload: bytes = PAYLOAD,
     noise_std: float = 0.04,
     carrier_offset: float = 120,
+    carrier_end_offset: float | None = None,
     carrier_phase: float = 0.5,
     amplitude: float = 0.4,
     sample_rate: float = 48_000,
@@ -149,7 +158,13 @@ def synthesize_qpsk(
     samples = noise.astype(np.complex64)
     samples += np.complex64(0.02 + 0.01j)
     time_axis = np.arange(baseband.size) / sample_rate
-    carrier = np.exp(1j * (2 * np.pi * carrier_offset * time_axis + carrier_phase))
+    end_offset = carrier_offset if carrier_end_offset is None else carrier_end_offset
+    duration = baseband.size / sample_rate
+    carrier = np.exp(1j * (
+        2 * np.pi * (carrier_offset * time_axis
+                     + (end_offset - carrier_offset) * time_axis**2 / (2 * duration))
+        + carrier_phase
+    ))
     transmitted = (amplitude * baseband * carrier).astype(np.complex64)
     if multipath_paths is not None:
         transmitted = apply_multipath(transmitted, multipath_paths)
@@ -165,6 +180,7 @@ def synthesize_qpsk(
         "symbolRate": symbol_rate,
         "samplesPerSymbol": samples_per_symbol,
         "carrierOffsetHz": carrier_offset,
+        "carrierEndOffsetHz": end_offset,
         "carrierPhaseRadians": carrier_phase,
         "noiseStd": noise_std,
         "amplitude": amplitude,

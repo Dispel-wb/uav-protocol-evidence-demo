@@ -46,6 +46,7 @@ npm run evaluate:rrc
 npm run evaluate:clock-drift
 npm run evaluate:gardner
 npm run evaluate:multipath
+npm run evaluate:carrier-drift
 npm run stream:replay
 npm run stream:state
 ```
@@ -71,6 +72,8 @@ RRC分支进一步在−10000～+10000 ppm的离散候选上改变符号采样�
 `rf/timing_recovery.py` 实现了带线性插值、归一化Gardner误差、频率积分项和±3%环路边界的定时恢复。`npm run evaluate:gardner` 使用4个连续MAVLink帧构成长突发，并令采样时钟由−10000 ppm线性漂移至+10000 ppm。在4档噪声、2个随机种子的8组测试中，固定漂移网格完整恢复0/8组，Gardner环完整恢复8/8组；每组4个协议帧均通过CRC。当前结果仍来自同源合成数据，尚未验证真实采样器的抖动、突变或多径耦合。报告位于 `reports/gardner_timing_evaluation.json`。
 
 `rf/equalization.py` 使用已知同步序列训练7抽头复数FIR均衡器，并报告训练前后均方误差；解调器同时保留未经均衡与已经均衡的候选，由协议CRC优先选路。`npm run evaluate:multipath` 对5组延迟/复增益和2档噪声组成的10个双径QPSK案例做消融：未经均衡完整恢复0/10组，启用均衡后恢复10/10组，改善10组、回退0组，错误CRC接收为0。该证据依赖已知同步序列和静态双径合成信道，报告位于 `reports/multipath_equalizer_ablation.json`。
+
+`rf/carrier_tracking.py` 对BPSK平方、QPSK四次幂后的相位进行加权二次拟合，校正一个突发内平滑变化的载波频率。原有固定频偏分支仍参与候选选择，由协议CRC决定最终输出。`npm run evaluate:carrier-drift` 的16组合成实验覆盖两种调制、两档噪声，以及250 Hz逐渐变化到250、275、300、350 Hz的载波轨迹：固定频偏精确恢复4/16组，加入相位跟踪后恢复16/16组，改善12组、回退0组，错误调制和错误CRC接收均为0。该方法使用完整突发做批量拟合，尚未验证相位突变、快速随机漂移或真实振荡器；报告位于 `reports/carrier_drift_ablation.json`。
 
 `rf/denoise.py` 提供稀疏脉冲干扰抑制：只在已检测突发内部，以幅度中位数和MAD形成稳健阈值，将占比不超过5%的离群采样用相邻正常复数采样插值；异常比例过高时拒绝处理。`npm run evaluate:denoise` 对四种波形各5组注入1%、幅度3.0的脉冲干扰。未处理链恢复12/20组，启用抑制后恢复20/20组，改善8组且回退0组。完整消融记录位于 `reports/impulse_denoise_ablation.json`。
 

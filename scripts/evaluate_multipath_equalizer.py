@@ -57,6 +57,7 @@ def main() -> None:
                 ("qpsk",),
                 use_gardner=False,
                 use_equalizer=False,
+                use_carrier_tracking=False,
             )
             equalized = select_waveform(
                 samples,
@@ -65,6 +66,7 @@ def main() -> None:
                 ("qpsk",),
                 use_gardner=False,
                 use_equalizer=True,
+                use_carrier_tracking=False,
             )
             demodulation = chosen_demodulation(equalized)
             equalizer = demodulation.get("equalization", {})

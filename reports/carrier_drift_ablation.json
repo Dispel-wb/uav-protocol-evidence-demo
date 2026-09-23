@@ -1,0 +1,313 @@
+{
+  "schema": "psk-carrier-drift-ablation-v1",
+  "cases": 16,
+  "fixedExactPayloads": 4,
+  "trackedExactPayloads": 16,
+  "improvedCases": 12,
+  "regressions": 0,
+  "wrongModulation": 0,
+  "falseValidProtocolFrames": 0,
+  "records": [
+    {
+      "transmitModulation": "BPSK",
+      "noiseStd": 0.02,
+      "seed": 20261800,
+      "startCarrierOffsetHz": 250,
+      "endCarrierOffsetHz": 250,
+      "fixedExactPayload": true,
+      "trackedExactPayload": true,
+      "fixedValidProtocolFrames": 1,
+      "trackedValidProtocolFrames": 1,
+      "chosenModulation": "BPSK",
+      "selectedCarrierTracking": {
+        "method": "fixed"
+      }
+    },
+    {
+      "transmitModulation": "BPSK",
+      "noiseStd": 0.02,
+      "seed": 20261801,
+      "startCarrierOffsetHz": 250,
+      "endCarrierOffsetHz": 275,
+      "fixedExactPayload": false,
+      "trackedExactPayload": true,
+      "fixedValidProtocolFrames": 0,
+      "trackedValidProtocolFrames": 1,
+      "chosenModulation": "BPSK",
+      "selectedCarrierTracking": {
+        "method": "mth-power-quadratic",
+        "order": 2,
+        "phaseFitResidualRadiansRms": 0.013069248833357219,
+        "startResidualFrequencyHz": -12.656351492135355,
+        "endResidualFrequencyHz": 12.645008524359273,
+        "observations": 430
+      }
+    },
+    {
+      "transmitModulation": "BPSK",
+      "noiseStd": 0.02,
+      "seed": 20261802,
+      "startCarrierOffsetHz": 250,
+      "endCarrierOffsetHz": 300,
+      "fixedExactPayload": false,
+      "trackedExactPayload": true,
+      "fixedValidProtocolFrames": 0,
+      "trackedValidProtocolFrames": 1,
+      "chosenModulation": "BPSK",
+      "selectedCarrierTracking": {
+        "method": "mth-power-quadratic",
+        "order": 2,
+        "phaseFitResidualRadiansRms": 0.01975761390329665,
+        "startResidualFrequencyHz": -25.205204461050958,
+        "endResidualFrequencyHz": 25.39872011229587,
+        "observations": 430
+      }
+    },
+    {
+      "transmitModulation": "BPSK",
+      "noiseStd": 0.02,
+      "seed": 20261803,
+      "startCarrierOffsetHz": 250,
+      "endCarrierOffsetHz": 350,
+      "fixedExactPayload": false,
+      "trackedExactPayload": true,
+      "fixedValidProtocolFrames": 0,
+      "trackedValidProtocolFrames": 1,
+      "chosenModulation": "BPSK",
+      "selectedCarrierTracking": {
+        "method": "mth-power-quadratic",
+        "order": 2,
+        "phaseFitResidualRadiansRms": 0.03377882384274492,
+        "startResidualFrequencyHz": -49.26568502138695,
+        "endResidualFrequencyHz": 51.92908412040339,
+        "observations": 430
+      }
+    },
+    {
+      "transmitModulation": "BPSK",
+      "noiseStd": 0.04,
+      "seed": 20261810,
+      "startCarrierOffsetHz": 250,
+      "endCarrierOffsetHz": 250,
+      "fixedExactPayload": true,
+      "trackedExactPayload": true,
+      "fixedValidProtocolFrames": 1,
+      "trackedValidProtocolFrames": 1,
+      "chosenModulation": "BPSK",
+      "selectedCarrierTracking": {
+        "method": "fixed"
+      }
+    },
+    {
+      "transmitModulation": "BPSK",
+      "noiseStd": 0.04,
+      "seed": 20261811,
+      "startCarrierOffsetHz": 250,
+      "endCarrierOffsetHz": 275,
+      "fixedExactPayload": false,
+      "trackedExactPayload": true,
+      "fixedValidProtocolFrames": 0,
+      "trackedValidProtocolFrames": 1,
+      "chosenModulation": "BPSK",
+      "selectedCarrierTracking": {
+        "method": "mth-power-quadratic",
+        "order": 2,
+        "phaseFitResidualRadiansRms": 0.023154755101874452,
+        "startResidualFrequencyHz": -12.699195706040062,
+        "endResidualFrequencyHz": 12.493366638810654,
+        "observations": 429
+      }
+    },
+    {
+      "transmitModulation": "BPSK",
+      "noiseStd": 0.04,
+      "seed": 20261812,
+      "startCarrierOffsetHz": 250,
+      "endCarrierOffsetHz": 300,
+      "fixedExactPayload": false,
+      "trackedExactPayload": true,
+      "fixedValidProtocolFrames": 0,
+      "trackedValidProtocolFrames": 1,
+      "chosenModulation": "BPSK",
+      "selectedCarrierTracking": {
+        "method": "mth-power-quadratic",
+        "order": 2,
+        "phaseFitResidualRadiansRms": 0.027994974818785563,
+        "startResidualFrequencyHz": -25.337947178573557,
+        "endResidualFrequencyHz": 25.131803303277305,
+        "observations": 429
+      }
+    },
+    {
+      "transmitModulation": "BPSK",
+      "noiseStd": 0.04,
+      "seed": 20261813,
+      "startCarrierOffsetHz": 250,
+      "endCarrierOffsetHz": 350,
+      "fixedExactPayload": false,
+      "trackedExactPayload": true,
+      "fixedValidProtocolFrames": 0,
+      "trackedValidProtocolFrames": 1,
+      "chosenModulation": "BPSK",
+      "selectedCarrierTracking": {
+        "method": "mth-power-quadratic",
+        "order": 2,
+        "phaseFitResidualRadiansRms": 0.03815223291385632,
+        "startResidualFrequencyHz": -49.86281673113143,
+        "endResidualFrequencyHz": 51.18885652418964,
+        "observations": 429
+      }
+    },
+    {
+      "transmitModulation": "QPSK",
+      "noiseStd": 0.02,
+      "seed": 20261900,
+      "startCarrierOffsetHz": 250,
+      "endCarrierOffsetHz": 250,
+      "fixedExactPayload": true,
+      "trackedExactPayload": true,
+      "fixedValidProtocolFrames": 1,
+      "trackedValidProtocolFrames": 1,
+      "chosenModulation": "QPSK",
+      "selectedCarrierTracking": {
+        "method": "fixed"
+      }
+    },
+    {
+      "transmitModulation": "QPSK",
+      "noiseStd": 0.02,
+      "seed": 20261901,
+      "startCarrierOffsetHz": 250,
+      "endCarrierOffsetHz": 275,
+      "fixedExactPayload": false,
+      "trackedExactPayload": true,
+      "fixedValidProtocolFrames": 0,
+      "trackedValidProtocolFrames": 1,
+      "chosenModulation": "QPSK",
+      "selectedCarrierTracking": {
+        "method": "mth-power-quadratic",
+        "order": 4,
+        "phaseFitResidualRadiansRms": 0.18255437180550244,
+        "startResidualFrequencyHz": -14.35712011685454,
+        "endResidualFrequencyHz": 11.149927820475902,
+        "observations": 214
+      }
+    },
+    {
+      "transmitModulation": "QPSK",
+      "noiseStd": 0.02,
+      "seed": 20261902,
+      "startCarrierOffsetHz": 250,
+      "endCarrierOffsetHz": 300,
+      "fixedExactPayload": false,
+      "trackedExactPayload": true,
+      "fixedValidProtocolFrames": 0,
+      "trackedValidProtocolFrames": 1,
+      "chosenModulation": "QPSK",
+      "selectedCarrierTracking": {
+        "method": "mth-power-quadratic",
+        "order": 4,
+        "phaseFitResidualRadiansRms": 0.1825391466396483,
+        "startResidualFrequencyHz": -25.205349446783533,
+        "endResidualFrequencyHz": 26.007166854200324,
+        "observations": 214
+      }
+    },
+    {
+      "transmitModulation": "QPSK",
+      "noiseStd": 0.02,
+      "seed": 20261903,
+      "startCarrierOffsetHz": 250,
+      "endCarrierOffsetHz": 350,
+      "fixedExactPayload": false,
+      "trackedExactPayload": true,
+      "fixedValidProtocolFrames": 0,
+      "trackedValidProtocolFrames": 1,
+      "chosenModulation": "QPSK",
+      "selectedCarrierTracking": {
+        "method": "mth-power-quadratic",
+        "order": 4,
+        "phaseFitResidualRadiansRms": 0.1942268289753549,
+        "startResidualFrequencyHz": -58.58261977352813,
+        "endResidualFrequencyHz": 43.814118411934956,
+        "observations": 214
+      }
+    },
+    {
+      "transmitModulation": "QPSK",
+      "noiseStd": 0.04,
+      "seed": 20261910,
+      "startCarrierOffsetHz": 250,
+      "endCarrierOffsetHz": 250,
+      "fixedExactPayload": true,
+      "trackedExactPayload": true,
+      "fixedValidProtocolFrames": 1,
+      "trackedValidProtocolFrames": 1,
+      "chosenModulation": "QPSK",
+      "selectedCarrierTracking": {
+        "method": "fixed"
+      }
+    },
+    {
+      "transmitModulation": "QPSK",
+      "noiseStd": 0.04,
+      "seed": 20261911,
+      "startCarrierOffsetHz": 250,
+      "endCarrierOffsetHz": 275,
+      "fixedExactPayload": false,
+      "trackedExactPayload": true,
+      "fixedValidProtocolFrames": 0,
+      "trackedValidProtocolFrames": 1,
+      "chosenModulation": "QPSK",
+      "selectedCarrierTracking": {
+        "method": "mth-power-quadratic",
+        "order": 4,
+        "phaseFitResidualRadiansRms": 0.191165776780579,
+        "startResidualFrequencyHz": -14.409378304374291,
+        "endResidualFrequencyHz": 11.156187064964836,
+        "observations": 213
+      }
+    },
+    {
+      "transmitModulation": "QPSK",
+      "noiseStd": 0.04,
+      "seed": 20261912,
+      "startCarrierOffsetHz": 250,
+      "endCarrierOffsetHz": 300,
+      "fixedExactPayload": false,
+      "trackedExactPayload": true,
+      "fixedValidProtocolFrames": 0,
+      "trackedValidProtocolFrames": 1,
+      "chosenModulation": "QPSK",
+      "selectedCarrierTracking": {
+        "method": "mth-power-quadratic",
+        "order": 4,
+        "phaseFitResidualRadiansRms": 0.19035696343937625,
+        "startResidualFrequencyHz": -24.57366633386844,
+        "endResidualFrequencyHz": 26.408876261949366,
+        "observations": 213
+      }
+    },
+    {
+      "transmitModulation": "QPSK",
+      "noiseStd": 0.04,
+      "seed": 20261913,
+      "startCarrierOffsetHz": 250,
+      "endCarrierOffsetHz": 350,
+      "fixedExactPayload": false,
+      "trackedExactPayload": true,
+      "fixedValidProtocolFrames": 0,
+      "trackedValidProtocolFrames": 1,
+      "chosenModulation": "QPSK",
+      "selectedCarrierTracking": {
+        "method": "mth-power-quadratic",
+        "order": 4,
+        "phaseFitResidualRadiansRms": 0.2004013373905264,
+        "startResidualFrequencyHz": -57.51921538041625,
+        "endResidualFrequencyHz": 44.51793189396963,
+        "observations": 213
+      }
+    }
+  ],
+  "boundary": "Deterministic linearly varying carrier frequency on short synthetic RRC PSK bursts. Quadratic burst phase fitting assumes smooth drift; phase steps, faster wander and real oscillators remain untested."
+}

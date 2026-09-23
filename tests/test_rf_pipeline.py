@@ -244,6 +244,7 @@ class RFInputTests(unittest.TestCase):
             [1_200],
             ["qpsk"],
             use_gardner=False,
+            use_carrier_tracking=False,
         )
         grid_payload = bytes.fromhex(grid_only["chosenPayloadHex"])
         self.assertNotEqual(grid_payload[:len(expected)], expected)
@@ -255,6 +256,7 @@ class RFInputTests(unittest.TestCase):
             [1_200],
             ["qpsk"],
             use_gardner=True,
+            use_carrier_tracking=False,
         )
         tracked_payload = bytes.fromhex(tracked["chosenPayloadHex"])
         self.assertEqual(tracked_payload[:len(expected)], expected)
@@ -284,6 +286,7 @@ class RFInputTests(unittest.TestCase):
             ["qpsk"],
             use_gardner=False,
             use_equalizer=False,
+            use_carrier_tracking=False,
         )
         self.assertEqual(unequalized["validProtocolFrames"], 0)
 
@@ -294,6 +297,7 @@ class RFInputTests(unittest.TestCase):
             ["qpsk"],
             use_gardner=False,
             use_equalizer=True,
+            use_carrier_tracking=False,
         )
         self.assertEqual(equalized["validProtocolFrames"], 1)
         payload = bytes.fromhex(equalized["chosenPayloadHex"])
@@ -305,6 +309,43 @@ class RFInputTests(unittest.TestCase):
         report = candidate["demodulation"]["equalization"]
         self.assertEqual(report["method"], "training-fir")
         self.assertLess(report["trainingMseAfter"], report["trainingMseBefore"])
+
+    def test_carrier_phase_tracking_recovers_frequency_ramp(self):
+        cases = (
+            (synthesize_bpsk, "BPSK", 701),
+            (synthesize_qpsk, "QPSK", 702),
+        )
+        for generator, modulation, seed in cases:
+            with self.subTest(modulation=modulation):
+                samples, truth = generator(
+                    noise_std=0.04,
+                    rolloff=0.35,
+                    carrier_offset=250,
+                    carrier_end_offset=300,
+                    seed=seed,
+                )
+                fixed = select_waveform(
+                    samples, truth["sampleRate"], [1_200],
+                    [modulation.lower()], use_gardner=False,
+                    use_equalizer=False, use_carrier_tracking=False,
+                )
+                self.assertEqual(fixed["validProtocolFrames"], 0)
+                tracked = select_waveform(
+                    samples, truth["sampleRate"], [1_200],
+                    [modulation.lower()], use_gardner=False,
+                    use_equalizer=False, use_carrier_tracking=True,
+                )
+                self.assertEqual(tracked["validProtocolFrames"], 1)
+                payload = bytes.fromhex(tracked["chosenPayloadHex"])
+                self.assertEqual(payload[:len(PAYLOAD)], PAYLOAD)
+                demod = next(
+                    item["demodulation"] for item in tracked["candidates"]
+                    if item["status"] == "decoded"
+                )
+                self.assertEqual(
+                    demod["carrierTracking"]["method"],
+                    "mth-power-quadratic",
+                )
 
     def test_impulse_suppression_recovers_a_qpsk_frame(self):
         samples, truth = synthesize_qpsk(seed=102)

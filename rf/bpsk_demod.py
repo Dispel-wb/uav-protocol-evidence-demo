@@ -7,6 +7,7 @@ from typing import Any, Callable
 import numpy as np
 
 from rf.denoise import suppress_edge_stationary_tone, suppress_impulses
+from rf.carrier_tracking import track_carrier_phase
 from rf.equalization import train_linear_equalizer
 from rf.pulse_shaping import root_raised_cosine, sample_symbols
 from rf.signal_quality import detect_bursts
@@ -33,6 +34,7 @@ def demodulate_bpsk(
     use_gardner: bool = True,
     payload_score: Callable[[bytes], float] | None = None,
     use_equalizer: bool = True,
+    use_carrier_tracking: bool = True,
 ) -> dict[str, Any]:
     if any(1 + offset * 1e-6 <= 0 for offset in clock_offsets_ppm):
         raise ValueError("clock offset candidates must keep a positive symbol period")
@@ -76,13 +78,23 @@ def demodulate_bpsk(
 
     preamble_bits = np.unpackbits(np.frombuffer(preamble, dtype=np.uint8), bitorder="big")
     preamble_symbols = np.where(preamble_bits > 0, 1.0, -1.0).astype(np.complex64)
-    receive_branches = [("integrate-dump", corrected, True)]
+    receive_branches = [("integrate-dump", corrected, True, {"method": "fixed"})]
     matched = np.convolve(
         corrected,
         root_raised_cosine(samples_per_symbol, 0.35),
         mode="same",
     )
-    receive_branches.append(("rrc-0.35", matched, False))
+    receive_branches.append(("rrc-0.35", matched, False, {"method": "fixed"}))
+    if use_carrier_tracking:
+        tracked, carrier_tracking_report = track_carrier_phase(
+            corrected, sample_rate, samples_per_symbol, 2
+        )
+        receive_branches.extend((
+            ("integrate-dump", tracked, True, carrier_tracking_report),
+            ("rrc-0.35", np.convolve(
+                tracked, root_raised_cosine(samples_per_symbol, 0.35), mode="same"
+            ), False, carrier_tracking_report),
+        ))
     candidates = []
 
     def consider(
@@ -91,6 +103,7 @@ def demodulate_bpsk(
         clock_offset_ppm: float,
         timing: int,
         timing_report: dict[str, Any],
+        carrier_tracking_report: dict[str, Any],
     ) -> None:
         for inverted in (False, True):
             oriented = -means if inverted else means
@@ -119,6 +132,7 @@ def demodulate_bpsk(
                         bits,
                         timing_report,
                         None,
+                        carrier_tracking_report,
                     ))
                     if use_equalizer:
                         equalized, equalizer_report = train_linear_equalizer(
@@ -152,10 +166,11 @@ def demodulate_bpsk(
                                 equalized_bits,
                                 timing_report,
                                 equalizer_report,
+                                carrier_tracking_report,
                             ))
                     break
 
-    for receive_filter, branch, integrate in receive_branches:
+    for receive_filter, branch, integrate, carrier_tracking_report in receive_branches:
         drift_candidates = (0.0,) if integrate else clock_offsets_ppm
         for clock_offset_ppm in drift_candidates:
             effective_period = samples_per_symbol / (1 + clock_offset_ppm * 1e-6)
@@ -179,35 +194,34 @@ def demodulate_bpsk(
                         "method": "fixed" if integrate else "clock-grid",
                         "samplesPerSymbol": float(effective_period),
                     },
+                    carrier_tracking_report,
                 )
     if use_gardner:
-        acquisition_offsets = (
-            clock_offsets_ppm[0], 0.0, clock_offsets_ppm[-1]
-        ) if clock_offsets_ppm else (0.0,)
-        for acquisition_offset in dict.fromkeys(acquisition_offsets):
-            initial_period = samples_per_symbol / (
-                1 + acquisition_offset * 1e-6
-            )
-            for timing in range(samples_per_symbol):
-                means, gardner_report = gardner_recover(
-                    matched,
-                    samples_per_symbol,
-                    timing,
-                    initial_samples_per_symbol=initial_period,
+        for receive_filter, branch, integrate, carrier_tracking_report in receive_branches:
+            if integrate:
+                continue
+            acquisition_offsets = (
+                clock_offsets_ppm[0], 0.0, clock_offsets_ppm[-1]
+            ) if clock_offsets_ppm else (0.0,)
+            for acquisition_offset in dict.fromkeys(acquisition_offsets):
+                initial_period = samples_per_symbol / (
+                    1 + acquisition_offset * 1e-6
                 )
-                if means.size < preamble_bits.size:
-                    continue
-                consider(
-                    means,
-                    "rrc-0.35",
-                    gardner_report["estimatedClockOffsetPpm"],
-                    timing,
-                    {
-                        "method": "gardner",
-                        "acquisitionClockOffsetPpm": acquisition_offset,
-                        **gardner_report,
-                    },
-                )
+                for timing in range(samples_per_symbol):
+                    means, gardner_report = gardner_recover(
+                        branch, samples_per_symbol, timing,
+                        initial_samples_per_symbol=initial_period,
+                    )
+                    if means.size < preamble_bits.size:
+                        continue
+                    consider(
+                        means, receive_filter,
+                        gardner_report["estimatedClockOffsetPpm"], timing,
+                        {"method": "gardner",
+                         "acquisitionClockOffsetPpm": acquisition_offset,
+                         **gardner_report},
+                        carrier_tracking_report,
+                    )
     if not candidates:
         raise ValueError("preamble not found after BPSK demodulation")
     def selection_key(item: tuple) -> tuple:
@@ -216,7 +230,7 @@ def demodulate_bpsk(
         validation_score = float(payload_score(payload)) if payload_score else 0.0
         return (-validation_score, item[0], item[1], item[6])
 
-    errors, negative_confidence, receive_filter, clock_offset_ppm, timing, inverted, position, bits, timing_report, equalizer_report = min(
+    errors, negative_confidence, receive_filter, clock_offset_ppm, timing, inverted, position, bits, timing_report, equalizer_report, carrier_tracking_report = min(
         candidates,
         key=selection_key,
     )
@@ -235,6 +249,7 @@ def demodulate_bpsk(
         "receiveFilter": receive_filter,
         "sampleClockOffsetPpm": clock_offset_ppm,
         "timingRecovery": timing_report,
+        "carrierTracking": carrier_tracking_report,
         "equalization": (
             equalizer_report
             if equalizer_report is not None

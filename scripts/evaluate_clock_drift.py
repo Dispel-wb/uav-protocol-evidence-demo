@@ -42,6 +42,7 @@ def main() -> None:
                 ("bpsk", "qpsk"),
                 clock_offsets_ppm=(0,),
                 use_gardner=False,
+                use_carrier_tracking=False,
             )
             adaptive = select_waveform(
                 samples,
@@ -49,6 +50,7 @@ def main() -> None:
                 (truth["symbolRate"],),
                 ("bpsk", "qpsk"),
                 use_gardner=False,
+                use_carrier_tracking=False,
             )
             selected = next((
                 item for item in adaptive["candidates"]

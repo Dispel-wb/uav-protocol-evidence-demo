@@ -55,6 +55,7 @@ def main() -> None:
                 (truth["symbolRate"],),
                 ("qpsk",),
                 use_gardner=False,
+                use_carrier_tracking=False,
             )
             tracked = select_waveform(
                 samples,
@@ -62,6 +63,7 @@ def main() -> None:
                 (truth["symbolRate"],),
                 ("qpsk",),
                 use_gardner=True,
+                use_carrier_tracking=False,
             )
             records.append({
                 "noiseStd": noise,
