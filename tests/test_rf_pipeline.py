@@ -188,6 +188,42 @@ class RFInputTests(unittest.TestCase):
                     {"integrate-dump", "rrc-0.35"},
                 )
 
+    def test_clock_drift_search_recovers_shaped_psk_payloads(self):
+        cases = (
+            (synthesize_bpsk, "BPSK", -10_000, 83),
+            (synthesize_qpsk, "QPSK", 10_000, 84),
+        )
+        for synthesize_psk, expected, drift_ppm, seed in cases:
+            with self.subTest(modulation=expected):
+                samples, truth = synthesize_psk(
+                    noise_std=0.04,
+                    rolloff=0.35,
+                    sample_clock_offset_ppm=drift_ppm,
+                    seed=seed,
+                )
+                fixed = select_waveform(
+                    samples,
+                    truth["sampleRate"],
+                    [1_200],
+                    ["bpsk", "qpsk"],
+                    clock_offsets_ppm=(0,),
+                )
+                fixed_payload = (
+                    bytes.fromhex(fixed["chosenPayloadHex"])
+                    if fixed["chosenPayloadHex"] else b""
+                )
+                self.assertNotEqual(fixed_payload[:len(PAYLOAD)], PAYLOAD)
+                adaptive = select_waveform(
+                    samples,
+                    truth["sampleRate"],
+                    [1_200],
+                    ["bpsk", "qpsk"],
+                )
+                self.assertEqual(adaptive["chosenModulation"], expected)
+                self.assertEqual(adaptive["validProtocolFrames"], 1)
+                payload = bytes.fromhex(adaptive["chosenPayloadHex"])
+                self.assertEqual(payload[:len(PAYLOAD)], PAYLOAD)
+
     def test_impulse_suppression_recovers_a_qpsk_frame(self):
         samples, truth = synthesize_qpsk(seed=102)
         impaired, impairment = add_impulsive_noise(

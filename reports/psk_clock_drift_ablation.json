@@ -1,0 +1,103 @@
+{
+  "schema": "psk-clock-drift-ablation-v1",
+  "cases": 10,
+  "fixedClockExactPayloads": 4,
+  "adaptiveExactPayloads": 10,
+  "improvedCases": 6,
+  "regressions": 0,
+  "wrongModulation": 0,
+  "falseValidProtocolFrames": 0,
+  "records": [
+    {
+      "transmitModulation": "BPSK",
+      "injectedClockOffsetPpm": -10000,
+      "fixedClockExactPayload": false,
+      "adaptiveExactPayload": true,
+      "chosenModulation": "BPSK",
+      "selectedClockOffsetPpm": -10000,
+      "validProtocolFrames": 1
+    },
+    {
+      "transmitModulation": "BPSK",
+      "injectedClockOffsetPpm": -5000,
+      "fixedClockExactPayload": false,
+      "adaptiveExactPayload": true,
+      "chosenModulation": "BPSK",
+      "selectedClockOffsetPpm": -5000,
+      "validProtocolFrames": 1
+    },
+    {
+      "transmitModulation": "BPSK",
+      "injectedClockOffsetPpm": 0,
+      "fixedClockExactPayload": true,
+      "adaptiveExactPayload": true,
+      "chosenModulation": "BPSK",
+      "selectedClockOffsetPpm": 0.0,
+      "validProtocolFrames": 1
+    },
+    {
+      "transmitModulation": "BPSK",
+      "injectedClockOffsetPpm": 5000,
+      "fixedClockExactPayload": false,
+      "adaptiveExactPayload": true,
+      "chosenModulation": "BPSK",
+      "selectedClockOffsetPpm": 5000,
+      "validProtocolFrames": 1
+    },
+    {
+      "transmitModulation": "BPSK",
+      "injectedClockOffsetPpm": 10000,
+      "fixedClockExactPayload": false,
+      "adaptiveExactPayload": true,
+      "chosenModulation": "BPSK",
+      "selectedClockOffsetPpm": 10000,
+      "validProtocolFrames": 1
+    },
+    {
+      "transmitModulation": "QPSK",
+      "injectedClockOffsetPpm": -10000,
+      "fixedClockExactPayload": false,
+      "adaptiveExactPayload": true,
+      "chosenModulation": "QPSK",
+      "selectedClockOffsetPpm": -10000,
+      "validProtocolFrames": 1
+    },
+    {
+      "transmitModulation": "QPSK",
+      "injectedClockOffsetPpm": -5000,
+      "fixedClockExactPayload": true,
+      "adaptiveExactPayload": true,
+      "chosenModulation": "QPSK",
+      "selectedClockOffsetPpm": -5000,
+      "validProtocolFrames": 1
+    },
+    {
+      "transmitModulation": "QPSK",
+      "injectedClockOffsetPpm": 0,
+      "fixedClockExactPayload": true,
+      "adaptiveExactPayload": true,
+      "chosenModulation": "QPSK",
+      "selectedClockOffsetPpm": 0.0,
+      "validProtocolFrames": 1
+    },
+    {
+      "transmitModulation": "QPSK",
+      "injectedClockOffsetPpm": 5000,
+      "fixedClockExactPayload": true,
+      "adaptiveExactPayload": true,
+      "chosenModulation": "QPSK",
+      "selectedClockOffsetPpm": 5000,
+      "validProtocolFrames": 1
+    },
+    {
+      "transmitModulation": "QPSK",
+      "injectedClockOffsetPpm": 10000,
+      "fixedClockExactPayload": false,
+      "adaptiveExactPayload": true,
+      "chosenModulation": "QPSK",
+      "selectedClockOffsetPpm": 10000,
+      "validProtocolFrames": 1
+    }
+  ],
+  "boundary": "Short deterministic rolloff-0.35 RRC bursts with an intentionally wide clock-stress range up to one percent. Candidate-grid recovery is not a continuous timing loop and does not establish real oscillator tolerance."
+}

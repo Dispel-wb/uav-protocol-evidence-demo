@@ -50,3 +50,43 @@ def shape_symbols(
     shaped = np.convolve(impulses, taps, mode="same")
     rms = float(np.sqrt(np.mean(np.abs(shaped) ** 2)))
     return (shaped / rms).astype(np.complex64)
+
+
+def apply_sample_clock_offset(
+    samples: np.ndarray,
+    offset_ppm: float,
+) -> np.ndarray:
+    """Resample a fixture so its symbol clock drifts against nominal receiver time."""
+    source = np.asarray(samples, dtype=np.complex64).reshape(-1)
+    scale = 1 + offset_ppm * 1e-6
+    if scale <= 0:
+        raise ValueError("sample clock offset must keep a positive sampling scale")
+    if source.size < 2 or offset_ppm == 0:
+        return source.copy()
+    output_size = int(np.floor((source.size - 1) / scale)) + 1
+    positions = np.arange(output_size, dtype=np.float64) * scale
+    source_positions = np.arange(source.size, dtype=np.float64)
+    real = np.interp(positions, source_positions, source.real)
+    imag = np.interp(positions, source_positions, source.imag)
+    return (real + 1j * imag).astype(np.complex64)
+
+
+def sample_symbols(
+    samples: np.ndarray,
+    first_sample: float,
+    samples_per_symbol: float,
+) -> np.ndarray:
+    """Linearly interpolate symbol centers at a possibly noninteger period."""
+    source = np.asarray(samples).reshape(-1)
+    if samples_per_symbol <= 0:
+        raise ValueError("samples_per_symbol must be positive")
+    positions = np.arange(
+        first_sample,
+        source.size - 1,
+        samples_per_symbol,
+        dtype=np.float64,
+    )
+    source_positions = np.arange(source.size, dtype=np.float64)
+    real = np.interp(positions, source_positions, source.real)
+    imag = np.interp(positions, source_positions, source.imag)
+    return real + 1j * imag

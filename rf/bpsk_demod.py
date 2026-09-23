@@ -7,7 +7,7 @@ from typing import Any
 import numpy as np
 
 from rf.denoise import suppress_edge_stationary_tone, suppress_impulses
-from rf.pulse_shaping import root_raised_cosine
+from rf.pulse_shaping import root_raised_cosine, sample_symbols
 from rf.signal_quality import detect_bursts
 
 
@@ -24,7 +24,13 @@ def demodulate_bpsk(
     preamble: bytes = bytes.fromhex("55 55 55 55 D3 91"),
     suppress_impulsive: bool = True,
     suppress_tone: bool = True,
+    clock_offsets_ppm: tuple[float, ...] = (
+        -10_000, -5_000, -2_000, -1_000, -500,
+        0, 500, 1_000, 2_000, 5_000, 10_000,
+    ),
 ) -> dict[str, Any]:
+    if any(1 + offset * 1e-6 <= 0 for offset in clock_offsets_ppm):
+        raise ValueError("clock offset candidates must keep a positive symbol period")
     iq = np.asarray(samples, dtype=np.complex64).reshape(-1)
     tone_report = {"applied": False, "reason": "disabled"}
     if suppress_tone:
@@ -73,43 +79,53 @@ def demodulate_bpsk(
     receive_branches.append(("rrc-0.35", matched, False))
     candidates = []
     for receive_filter, branch, integrate in receive_branches:
-        for timing in range(samples_per_symbol):
-            usable = branch[timing:]
-            if integrate:
-                usable = usable[:usable.size - usable.size % samples_per_symbol]
-                if usable.size < preamble_bits.size * samples_per_symbol:
-                    continue
-                means = usable.reshape(-1, samples_per_symbol).mean(axis=1)
-            else:
-                means = usable[::samples_per_symbol]
-                if means.size < preamble_bits.size:
-                    continue
-            for inverted in (False, True):
-                bits = (means.real < 0 if inverted else means.real > 0).astype(np.uint8)
-                for position in range(bits.size - preamble_bits.size + 1):
-                    errors = int(np.count_nonzero(
-                        bits[position:position + preamble_bits.size] != preamble_bits
-                    ))
-                    if errors <= 2:
-                        confidence = float(
-                            np.mean(np.abs(means.real)) /
-                            (np.std(means.imag) + 1e-9)
-                        )
-                        candidates.append((
-                            errors,
-                            -confidence,
-                            receive_filter,
-                            timing,
-                            inverted,
-                            position,
-                            bits,
+        drift_candidates = (0.0,) if integrate else clock_offsets_ppm
+        for clock_offset_ppm in drift_candidates:
+            effective_period = samples_per_symbol / (1 + clock_offset_ppm * 1e-6)
+            for timing in range(samples_per_symbol):
+                usable = branch[timing:]
+                if integrate:
+                    usable = usable[:usable.size - usable.size % samples_per_symbol]
+                    if usable.size < preamble_bits.size * samples_per_symbol:
+                        continue
+                    means = usable.reshape(-1, samples_per_symbol).mean(axis=1)
+                else:
+                    means = sample_symbols(branch, timing, effective_period)
+                    if means.size < preamble_bits.size:
+                        continue
+                for inverted in (False, True):
+                    bits = (
+                        means.real < 0 if inverted else means.real > 0
+                    ).astype(np.uint8)
+                    for position in range(bits.size - preamble_bits.size + 1):
+                        errors = int(np.count_nonzero(
+                            bits[position:position + preamble_bits.size] != preamble_bits
                         ))
-                        break
+                        if errors <= 2:
+                            mean_axis = np.mean(np.abs(means.real))
+                            constellation_error = np.sqrt(
+                                np.mean(means.imag ** 2) +
+                                np.var(np.abs(means.real))
+                            )
+                            confidence = float(
+                                mean_axis / (constellation_error + 1e-9)
+                            )
+                            candidates.append((
+                                errors,
+                                -confidence,
+                                receive_filter,
+                                clock_offset_ppm,
+                                timing,
+                                inverted,
+                                position,
+                                bits,
+                            ))
+                            break
     if not candidates:
         raise ValueError("preamble not found after BPSK demodulation")
-    errors, negative_confidence, receive_filter, timing, inverted, position, bits = min(
+    errors, negative_confidence, receive_filter, clock_offset_ppm, timing, inverted, position, bits = min(
         candidates,
-        key=lambda item: (item[0], item[1], item[5]),
+        key=lambda item: (item[0], item[1], item[6]),
     )
     payload_bits = bits[position + preamble_bits.size:]
     payload = _bits_to_bytes(payload_bits)
@@ -123,6 +139,7 @@ def demodulate_bpsk(
         "carrierPhaseRadians": carrier_phase,
         "timingOffset": timing,
         "receiveFilter": receive_filter,
+        "sampleClockOffsetPpm": clock_offset_ppm,
         "bitPolarityInverted": inverted,
         "preambleBitErrors": errors,
         "decisionConfidence": -negative_confidence,
@@ -130,5 +147,5 @@ def demodulate_bpsk(
         "dcOffset": {"i": dc.real, "q": dc.imag},
         "impulseSuppression": impulse_report,
         "toneSuppression": tone_report,
-        "boundary": "Current BPSK baseline assumes a burst, integer samples per symbol and a known preamble; rectangular and rolloff-0.35 RRC receive branches are synthetic-only and real oscillator drift remains to be validated.",
+        "boundary": "Current BPSK baseline assumes a burst and a known preamble; RRC timing-drift candidates are synthetic-only and are not a continuous timing loop.",
     }

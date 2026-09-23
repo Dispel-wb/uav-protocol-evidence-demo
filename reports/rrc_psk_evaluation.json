@@ -5,8 +5,8 @@
   "wrongModulation": 0,
   "falseValidProtocolFrames": 0,
   "receiveFilterSelections": {
-    "integrate-dump": 12,
-    "rrc-0.35": 6
+    "integrate-dump": 13,
+    "rrc-0.35": 5
   },
   "records": [
     {
@@ -17,7 +17,7 @@
       "carrierOffsetHz": -300,
       "chosenModulation": "BPSK",
       "chosenSymbolRate": 1200.0,
-      "receiveFilter": "integrate-dump",
+      "receiveFilter": "rrc-0.35",
       "validProtocolFrames": 1,
       "exactPayload": true
     },
@@ -41,7 +41,7 @@
       "carrierOffsetHz": 300,
       "chosenModulation": "BPSK",
       "chosenSymbolRate": 1200.0,
-      "receiveFilter": "rrc-0.35",
+      "receiveFilter": "integrate-dump",
       "validProtocolFrames": 1,
       "exactPayload": true
     },
@@ -77,7 +77,7 @@
       "carrierOffsetHz": 300,
       "chosenModulation": "BPSK",
       "chosenSymbolRate": 1200.0,
-      "receiveFilter": "rrc-0.35",
+      "receiveFilter": "integrate-dump",
       "validProtocolFrames": 1,
       "exactPayload": true
     },

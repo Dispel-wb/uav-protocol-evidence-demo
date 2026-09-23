@@ -4,7 +4,7 @@ from __future__ import annotations
 import numpy as np
 
 from rf.generate_iq_fixture import PAYLOAD, PREAMBLE
-from rf.pulse_shaping import shape_symbols
+from rf.pulse_shaping import apply_sample_clock_offset, shape_symbols
 
 
 def synthesize_bpsk(
@@ -18,6 +18,7 @@ def synthesize_bpsk(
     symbol_rate: float = 1_200,
     seed: int = 20261200,
     rolloff: float | None = None,
+    sample_clock_offset_ppm: float = 0,
 ) -> tuple[np.ndarray, dict]:
     samples_per_symbol = int(round(sample_rate / symbol_rate))
     if samples_per_symbol <= 0 or not np.isclose(
@@ -32,6 +33,7 @@ def synthesize_bpsk(
         shape_symbols(symbols.astype(np.complex64), samples_per_symbol, rolloff)
         if rolloff is not None else np.repeat(symbols, samples_per_symbol)
     )
+    baseband = apply_sample_clock_offset(baseband, sample_clock_offset_ppm)
     start = 1_600
     end = start + baseband.size
     total = end + 1_600
@@ -58,6 +60,7 @@ def synthesize_bpsk(
         "modulation": "BPSK",
         "pulseShape": "RRC" if rolloff is not None else "rectangular",
         "rolloff": rolloff,
+        "sampleClockOffsetPpm": sample_clock_offset_ppm,
     }
     return samples, truth
 
@@ -73,6 +76,7 @@ def synthesize_qpsk(
     symbol_rate: float = 1_200,
     seed: int = 20261300,
     rolloff: float | None = None,
+    sample_clock_offset_ppm: float = 0,
 ) -> tuple[np.ndarray, dict]:
     samples_per_symbol = int(round(sample_rate / symbol_rate))
     if samples_per_symbol <= 0 or not np.isclose(
@@ -90,6 +94,7 @@ def synthesize_qpsk(
         shape_symbols(symbols.astype(np.complex64), samples_per_symbol, rolloff)
         if rolloff is not None else np.repeat(symbols, samples_per_symbol)
     )
+    baseband = apply_sample_clock_offset(baseband, sample_clock_offset_ppm)
     start = 1_600
     end = start + baseband.size
     total = end + 1_600
@@ -116,5 +121,6 @@ def synthesize_qpsk(
         "modulation": "QPSK",
         "pulseShape": "RRC" if rolloff is not None else "rectangular",
         "rolloff": rolloff,
+        "sampleClockOffsetPpm": sample_clock_offset_ppm,
     }
     return samples, truth

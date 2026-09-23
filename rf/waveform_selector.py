@@ -16,9 +16,18 @@ def select_waveform(
     sample_rate: float,
     symbol_rates: Iterable[float],
     modulations: Iterable[str] = ("fsk",),
+    clock_offsets_ppm: Iterable[float] | None = None,
 ) -> dict[str, Any]:
     rates = tuple(float(rate) for rate in symbol_rates)
     families = tuple(dict.fromkeys(name.lower() for name in modulations))
+    clock_candidates = (
+        None if clock_offsets_ppm is None
+        else tuple(float(offset) for offset in clock_offsets_ppm)
+    )
+    timing_options = (
+        {} if clock_candidates is None
+        else {"clock_offsets_ppm": clock_candidates}
+    )
     unsupported = set(families) - {"fsk", "bpsk", "qpsk"}
     if not rates:
         raise ValueError("at least one symbol-rate candidate is required")
@@ -38,7 +47,9 @@ def select_waveform(
     if "bpsk" in families:
         for rate in rates:
             try:
-                report = demodulate_bpsk(samples, sample_rate, rate)
+                report = demodulate_bpsk(
+                    samples, sample_rate, rate, **timing_options
+                )
                 payload = report.pop("payload")
                 protocol = mavlink_evidence(payload)
                 score = (
@@ -69,7 +80,9 @@ def select_waveform(
     if "qpsk" in families:
         for rate in rates:
             try:
-                report = demodulate_qpsk(samples, sample_rate, rate)
+                report = demodulate_qpsk(
+                    samples, sample_rate, rate, **timing_options
+                )
                 payload = report.pop("payload")
                 protocol = mavlink_evidence(payload)
                 score = (
