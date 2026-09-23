@@ -1,0 +1,18 @@
+{
+  "schema": "sdr-hardware-readiness-v1",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.12.10",
+  "soapyBindingsInstalled": false,
+  "deviceArguments": "",
+  "devices": [],
+  "enumerationError": null,
+  "readyForCapture": false,
+  "blockers": [
+    "SoapySDR Python bindings are not installed"
+  ],
+  "nextEvidence": [
+    "enumerated device identity and driver",
+    "finite SigMF capture with hardware timestamps",
+    "continuous run with timeout, overflow and latency statistics"
+  ]
+}

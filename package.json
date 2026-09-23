@@ -6,6 +6,7 @@
     "test": "node tests/test_decoder.js && node tests/test_discovery.js && node tests/test_link_intelligence.js && node tests/test_stream_intelligence.js && node tests/test_state_analysis.js && node tests/test_protocol_model.js && node tests/test_model_evaluation.js && node tests/test_active_learning.js",
     "evaluate:model": "node scripts/evaluate_protocol_model.js",
     "test:rf": "python -m unittest discover -s tests -p test_rf_pipeline.py -v",
+    "diagnose:sdr": "python -m rf.diagnose_sdr --output reports/hardware_readiness.json",
     "fixture:iq": "python -m rf.generate_iq_fixture",
     "analyze:iq": "python -m rf.analyze_iq samples/iq/fsk_demo.sigmf-meta --output reports/iq_quality_fsk_demo.json",
     "demod:iq": "python -m rf.demodulate_iq samples/iq/fsk_demo.sigmf-meta --symbol-rate 1200 --truth samples/iq/fsk_demo_truth.json --output reports/fsk_demod_report.json --hex-output reports/fsk_demo.demod.hex",

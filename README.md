@@ -30,6 +30,7 @@
 
 ```bash
 npm run test:rf
+npm run diagnose:sdr
 npm run fixture:iq
 npm run analyze:iq
 npm run demod:iq
@@ -69,6 +70,8 @@ python -m rf.capture_sdr --args "driver=设备驱动名" --frequency 433920000 -
 ```
 
 真实采样报告会记录设备参数、接收样本数、超时、溢出、空读、时间戳跳变和环形缓冲覆盖数量。目前仓库中没有真实SDR硬件实测记录，因此实时接收仍属于“接口与回放已验证、硬件未验证”。
+
+`npm run diagnose:sdr` 会检查SoapySDR Python绑定、设备枚举结果和当前阻塞项，并把结果写入 `reports/hardware_readiness.json`。当前机器的报告为：绑定未安装、枚举设备数0、`readyForCapture=false`。安装与具体接收硬件匹配的SoapySDR运行库、Python绑定和厂商驱动后，应重新运行该命令，再进行有限SigMF采样和连续运行验证。
 
 `rf/full_pipeline.py` 已把统一采样源、信号质量分析、2-FSK候选解调和协议CRC反馈连接成有限窗口闭环。数组回放测试能够从分块采样重新选择1200 Bd并恢复有效MAVLink帧。
 
