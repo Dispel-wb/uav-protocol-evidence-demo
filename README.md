@@ -45,6 +45,7 @@ npm run evaluate:tone-denoise
 npm run evaluate:rrc
 npm run evaluate:clock-drift
 npm run evaluate:gardner
+npm run evaluate:multipath
 npm run stream:replay
 npm run stream:state
 ```
@@ -63,11 +64,13 @@ BPSK使用独立的相位调制链：平方去除数据符号、平方谱线峰�
 
 QPSK进一步使用四次方法消除数据符号、四次谱线峰值恢复载波，并遍历四种象限模糊和全部符号定时。`npm run evaluate:qpsk` 的20组合成测试覆盖噪声标准差0.02～0.12和频偏±400 Hz，20例全部精确恢复。错误调制选择和错误CRC接收均为0，逐例结果位于 `reports/qpsk_robustness.json`。
 
-BPSK与QPSK现在同时尝试矩形脉冲的积分判决和滚降系数0.35的根升余弦匹配滤波判决；载波频偏由平方／四次谱线峰值估计，避免成形过渡区的低幅相位使相位展开失稳。`npm run evaluate:rrc` 对两种调制、3档噪声和3档频偏执行18组合成测试，18组均恢复正确载荷并通过MAVLink CRC，错误调制选择和错误CRC接收均为0。完整结果位于 `reports/rrc_psk_evaluation.json`。发射端和接收端仍使用同一套合成实现，尚未覆盖真实采样器漂移、多径、功放非线性和真实发射机。
+BPSK与QPSK现在同时尝试矩形脉冲的积分判决和滚降系数0.35的根升余弦匹配滤波判决；载波频偏由平方／四次谱线峰值估计，避免成形过渡区的低幅相位使相位展开失稳。`npm run evaluate:rrc` 对两种调制、3档噪声和3档频偏执行18组合成测试，18组均恢复正确载荷并通过MAVLink CRC，错误调制选择和错误CRC接收均为0。完整结果位于 `reports/rrc_psk_evaluation.json`。发射端和接收端仍使用同一套合成实现，尚未覆盖真实采样器漂移、时变多径、功放非线性和真实发射机。
 
 RRC分支进一步在−10000～+10000 ppm的离散候选上改变符号采样周期，并用协议CRC、同步字误差和星座离散度依次排序。`npm run evaluate:clock-drift` 对BPSK/QPSK各5组恒定时钟偏移做消融：固定符号时钟精确恢复6/10组，启用漂移搜索后恢复10/10组，改善4组、回退0组，错误调制和错误CRC接收均为0。该范围用于在短突发中放大漂移效应，报告位于 `reports/psk_clock_drift_ablation.json`。
 
 `rf/timing_recovery.py` 实现了带线性插值、归一化Gardner误差、频率积分项和±3%环路边界的定时恢复。`npm run evaluate:gardner` 使用4个连续MAVLink帧构成长突发，并令采样时钟由−10000 ppm线性漂移至+10000 ppm。在4档噪声、2个随机种子的8组测试中，固定漂移网格完整恢复0/8组，Gardner环完整恢复8/8组；每组4个协议帧均通过CRC。当前结果仍来自同源合成数据，尚未验证真实采样器的抖动、突变或多径耦合。报告位于 `reports/gardner_timing_evaluation.json`。
+
+`rf/equalization.py` 使用已知同步序列训练7抽头复数FIR均衡器，并报告训练前后均方误差；解调器同时保留未经均衡与已经均衡的候选，由协议CRC优先选路。`npm run evaluate:multipath` 对5组延迟/复增益和2档噪声组成的10个双径QPSK案例做消融：未经均衡完整恢复0/10组，启用均衡后恢复10/10组，改善10组、回退0组，错误CRC接收为0。该证据依赖已知同步序列和静态双径合成信道，报告位于 `reports/multipath_equalizer_ablation.json`。
 
 `rf/denoise.py` 提供稀疏脉冲干扰抑制：只在已检测突发内部，以幅度中位数和MAD形成稳健阈值，将占比不超过5%的离群采样用相邻正常复数采样插值；异常比例过高时拒绝处理。`npm run evaluate:denoise` 对四种波形各5组注入1%、幅度3.0的脉冲干扰。未处理链恢复12/20组，启用抑制后恢复20/20组，改善8组且回退0组。完整消融记录位于 `reports/impulse_denoise_ablation.json`。
 

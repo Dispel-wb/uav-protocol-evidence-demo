@@ -269,6 +269,43 @@ class RFInputTests(unittest.TestCase):
         )
         self.assertEqual(candidate["demodulation"]["payloadValidationScore"], 4)
 
+    def test_training_equalizer_recovers_multipath_qpsk_frame(self):
+        samples, truth = synthesize_qpsk(
+            noise_std=0.03,
+            rolloff=0.35,
+            carrier_offset=250,
+            multipath_paths=((0, 1 + 0j), (35, -0.5 + 0j)),
+            seed=20261702,
+        )
+        unequalized = select_waveform(
+            samples,
+            truth["sampleRate"],
+            [1_200],
+            ["qpsk"],
+            use_gardner=False,
+            use_equalizer=False,
+        )
+        self.assertEqual(unequalized["validProtocolFrames"], 0)
+
+        equalized = select_waveform(
+            samples,
+            truth["sampleRate"],
+            [1_200],
+            ["qpsk"],
+            use_gardner=False,
+            use_equalizer=True,
+        )
+        self.assertEqual(equalized["validProtocolFrames"], 1)
+        payload = bytes.fromhex(equalized["chosenPayloadHex"])
+        self.assertEqual(payload[:len(PAYLOAD)], PAYLOAD)
+        candidate = next(
+            item for item in equalized["candidates"]
+            if item["status"] == "decoded"
+        )
+        report = candidate["demodulation"]["equalization"]
+        self.assertEqual(report["method"], "training-fir")
+        self.assertLess(report["trainingMseAfter"], report["trainingMseBefore"])
+
     def test_impulse_suppression_recovers_a_qpsk_frame(self):
         samples, truth = synthesize_qpsk(seed=102)
         impaired, impairment = add_impulsive_noise(

@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import numpy as np
 
+from rf.channel_impairments import apply_multipath
 from rf.generate_iq_fixture import PAYLOAD, PREAMBLE
 from rf.pulse_shaping import (
     apply_sample_clock_drift,
@@ -25,6 +26,7 @@ def synthesize_bpsk(
     sample_clock_offset_ppm: float = 0,
     sample_clock_end_offset_ppm: float | None = None,
     guard_samples: int = 1_600,
+    multipath_paths: tuple[tuple[int, complex], ...] | None = None,
 ) -> tuple[np.ndarray, dict]:
     samples_per_symbol = int(round(sample_rate / symbol_rate))
     if samples_per_symbol <= 0 or not np.isclose(
@@ -59,7 +61,15 @@ def synthesize_bpsk(
     samples += np.complex64(0.02 + 0.01j)
     time_axis = np.arange(baseband.size) / sample_rate
     carrier = np.exp(1j * (2 * np.pi * carrier_offset * time_axis + carrier_phase))
-    samples[start:end] += (amplitude * baseband * carrier).astype(np.complex64)
+    transmitted = (amplitude * baseband * carrier).astype(np.complex64)
+    if multipath_paths is not None:
+        transmitted = apply_multipath(transmitted, multipath_paths)
+        end = start + transmitted.size
+        total = end + guard_samples
+        noise = rng.normal(0, noise_std, total) + 1j * rng.normal(0, noise_std, total)
+        samples = noise.astype(np.complex64)
+        samples += np.complex64(0.02 + 0.01j)
+    samples[start:end] += transmitted
     truth = {
         "schema": "synthetic-bpsk-truth-v1",
         "sampleRate": sample_rate,
@@ -78,6 +88,12 @@ def synthesize_bpsk(
         "rolloff": rolloff,
         "sampleClockOffsetPpm": sample_clock_offset_ppm,
         "sampleClockEndOffsetPpm": sample_clock_end_offset_ppm,
+        "multipathPaths": (
+            None if multipath_paths is None else [
+                {"delaySamples": delay, "gainI": gain.real, "gainQ": gain.imag}
+                for delay, gain in multipath_paths
+            ]
+        ),
     }
     return samples, truth
 
@@ -96,6 +112,7 @@ def synthesize_qpsk(
     sample_clock_offset_ppm: float = 0,
     sample_clock_end_offset_ppm: float | None = None,
     guard_samples: int = 1_600,
+    multipath_paths: tuple[tuple[int, complex], ...] | None = None,
 ) -> tuple[np.ndarray, dict]:
     samples_per_symbol = int(round(sample_rate / symbol_rate))
     if samples_per_symbol <= 0 or not np.isclose(
@@ -133,7 +150,15 @@ def synthesize_qpsk(
     samples += np.complex64(0.02 + 0.01j)
     time_axis = np.arange(baseband.size) / sample_rate
     carrier = np.exp(1j * (2 * np.pi * carrier_offset * time_axis + carrier_phase))
-    samples[start:end] += (amplitude * baseband * carrier).astype(np.complex64)
+    transmitted = (amplitude * baseband * carrier).astype(np.complex64)
+    if multipath_paths is not None:
+        transmitted = apply_multipath(transmitted, multipath_paths)
+        end = start + transmitted.size
+        total = end + guard_samples
+        noise = rng.normal(0, noise_std, total) + 1j * rng.normal(0, noise_std, total)
+        samples = noise.astype(np.complex64)
+        samples += np.complex64(0.02 + 0.01j)
+    samples[start:end] += transmitted
     truth = {
         "schema": "synthetic-qpsk-truth-v1",
         "sampleRate": sample_rate,
@@ -152,5 +177,11 @@ def synthesize_qpsk(
         "rolloff": rolloff,
         "sampleClockOffsetPpm": sample_clock_offset_ppm,
         "sampleClockEndOffsetPpm": sample_clock_end_offset_ppm,
+        "multipathPaths": (
+            None if multipath_paths is None else [
+                {"delaySamples": delay, "gainI": gain.real, "gainQ": gain.imag}
+                for delay, gain in multipath_paths
+            ]
+        ),
     }
     return samples, truth

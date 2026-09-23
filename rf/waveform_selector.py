@@ -18,6 +18,7 @@ def select_waveform(
     modulations: Iterable[str] = ("fsk",),
     clock_offsets_ppm: Iterable[float] | None = None,
     use_gardner: bool = True,
+    use_equalizer: bool = True,
 ) -> dict[str, Any]:
     rates = tuple(float(rate) for rate in symbol_rates)
     families = tuple(dict.fromkeys(name.lower() for name in modulations))
@@ -26,10 +27,14 @@ def select_waveform(
         else tuple(float(offset) for offset in clock_offsets_ppm)
     )
     timing_options = (
-        {"use_gardner": use_gardner} if clock_candidates is None
+        {
+            "use_gardner": use_gardner,
+            "use_equalizer": use_equalizer,
+        } if clock_candidates is None
         else {
             "clock_offsets_ppm": clock_candidates,
             "use_gardner": use_gardner,
+            "use_equalizer": use_equalizer,
         }
     )
     timing_options["payload_score"] = lambda payload: mavlink_evidence(payload)[

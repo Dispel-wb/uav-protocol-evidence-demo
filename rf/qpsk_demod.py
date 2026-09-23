@@ -7,6 +7,7 @@ from typing import Any, Callable
 import numpy as np
 
 from rf.denoise import suppress_edge_stationary_tone, suppress_impulses
+from rf.equalization import train_linear_equalizer
 from rf.pulse_shaping import root_raised_cosine, sample_symbols
 from rf.signal_quality import detect_bursts
 from rf.timing_recovery import gardner_recover
@@ -40,6 +41,7 @@ def demodulate_qpsk(
     ),
     use_gardner: bool = True,
     payload_score: Callable[[bytes], float] | None = None,
+    use_equalizer: bool = True,
 ) -> dict[str, Any]:
     if any(1 + offset * 1e-6 <= 0 for offset in clock_offsets_ppm):
         raise ValueError("clock offset candidates must keep a positive symbol period")
@@ -67,6 +69,11 @@ def demodulate_qpsk(
     ):
         raise ValueError("this baseline requires an integer number of samples per symbol")
     preamble_bits = np.unpackbits(np.frombuffer(preamble, dtype=np.uint8), bitorder="big")
+    preamble_pairs = preamble_bits.reshape(-1, 2)
+    preamble_symbols = (
+        np.where(preamble_pairs[:, 1] > 0, -1.0, 1.0)
+        + 1j * np.where(preamble_pairs[:, 0] > 0, -1.0, 1.0)
+    ).astype(np.complex64) / np.sqrt(2)
     minimum_samples = math.ceil(preamble_bits.size / 2) * samples_per_symbol
     if segment.size < minimum_samples:
         raise ValueError("burst is too short for the QPSK preamble")
@@ -124,7 +131,40 @@ def demodulate_qpsk(
                         position,
                         bits,
                         timing_report,
+                        None,
                     ))
+                    if use_equalizer and position % 2 == 0:
+                        equalized, equalizer_report = train_linear_equalizer(
+                            rotated,
+                            preamble_symbols,
+                            position // 2,
+                        )
+                        equalized_bits = _symbols_to_bits(equalized)
+                        equalized_errors = int(np.count_nonzero(
+                            equalized_bits[
+                                position:position + preamble_bits.size
+                            ] != preamble_bits
+                        ))
+                        if equalized_errors <= 2:
+                            axis_margin = np.minimum(
+                                np.abs(equalized.real), np.abs(equalized.imag)
+                            )
+                            equalized_confidence = float(
+                                np.mean(axis_margin) /
+                                (np.std(np.abs(equalized)) + 1e-9)
+                            )
+                            candidates.append((
+                                equalized_errors,
+                                -equalized_confidence,
+                                receive_filter,
+                                clock_offset_ppm,
+                                timing,
+                                quadrant,
+                                position,
+                                equalized_bits,
+                                timing_report,
+                                equalizer_report,
+                            ))
                     break
 
     for receive_filter, branch, integrate in receive_branches:
@@ -188,7 +228,7 @@ def demodulate_qpsk(
         validation_score = float(payload_score(payload)) if payload_score else 0.0
         return (-validation_score, item[0], item[1], item[6])
 
-    errors, negative_confidence, receive_filter, clock_offset_ppm, timing, quadrant, position, bits, timing_report = min(
+    errors, negative_confidence, receive_filter, clock_offset_ppm, timing, quadrant, position, bits, timing_report, equalizer_report = min(
         candidates,
         key=selection_key,
     )
@@ -207,6 +247,11 @@ def demodulate_qpsk(
         "receiveFilter": receive_filter,
         "sampleClockOffsetPpm": clock_offset_ppm,
         "timingRecovery": timing_report,
+        "equalization": (
+            equalizer_report
+            if equalizer_report is not None
+            else {"applied": False, "method": "none"}
+        ),
         "quadrantRotation": quadrant,
         "preambleBitErrors": errors,
         "decisionConfidence": -negative_confidence,

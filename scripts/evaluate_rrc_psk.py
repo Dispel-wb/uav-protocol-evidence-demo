@@ -31,6 +31,8 @@ def main() -> None:
                     truth["sampleRate"],
                     (800, truth["symbolRate"], 2400),
                     ("fsk", "bpsk", "qpsk"),
+                    use_gardner=False,
+                    use_equalizer=False,
                 )
                 payload = (
                     bytes.fromhex(result["chosenPayloadHex"])

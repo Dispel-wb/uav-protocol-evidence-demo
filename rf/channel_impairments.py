@@ -4,6 +4,25 @@ from __future__ import annotations
 import numpy as np
 
 
+def apply_multipath(
+    samples: np.ndarray,
+    paths: tuple[tuple[int, complex], ...],
+) -> np.ndarray:
+    """Apply deterministic delayed complex paths to a clean signal."""
+    source = np.asarray(samples, dtype=np.complex64).reshape(-1)
+    if not paths:
+        raise ValueError("at least one multipath component is required")
+    maximum_delay = max(delay for delay, _ in paths)
+    if maximum_delay < 0 or any(delay < 0 for delay, _ in paths):
+        raise ValueError("multipath delays must be nonnegative")
+    output = np.zeros(source.size + maximum_delay, dtype=np.complex64)
+    for delay, gain in paths:
+        if not np.isfinite(gain.real) or not np.isfinite(gain.imag):
+            raise ValueError("multipath gains must be finite")
+        output[delay:delay + source.size] += np.complex64(gain) * source
+    return output
+
+
 def add_impulsive_noise(
     samples: np.ndarray,
     start: int,

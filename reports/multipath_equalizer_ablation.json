@@ -1,0 +1,172 @@
+{
+  "schema": "qpsk-multipath-equalizer-ablation-v1",
+  "cases": 10,
+  "rawExactPayloads": 0,
+  "equalizedExactPayloads": 10,
+  "improvedCases": 10,
+  "regressions": 0,
+  "falseValidProtocolFrames": 0,
+  "records": [
+    {
+      "noiseStd": 0.03,
+      "seed": 20261700,
+      "echoDelaySamples": 15,
+      "echoGain": {
+        "i": -0.7,
+        "q": 0.0
+      },
+      "rawExactPayload": false,
+      "rawValidProtocolFrames": 0,
+      "equalizedExactPayload": true,
+      "equalizedValidProtocolFrames": 1,
+      "equalizerMethod": "training-fir",
+      "trainingMseBefore": 0.15008799731731415,
+      "trainingMseAfter": 0.011600676460281727
+    },
+    {
+      "noiseStd": 0.03,
+      "seed": 20261701,
+      "echoDelaySamples": 25,
+      "echoGain": {
+        "i": -0.6,
+        "q": 0.0
+      },
+      "rawExactPayload": false,
+      "rawValidProtocolFrames": 0,
+      "equalizedExactPayload": true,
+      "equalizedValidProtocolFrames": 1,
+      "equalizerMethod": "training-fir",
+      "trainingMseBefore": 0.149165540933609,
+      "trainingMseAfter": 0.0054953229825572105
+    },
+    {
+      "noiseStd": 0.03,
+      "seed": 20261702,
+      "echoDelaySamples": 35,
+      "echoGain": {
+        "i": -0.5,
+        "q": 0.0
+      },
+      "rawExactPayload": false,
+      "rawValidProtocolFrames": 0,
+      "equalizedExactPayload": true,
+      "equalizedValidProtocolFrames": 1,
+      "equalizerMethod": "training-fir",
+      "trainingMseBefore": 0.16314338147640228,
+      "trainingMseAfter": 0.006608667935239631
+    },
+    {
+      "noiseStd": 0.03,
+      "seed": 20261703,
+      "echoDelaySamples": 40,
+      "echoGain": {
+        "i": -0.5,
+        "q": 0.0
+      },
+      "rawExactPayload": false,
+      "rawValidProtocolFrames": 0,
+      "equalizedExactPayload": true,
+      "equalizedValidProtocolFrames": 1,
+      "equalizerMethod": "training-fir",
+      "trainingMseBefore": 0.16835461556911469,
+      "trainingMseAfter": 0.005429160270993503
+    },
+    {
+      "noiseStd": 0.03,
+      "seed": 20261704,
+      "echoDelaySamples": 50,
+      "echoGain": {
+        "i": 0.0,
+        "q": 0.8
+      },
+      "rawExactPayload": false,
+      "rawValidProtocolFrames": 0,
+      "equalizedExactPayload": true,
+      "equalizedValidProtocolFrames": 1,
+      "equalizerMethod": "training-fir",
+      "trainingMseBefore": 0.18905077874660492,
+      "trainingMseAfter": 0.011846559276078033
+    },
+    {
+      "noiseStd": 0.05,
+      "seed": 20261710,
+      "echoDelaySamples": 15,
+      "echoGain": {
+        "i": -0.7,
+        "q": 0.0
+      },
+      "rawExactPayload": false,
+      "rawValidProtocolFrames": 0,
+      "equalizedExactPayload": true,
+      "equalizedValidProtocolFrames": 1,
+      "equalizerMethod": "training-fir",
+      "trainingMseBefore": 0.1735261231660843,
+      "trainingMseAfter": 0.006941571964182718
+    },
+    {
+      "noiseStd": 0.05,
+      "seed": 20261711,
+      "echoDelaySamples": 25,
+      "echoGain": {
+        "i": -0.6,
+        "q": 0.0
+      },
+      "rawExactPayload": false,
+      "rawValidProtocolFrames": 0,
+      "equalizedExactPayload": true,
+      "equalizedValidProtocolFrames": 1,
+      "equalizerMethod": "training-fir",
+      "trainingMseBefore": 0.15942493081092834,
+      "trainingMseAfter": 0.006775736591957758
+    },
+    {
+      "noiseStd": 0.05,
+      "seed": 20261712,
+      "echoDelaySamples": 35,
+      "echoGain": {
+        "i": -0.5,
+        "q": 0.0
+      },
+      "rawExactPayload": false,
+      "rawValidProtocolFrames": 0,
+      "equalizedExactPayload": true,
+      "equalizedValidProtocolFrames": 1,
+      "equalizerMethod": "training-fir",
+      "trainingMseBefore": 0.15555636584758759,
+      "trainingMseAfter": 0.007965584944442624
+    },
+    {
+      "noiseStd": 0.05,
+      "seed": 20261713,
+      "echoDelaySamples": 40,
+      "echoGain": {
+        "i": -0.5,
+        "q": 0.0
+      },
+      "rawExactPayload": false,
+      "rawValidProtocolFrames": 0,
+      "equalizedExactPayload": true,
+      "equalizedValidProtocolFrames": 1,
+      "equalizerMethod": "training-fir",
+      "trainingMseBefore": 0.1539839804172516,
+      "trainingMseAfter": 0.007948090797924549
+    },
+    {
+      "noiseStd": 0.05,
+      "seed": 20261714,
+      "echoDelaySamples": 50,
+      "echoGain": {
+        "i": 0.0,
+        "q": 0.8
+      },
+      "rawExactPayload": false,
+      "rawValidProtocolFrames": 0,
+      "equalizedExactPayload": true,
+      "equalizedValidProtocolFrames": 1,
+      "equalizerMethod": "training-fir",
+      "trainingMseBefore": 0.19039833545684814,
+      "trainingMseAfter": 0.014135481747602513
+    }
+  ],
+  "boundary": "Deterministic two-path rolloff-0.35 RRC QPSK only. The seven-tap equalizer is trained by a known preamble and selected with protocol CRC; time-varying fading and channels without a known sequence remain untested."
+}

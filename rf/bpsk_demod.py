@@ -7,6 +7,7 @@ from typing import Any, Callable
 import numpy as np
 
 from rf.denoise import suppress_edge_stationary_tone, suppress_impulses
+from rf.equalization import train_linear_equalizer
 from rf.pulse_shaping import root_raised_cosine, sample_symbols
 from rf.signal_quality import detect_bursts
 from rf.timing_recovery import gardner_recover
@@ -31,6 +32,7 @@ def demodulate_bpsk(
     ),
     use_gardner: bool = True,
     payload_score: Callable[[bytes], float] | None = None,
+    use_equalizer: bool = True,
 ) -> dict[str, Any]:
     if any(1 + offset * 1e-6 <= 0 for offset in clock_offsets_ppm):
         raise ValueError("clock offset candidates must keep a positive symbol period")
@@ -73,6 +75,7 @@ def demodulate_bpsk(
     corrected *= np.exp(-1j * carrier_phase)
 
     preamble_bits = np.unpackbits(np.frombuffer(preamble, dtype=np.uint8), bitorder="big")
+    preamble_symbols = np.where(preamble_bits > 0, 1.0, -1.0).astype(np.complex64)
     receive_branches = [("integrate-dump", corrected, True)]
     matched = np.convolve(
         corrected,
@@ -90,9 +93,8 @@ def demodulate_bpsk(
         timing_report: dict[str, Any],
     ) -> None:
         for inverted in (False, True):
-            bits = (
-                means.real < 0 if inverted else means.real > 0
-            ).astype(np.uint8)
+            oriented = -means if inverted else means
+            bits = (oriented.real > 0).astype(np.uint8)
             for position in range(bits.size - preamble_bits.size + 1):
                 errors = int(np.count_nonzero(
                     bits[position:position + preamble_bits.size] != preamble_bits
@@ -116,7 +118,41 @@ def demodulate_bpsk(
                         position,
                         bits,
                         timing_report,
+                        None,
                     ))
+                    if use_equalizer:
+                        equalized, equalizer_report = train_linear_equalizer(
+                            oriented,
+                            preamble_symbols,
+                            position,
+                        )
+                        equalized_bits = (equalized.real > 0).astype(np.uint8)
+                        equalized_errors = int(np.count_nonzero(
+                            equalized_bits[
+                                position:position + preamble_bits.size
+                            ] != preamble_bits
+                        ))
+                        if equalized_errors <= 2:
+                            mean_axis = np.mean(np.abs(equalized.real))
+                            constellation_error = np.sqrt(
+                                np.mean(equalized.imag ** 2) +
+                                np.var(np.abs(equalized.real))
+                            )
+                            equalized_confidence = float(
+                                mean_axis / (constellation_error + 1e-9)
+                            )
+                            candidates.append((
+                                equalized_errors,
+                                -equalized_confidence,
+                                receive_filter,
+                                clock_offset_ppm,
+                                timing,
+                                inverted,
+                                position,
+                                equalized_bits,
+                                timing_report,
+                                equalizer_report,
+                            ))
                     break
 
     for receive_filter, branch, integrate in receive_branches:
@@ -180,7 +216,7 @@ def demodulate_bpsk(
         validation_score = float(payload_score(payload)) if payload_score else 0.0
         return (-validation_score, item[0], item[1], item[6])
 
-    errors, negative_confidence, receive_filter, clock_offset_ppm, timing, inverted, position, bits, timing_report = min(
+    errors, negative_confidence, receive_filter, clock_offset_ppm, timing, inverted, position, bits, timing_report, equalizer_report = min(
         candidates,
         key=selection_key,
     )
@@ -199,6 +235,11 @@ def demodulate_bpsk(
         "receiveFilter": receive_filter,
         "sampleClockOffsetPpm": clock_offset_ppm,
         "timingRecovery": timing_report,
+        "equalization": (
+            equalizer_report
+            if equalizer_report is not None
+            else {"applied": False, "method": "none"}
+        ),
         "bitPolarityInverted": inverted,
         "preambleBitErrors": errors,
         "decisionConfidence": -negative_confidence,
