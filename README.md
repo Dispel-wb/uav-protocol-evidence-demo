@@ -40,6 +40,7 @@ npm run evaluate:fsk
 npm run evaluate:modulation
 npm run evaluate:bpsk
 npm run evaluate:qpsk
+npm run evaluate:denoise
 npm run stream:replay
 npm run stream:state
 ```
@@ -57,6 +58,8 @@ GFSK作为第二种波形沿用同一频率判决主链，但在调制前加入B
 BPSK使用独立的相位调制链：平方去除数据符号、相位线性回归估计载波频偏、二阶相位估计、全符号定时搜索和同步字检验。`rf/waveform_selector.py` 同时尝试FSK族与BPSK，再以协议CRC为首要证据选路。`npm run evaluate:bpsk` 的20组合成测试中，噪声标准差0.02～0.08、频偏±500 Hz的15例全部精确恢复；0.12档5例均未达到精确验收。错误调制选择和错误CRC接收均为0，逐例结果位于 `reports/bpsk_robustness.json`。
 
 QPSK进一步使用四次方法消除数据符号、相位线性回归恢复载波，并遍历四种象限模糊和全部符号定时。`npm run evaluate:qpsk` 的20组合成测试中，噪声标准差0.02～0.04、频偏±400 Hz的10例全部精确恢复；0.08和0.12档10例未达到精确验收。错误调制选择和错误CRC接收均为0，逐例结果位于 `reports/qpsk_robustness.json`。当前四次载波恢复对噪声较敏感。
+
+`rf/denoise.py` 提供稀疏脉冲干扰抑制：只在已检测突发内部，以幅度中位数和MAD形成稳健阈值，将占比不超过5%的离群采样用相邻正常复数采样插值；异常比例过高时拒绝处理。`npm run evaluate:denoise` 对四种波形各5组注入1%、幅度3.0的脉冲干扰。未处理链恢复12/20组，启用抑制后恢复20/20组，改善8组且回退0组。完整消融记录位于 `reports/impulse_denoise_ablation.json`。
 
 ## SDR实时接收接口
 

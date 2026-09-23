@@ -19,6 +19,13 @@
     "filterCutoffHz": 4497.602466034936,
     "gain": 1.2634141231719909
   },
+  "impulseSuppression": {
+    "suppressedSamples": 0,
+    "candidateSamples": 0,
+    "thresholdMagnitude": 0.727995094013214,
+    "applied": false,
+    "reason": "no sparse impulses"
+  },
   "dcOffset": {
     "i": 0.02011875808238983,
     "q": 0.0013470184057950974

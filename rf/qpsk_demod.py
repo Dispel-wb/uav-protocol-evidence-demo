@@ -6,6 +6,7 @@ from typing import Any
 
 import numpy as np
 
+from rf.denoise import suppress_impulses
 from rf.signal_quality import detect_bursts
 
 
@@ -29,6 +30,7 @@ def demodulate_qpsk(
     symbol_rate: float,
     *,
     preamble: bytes = bytes.fromhex("55 55 55 55 D3 91"),
+    suppress_impulsive: bool = True,
 ) -> dict[str, Any]:
     iq = np.asarray(samples, dtype=np.complex64).reshape(-1)
     bursts, _, _ = detect_bursts(iq)
@@ -37,7 +39,11 @@ def demodulate_qpsk(
     start, end = max(bursts, key=lambda item: item[1] - item[0])
     outside = np.concatenate((iq[:start], iq[end:]))
     dc = complex(np.mean(outside)) if outside.size else 0j
-    segment = (iq[start:end] - dc).astype(np.complex64)
+    cleaned = (iq - dc).astype(np.complex64)
+    impulse_report = {"suppressedSamples": 0, "applied": False, "reason": "disabled"}
+    if suppress_impulsive:
+        cleaned, impulse_report = suppress_impulses(cleaned, start, end)
+    segment = cleaned[start:end]
     samples_per_symbol = int(round(sample_rate / symbol_rate))
     if not math.isclose(
         samples_per_symbol,
@@ -110,5 +116,6 @@ def demodulate_qpsk(
         "decisionConfidence": -negative_confidence,
         "burst": {"startSample": start, "endSample": end},
         "dcOffset": {"i": dc.real, "q": dc.imag},
+        "impulseSuppression": impulse_report,
         "boundary": "Current QPSK baseline assumes rectangular pulse shaping, integer samples per symbol and a known preamble.",
     }

@@ -7,12 +7,14 @@ import unittest
 
 import numpy as np
 
+from rf.channel_impairments import add_impulsive_noise
 from rf.generate_iq_fixture import PAYLOAD, generate, synthesize
 from rf.generate_psk_fixture import synthesize_bpsk, synthesize_qpsk
 from rf.fsk_demod import demodulate, preprocess
 from rf.candidate_selector import select
 from rf.protocol_feedback import mavlink_evidence, update_mavlink_continuity
 from rf.protocol_state import ProtocolStateTracker
+from rf.qpsk_demod import demodulate_qpsk
 from rf.ring_buffer import ComplexRingBuffer
 from rf.stream_capture import ArraySource, CaptureConfig, capture, capture_to_sigmf
 from rf.streaming_pipeline import run_streaming
@@ -150,6 +152,39 @@ class RFInputTests(unittest.TestCase):
         self.assertEqual(window["chosenModulation"], "QPSK")
         self.assertEqual(window["chosenDemodulator"], "QPSK")
         self.assertEqual(report["analysis"]["protocolState"]["finalState"], "disarmed")
+
+    def test_impulse_suppression_recovers_a_qpsk_frame(self):
+        samples, truth = synthesize_qpsk(seed=102)
+        impaired, impairment = add_impulsive_noise(
+            samples,
+            truth["startSample"],
+            truth["endSample"],
+            fraction=0.01,
+            amplitude=3.0,
+            seed=202,
+        )
+        try:
+            raw = demodulate_qpsk(
+                impaired,
+                truth["sampleRate"],
+                truth["symbolRate"],
+                suppress_impulsive=False,
+            )
+            raw_valid = mavlink_evidence(raw["payload"])["validFrames"]
+        except ValueError:
+            raw_valid = 0
+        cleaned = demodulate_qpsk(
+            impaired,
+            truth["sampleRate"],
+            truth["symbolRate"],
+            suppress_impulsive=True,
+        )
+        self.assertEqual(raw_valid, 0)
+        self.assertEqual(mavlink_evidence(cleaned["payload"])["validFrames"], 1)
+        self.assertEqual(
+            cleaned["impulseSuppression"]["suppressedSamples"],
+            impairment["count"],
+        )
 
     def test_mavlink_sequence_continuity_handles_wrap_gap_and_reordering(self):
         state = {}

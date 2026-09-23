@@ -1,0 +1,171 @@
+{
+  "schema": "impulse-denoise-ablation-v1",
+  "cases": 20,
+  "rawRecovered": 12,
+  "cleanedRecovered": 20,
+  "improvedCases": 8,
+  "regressedCases": 0,
+  "records": [
+    {
+      "modulation": "2-FSK",
+      "seed": 0,
+      "impulseCount": 86,
+      "rawValidFrames": 1,
+      "cleanedValidFrames": 1,
+      "suppressedSamples": 86
+    },
+    {
+      "modulation": "2-FSK",
+      "seed": 1,
+      "impulseCount": 86,
+      "rawValidFrames": 1,
+      "cleanedValidFrames": 1,
+      "suppressedSamples": 86
+    },
+    {
+      "modulation": "2-FSK",
+      "seed": 2,
+      "impulseCount": 86,
+      "rawValidFrames": 1,
+      "cleanedValidFrames": 1,
+      "suppressedSamples": 86
+    },
+    {
+      "modulation": "2-FSK",
+      "seed": 3,
+      "impulseCount": 86,
+      "rawValidFrames": 1,
+      "cleanedValidFrames": 1,
+      "suppressedSamples": 86
+    },
+    {
+      "modulation": "2-FSK",
+      "seed": 4,
+      "impulseCount": 86,
+      "rawValidFrames": 1,
+      "cleanedValidFrames": 1,
+      "suppressedSamples": 86
+    },
+    {
+      "modulation": "GFSK",
+      "seed": 0,
+      "impulseCount": 86,
+      "rawValidFrames": 1,
+      "cleanedValidFrames": 1,
+      "suppressedSamples": 86
+    },
+    {
+      "modulation": "GFSK",
+      "seed": 1,
+      "impulseCount": 86,
+      "rawValidFrames": 1,
+      "cleanedValidFrames": 1,
+      "suppressedSamples": 86
+    },
+    {
+      "modulation": "GFSK",
+      "seed": 2,
+      "impulseCount": 86,
+      "rawValidFrames": 1,
+      "cleanedValidFrames": 1,
+      "suppressedSamples": 86
+    },
+    {
+      "modulation": "GFSK",
+      "seed": 3,
+      "impulseCount": 86,
+      "rawValidFrames": 0,
+      "cleanedValidFrames": 1,
+      "suppressedSamples": 86
+    },
+    {
+      "modulation": "GFSK",
+      "seed": 4,
+      "impulseCount": 86,
+      "rawValidFrames": 1,
+      "cleanedValidFrames": 1,
+      "suppressedSamples": 86
+    },
+    {
+      "modulation": "BPSK",
+      "seed": 0,
+      "impulseCount": 86,
+      "rawValidFrames": 0,
+      "cleanedValidFrames": 1,
+      "suppressedSamples": 86
+    },
+    {
+      "modulation": "BPSK",
+      "seed": 1,
+      "impulseCount": 86,
+      "rawValidFrames": 0,
+      "cleanedValidFrames": 1,
+      "suppressedSamples": 86
+    },
+    {
+      "modulation": "BPSK",
+      "seed": 2,
+      "impulseCount": 86,
+      "rawValidFrames": 0,
+      "cleanedValidFrames": 1,
+      "suppressedSamples": 86
+    },
+    {
+      "modulation": "BPSK",
+      "seed": 3,
+      "impulseCount": 86,
+      "rawValidFrames": 1,
+      "cleanedValidFrames": 1,
+      "suppressedSamples": 86
+    },
+    {
+      "modulation": "BPSK",
+      "seed": 4,
+      "impulseCount": 86,
+      "rawValidFrames": 0,
+      "cleanedValidFrames": 1,
+      "suppressedSamples": 86
+    },
+    {
+      "modulation": "QPSK",
+      "seed": 0,
+      "impulseCount": 43,
+      "rawValidFrames": 1,
+      "cleanedValidFrames": 1,
+      "suppressedSamples": 43
+    },
+    {
+      "modulation": "QPSK",
+      "seed": 1,
+      "impulseCount": 43,
+      "rawValidFrames": 1,
+      "cleanedValidFrames": 1,
+      "suppressedSamples": 43
+    },
+    {
+      "modulation": "QPSK",
+      "seed": 2,
+      "impulseCount": 43,
+      "rawValidFrames": 0,
+      "cleanedValidFrames": 1,
+      "suppressedSamples": 43
+    },
+    {
+      "modulation": "QPSK",
+      "seed": 3,
+      "impulseCount": 43,
+      "rawValidFrames": 0,
+      "cleanedValidFrames": 1,
+      "suppressedSamples": 43
+    },
+    {
+      "modulation": "QPSK",
+      "seed": 4,
+      "impulseCount": 43,
+      "rawValidFrames": 0,
+      "cleanedValidFrames": 1,
+      "suppressedSamples": 43
+    }
+  ],
+  "boundary": "Deterministic sparse high-amplitude impulses on synthetic bursts; this does not cover continuous interference or real ADC clipping."
+}
