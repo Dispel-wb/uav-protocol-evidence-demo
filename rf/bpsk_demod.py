@@ -7,6 +7,7 @@ from typing import Any
 import numpy as np
 
 from rf.denoise import suppress_edge_stationary_tone, suppress_impulses
+from rf.pulse_shaping import root_raised_cosine
 from rf.signal_quality import detect_bursts
 
 
@@ -51,47 +52,64 @@ def demodulate_bpsk(
         raise ValueError("burst is too short for the BPSK preamble")
 
     squared = segment * segment
-    squared_phase = np.unwrap(np.angle(squared))
-    phase_slope = np.polyfit(np.arange(squared.size), squared_phase, 1)[0]
-    carrier_offset = float(phase_slope * sample_rate / (4 * np.pi))
+    fft_size = 1 << int(np.ceil(np.log2(squared.size * 16)))
+    squared_spectrum = np.fft.fft(squared * np.hanning(squared.size), fft_size)
+    squared_frequencies = np.fft.fftfreq(fft_size, 1 / sample_rate)
+    carrier_offset = float(
+        squared_frequencies[int(np.argmax(np.abs(squared_spectrum)))] / 2
+    )
     time_axis = np.arange(segment.size) / sample_rate
     corrected = segment * np.exp(-2j * np.pi * carrier_offset * time_axis)
     carrier_phase = float(np.angle(np.mean(corrected * corrected)) / 2)
     corrected *= np.exp(-1j * carrier_phase)
 
     preamble_bits = np.unpackbits(np.frombuffer(preamble, dtype=np.uint8), bitorder="big")
+    receive_branches = [("integrate-dump", corrected, True)]
+    matched = np.convolve(
+        corrected,
+        root_raised_cosine(samples_per_symbol, 0.35),
+        mode="same",
+    )
+    receive_branches.append(("rrc-0.35", matched, False))
     candidates = []
-    for timing in range(samples_per_symbol):
-        usable = corrected[timing:]
-        usable = usable[:usable.size - usable.size % samples_per_symbol]
-        if usable.size < preamble_bits.size * samples_per_symbol:
-            continue
-        means = usable.reshape(-1, samples_per_symbol).mean(axis=1)
-        for inverted in (False, True):
-            bits = (means.real < 0 if inverted else means.real > 0).astype(np.uint8)
-            for position in range(bits.size - preamble_bits.size + 1):
-                errors = int(np.count_nonzero(
-                    bits[position:position + preamble_bits.size] != preamble_bits
-                ))
-                if errors <= 2:
-                    confidence = float(
-                        np.mean(np.abs(means.real)) /
-                        (np.std(means.imag) + 1e-9)
-                    )
-                    candidates.append((
-                        errors,
-                        -confidence,
-                        timing,
-                        inverted,
-                        position,
-                        bits,
+    for receive_filter, branch, integrate in receive_branches:
+        for timing in range(samples_per_symbol):
+            usable = branch[timing:]
+            if integrate:
+                usable = usable[:usable.size - usable.size % samples_per_symbol]
+                if usable.size < preamble_bits.size * samples_per_symbol:
+                    continue
+                means = usable.reshape(-1, samples_per_symbol).mean(axis=1)
+            else:
+                means = usable[::samples_per_symbol]
+                if means.size < preamble_bits.size:
+                    continue
+            for inverted in (False, True):
+                bits = (means.real < 0 if inverted else means.real > 0).astype(np.uint8)
+                for position in range(bits.size - preamble_bits.size + 1):
+                    errors = int(np.count_nonzero(
+                        bits[position:position + preamble_bits.size] != preamble_bits
                     ))
-                    break
+                    if errors <= 2:
+                        confidence = float(
+                            np.mean(np.abs(means.real)) /
+                            (np.std(means.imag) + 1e-9)
+                        )
+                        candidates.append((
+                            errors,
+                            -confidence,
+                            receive_filter,
+                            timing,
+                            inverted,
+                            position,
+                            bits,
+                        ))
+                        break
     if not candidates:
         raise ValueError("preamble not found after BPSK demodulation")
-    errors, negative_confidence, timing, inverted, position, bits = min(
+    errors, negative_confidence, receive_filter, timing, inverted, position, bits = min(
         candidates,
-        key=lambda item: (item[0], item[1], item[4]),
+        key=lambda item: (item[0], item[1], item[5]),
     )
     payload_bits = bits[position + preamble_bits.size:]
     payload = _bits_to_bytes(payload_bits)
@@ -104,6 +122,7 @@ def demodulate_bpsk(
         "carrierOffsetHz": carrier_offset,
         "carrierPhaseRadians": carrier_phase,
         "timingOffset": timing,
+        "receiveFilter": receive_filter,
         "bitPolarityInverted": inverted,
         "preambleBitErrors": errors,
         "decisionConfidence": -negative_confidence,
@@ -111,5 +130,5 @@ def demodulate_bpsk(
         "dcOffset": {"i": dc.real, "q": dc.imag},
         "impulseSuppression": impulse_report,
         "toneSuppression": tone_report,
-        "boundary": "Current BPSK baseline assumes a burst, integer samples per symbol and a known preamble; real oscillator drift and pulse shaping remain to be validated.",
+        "boundary": "Current BPSK baseline assumes a burst, integer samples per symbol and a known preamble; rectangular and rolloff-0.35 RRC receive branches are synthetic-only and real oscillator drift remains to be validated.",
     }

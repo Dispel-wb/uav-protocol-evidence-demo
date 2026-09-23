@@ -7,6 +7,7 @@ from typing import Any
 import numpy as np
 
 from rf.denoise import suppress_edge_stationary_tone, suppress_impulses
+from rf.pulse_shaping import root_raised_cosine
 from rf.signal_quality import detect_bursts
 
 
@@ -62,47 +63,64 @@ def demodulate_qpsk(
         raise ValueError("burst is too short for the QPSK preamble")
 
     fourth = segment ** 4
-    fourth_phase = np.unwrap(np.angle(fourth))
-    phase_slope = np.polyfit(np.arange(fourth.size), fourth_phase, 1)[0]
-    carrier_offset = float(phase_slope * sample_rate / (8 * np.pi))
+    fft_size = 1 << int(np.ceil(np.log2(fourth.size * 16)))
+    fourth_spectrum = np.fft.fft(fourth * np.hanning(fourth.size), fft_size)
+    fourth_frequencies = np.fft.fftfreq(fft_size, 1 / sample_rate)
+    carrier_offset = float(
+        fourth_frequencies[int(np.argmax(np.abs(fourth_spectrum)))] / 4
+    )
     time_axis = np.arange(segment.size) / sample_rate
     corrected = segment * np.exp(-2j * np.pi * carrier_offset * time_axis)
     carrier_phase = float(np.angle(-np.mean(corrected ** 4)) / 4)
     corrected *= np.exp(-1j * carrier_phase)
 
+    receive_branches = [("integrate-dump", corrected, True)]
+    matched = np.convolve(
+        corrected,
+        root_raised_cosine(samples_per_symbol, 0.35),
+        mode="same",
+    )
+    receive_branches.append(("rrc-0.35", matched, False))
     candidates = []
-    for timing in range(samples_per_symbol):
-        usable = corrected[timing:]
-        usable = usable[:usable.size - usable.size % samples_per_symbol]
-        if usable.size < minimum_samples:
-            continue
-        means = usable.reshape(-1, samples_per_symbol).mean(axis=1)
-        for quadrant in range(4):
-            rotated = means * np.exp(-1j * quadrant * np.pi / 2)
-            bits = _symbols_to_bits(rotated)
-            for position in range(bits.size - preamble_bits.size + 1):
-                errors = int(np.count_nonzero(
-                    bits[position:position + preamble_bits.size] != preamble_bits
-                ))
-                if errors <= 2:
-                    axis_margin = np.minimum(np.abs(rotated.real), np.abs(rotated.imag))
-                    confidence = float(
-                        np.mean(axis_margin) / (np.std(np.abs(rotated)) + 1e-9)
-                    )
-                    candidates.append((
-                        errors,
-                        -confidence,
-                        timing,
-                        quadrant,
-                        position,
-                        bits,
+    for receive_filter, branch, integrate in receive_branches:
+        for timing in range(samples_per_symbol):
+            usable = branch[timing:]
+            if integrate:
+                usable = usable[:usable.size - usable.size % samples_per_symbol]
+                if usable.size < minimum_samples:
+                    continue
+                means = usable.reshape(-1, samples_per_symbol).mean(axis=1)
+            else:
+                means = usable[::samples_per_symbol]
+                if means.size * 2 < preamble_bits.size:
+                    continue
+            for quadrant in range(4):
+                rotated = means * np.exp(-1j * quadrant * np.pi / 2)
+                bits = _symbols_to_bits(rotated)
+                for position in range(bits.size - preamble_bits.size + 1):
+                    errors = int(np.count_nonzero(
+                        bits[position:position + preamble_bits.size] != preamble_bits
                     ))
-                    break
+                    if errors <= 2:
+                        axis_margin = np.minimum(np.abs(rotated.real), np.abs(rotated.imag))
+                        confidence = float(
+                            np.mean(axis_margin) / (np.std(np.abs(rotated)) + 1e-9)
+                        )
+                        candidates.append((
+                            errors,
+                            -confidence,
+                            receive_filter,
+                            timing,
+                            quadrant,
+                            position,
+                            bits,
+                        ))
+                        break
     if not candidates:
         raise ValueError("preamble not found after QPSK demodulation")
-    errors, negative_confidence, timing, quadrant, position, bits = min(
+    errors, negative_confidence, receive_filter, timing, quadrant, position, bits = min(
         candidates,
-        key=lambda item: (item[0], item[1], item[4]),
+        key=lambda item: (item[0], item[1], item[5]),
     )
     payload_bits = bits[position + preamble_bits.size:]
     payload = _bits_to_bytes(payload_bits)
@@ -115,6 +133,7 @@ def demodulate_qpsk(
         "carrierOffsetHz": carrier_offset,
         "carrierPhaseRadians": carrier_phase,
         "timingOffset": timing,
+        "receiveFilter": receive_filter,
         "quadrantRotation": quadrant,
         "preambleBitErrors": errors,
         "decisionConfidence": -negative_confidence,
@@ -122,5 +141,5 @@ def demodulate_qpsk(
         "dcOffset": {"i": dc.real, "q": dc.imag},
         "impulseSuppression": impulse_report,
         "toneSuppression": tone_report,
-        "boundary": "Current QPSK baseline assumes rectangular pulse shaping, integer samples per symbol and a known preamble.",
+        "boundary": "Current QPSK baseline assumes integer samples per symbol and a known preamble; rectangular and rolloff-0.35 RRC receive branches are synthetic-only.",
     }

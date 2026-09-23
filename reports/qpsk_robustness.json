@@ -3,7 +3,7 @@
   "cases": 20,
   "requiredRangeCases": 10,
   "requiredRangeExact": 10,
-  "allExact": 10,
+  "allExact": 20,
   "wrongModulation": 0,
   "falseValidProtocolFrames": 0,
   "records": [
@@ -90,82 +90,82 @@
     {
       "noiseStd": 0.08,
       "carrierOffsetHz": -400,
-      "chosenModulation": null,
-      "chosenSymbolRate": null,
-      "validProtocolFrames": 0,
-      "exactPayload": false
+      "chosenModulation": "QPSK",
+      "chosenSymbolRate": 1200.0,
+      "validProtocolFrames": 1,
+      "exactPayload": true
     },
     {
       "noiseStd": 0.08,
       "carrierOffsetHz": -200,
-      "chosenModulation": null,
-      "chosenSymbolRate": null,
-      "validProtocolFrames": 0,
-      "exactPayload": false
+      "chosenModulation": "QPSK",
+      "chosenSymbolRate": 1200.0,
+      "validProtocolFrames": 1,
+      "exactPayload": true
     },
     {
       "noiseStd": 0.08,
       "carrierOffsetHz": 0,
-      "chosenModulation": null,
-      "chosenSymbolRate": null,
-      "validProtocolFrames": 0,
-      "exactPayload": false
+      "chosenModulation": "QPSK",
+      "chosenSymbolRate": 1200.0,
+      "validProtocolFrames": 1,
+      "exactPayload": true
     },
     {
       "noiseStd": 0.08,
       "carrierOffsetHz": 200,
       "chosenModulation": "QPSK",
       "chosenSymbolRate": 1200.0,
-      "validProtocolFrames": 0,
-      "exactPayload": false
+      "validProtocolFrames": 1,
+      "exactPayload": true
     },
     {
       "noiseStd": 0.08,
       "carrierOffsetHz": 400,
-      "chosenModulation": null,
-      "chosenSymbolRate": null,
-      "validProtocolFrames": 0,
-      "exactPayload": false
+      "chosenModulation": "QPSK",
+      "chosenSymbolRate": 1200.0,
+      "validProtocolFrames": 1,
+      "exactPayload": true
     },
     {
       "noiseStd": 0.12,
       "carrierOffsetHz": -400,
-      "chosenModulation": null,
-      "chosenSymbolRate": null,
-      "validProtocolFrames": 0,
-      "exactPayload": false
+      "chosenModulation": "QPSK",
+      "chosenSymbolRate": 1200.0,
+      "validProtocolFrames": 1,
+      "exactPayload": true
     },
     {
       "noiseStd": 0.12,
       "carrierOffsetHz": -200,
-      "chosenModulation": null,
-      "chosenSymbolRate": null,
-      "validProtocolFrames": 0,
-      "exactPayload": false
+      "chosenModulation": "QPSK",
+      "chosenSymbolRate": 1200.0,
+      "validProtocolFrames": 1,
+      "exactPayload": true
     },
     {
       "noiseStd": 0.12,
       "carrierOffsetHz": 0,
-      "chosenModulation": null,
-      "chosenSymbolRate": null,
-      "validProtocolFrames": 0,
-      "exactPayload": false
+      "chosenModulation": "QPSK",
+      "chosenSymbolRate": 1200.0,
+      "validProtocolFrames": 1,
+      "exactPayload": true
     },
     {
       "noiseStd": 0.12,
       "carrierOffsetHz": 200,
-      "chosenModulation": null,
-      "chosenSymbolRate": null,
-      "validProtocolFrames": 0,
-      "exactPayload": false
+      "chosenModulation": "QPSK",
+      "chosenSymbolRate": 1200.0,
+      "validProtocolFrames": 1,
+      "exactPayload": true
     },
     {
       "noiseStd": 0.12,
       "carrierOffsetHz": 400,
-      "chosenModulation": null,
-      "chosenSymbolRate": null,
-      "validProtocolFrames": 0,
-      "exactPayload": false
+      "chosenModulation": "QPSK",
+      "chosenSymbolRate": 1200.0,
+      "validProtocolFrames": 1,
+      "exactPayload": true
     }
   ],
   "boundary": "Deterministic rectangular-pulse QPSK only; this does not represent shaped pulses, timing drift, multipath or real oscillators."

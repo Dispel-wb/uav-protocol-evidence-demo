@@ -42,6 +42,7 @@ npm run evaluate:bpsk
 npm run evaluate:qpsk
 npm run evaluate:denoise
 npm run evaluate:tone-denoise
+npm run evaluate:rrc
 npm run stream:replay
 npm run stream:state
 ```
@@ -56,9 +57,11 @@ npm run stream:state
 
 GFSK作为第二种波形沿用同一频率判决主链，但在调制前加入BT=0.5的高斯脉冲整形。`rf/modulation_features.py` 根据瞬时频率中过渡区域的比例区分矩形2-FSK与GFSK，并在低SNR或模糊区间拒绝给出标签。`npm run evaluate:modulation` 的40组合成测试全部恢复CRC有效帧：30个较高SNR案例分类正确，10个低SNR案例拒识，错误分类为0。逐例证据位于 `reports/fsk_shape_evaluation.json`；该阈值尚未经过真实发射机和其他BT参数验证。
 
-BPSK使用独立的相位调制链：平方去除数据符号、相位线性回归估计载波频偏、二阶相位估计、全符号定时搜索和同步字检验。`rf/waveform_selector.py` 同时尝试FSK族与BPSK，再以协议CRC为首要证据选路。`npm run evaluate:bpsk` 的20组合成测试中，噪声标准差0.02～0.08、频偏±500 Hz的15例全部精确恢复；0.12档5例均未达到精确验收。错误调制选择和错误CRC接收均为0，逐例结果位于 `reports/bpsk_robustness.json`。
+BPSK使用独立的相位调制链：平方去除数据符号、平方谱线峰值估计载波频偏、二阶相位估计、全符号定时搜索和同步字检验。`rf/waveform_selector.py` 同时尝试FSK族与BPSK，再以协议CRC为首要证据选路。`npm run evaluate:bpsk` 的20组合成测试覆盖噪声标准差0.02～0.12和频偏±500 Hz，20例全部精确恢复。错误调制选择和错误CRC接收均为0，逐例结果位于 `reports/bpsk_robustness.json`。
 
-QPSK进一步使用四次方法消除数据符号、相位线性回归恢复载波，并遍历四种象限模糊和全部符号定时。`npm run evaluate:qpsk` 的20组合成测试中，噪声标准差0.02～0.04、频偏±400 Hz的10例全部精确恢复；0.08和0.12档10例未达到精确验收。错误调制选择和错误CRC接收均为0，逐例结果位于 `reports/qpsk_robustness.json`。当前四次载波恢复对噪声较敏感。
+QPSK进一步使用四次方法消除数据符号、四次谱线峰值恢复载波，并遍历四种象限模糊和全部符号定时。`npm run evaluate:qpsk` 的20组合成测试覆盖噪声标准差0.02～0.12和频偏±400 Hz，20例全部精确恢复。错误调制选择和错误CRC接收均为0，逐例结果位于 `reports/qpsk_robustness.json`。
+
+BPSK与QPSK现在同时尝试矩形脉冲的积分判决和滚降系数0.35的根升余弦匹配滤波判决；载波频偏由平方／四次谱线峰值估计，避免成形过渡区的低幅相位使相位展开失稳。`npm run evaluate:rrc` 对两种调制、3档噪声和3档频偏执行18组合成测试，18组均恢复正确载荷并通过MAVLink CRC，错误调制选择和错误CRC接收均为0。完整结果位于 `reports/rrc_psk_evaluation.json`。发射端和接收端仍使用同一套合成实现，尚未覆盖采样钟偏、多径、功放非线性和真实发射机。
 
 `rf/denoise.py` 提供稀疏脉冲干扰抑制：只在已检测突发内部，以幅度中位数和MAD形成稳健阈值，将占比不超过5%的离群采样用相邻正常复数采样插值；异常比例过高时拒绝处理。`npm run evaluate:denoise` 对四种波形各5组注入1%、幅度3.0的脉冲干扰。未处理链恢复12/20组，启用抑制后恢复20/20组，改善8组且回退0组。完整消融记录位于 `reports/impulse_denoise_ablation.json`。
 

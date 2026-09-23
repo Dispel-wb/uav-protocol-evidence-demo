@@ -153,6 +153,41 @@ class RFInputTests(unittest.TestCase):
         self.assertEqual(window["chosenDemodulator"], "QPSK")
         self.assertEqual(report["analysis"]["protocolState"]["finalState"], "disarmed")
 
+    def test_rrc_shaped_bpsk_and_qpsk_recover_through_unified_selector(self):
+        cases = (
+            (synthesize_bpsk, "BPSK", 350, 81),
+            (synthesize_qpsk, "QPSK", -300, 82),
+        )
+        for synthesize_psk, expected, offset, seed in cases:
+            with self.subTest(modulation=expected):
+                samples, truth = synthesize_psk(
+                    carrier_offset=offset,
+                    noise_std=0.08,
+                    rolloff=0.35,
+                    seed=seed,
+                )
+                selection = select_waveform(
+                    samples,
+                    truth["sampleRate"],
+                    [800, 1_200, 2_400],
+                    ["fsk", "bpsk", "qpsk"],
+                )
+                self.assertEqual(selection["chosenModulation"], expected)
+                self.assertEqual(selection["chosenSymbolRate"], 1_200)
+                self.assertEqual(selection["validProtocolFrames"], 1)
+                payload = bytes.fromhex(selection["chosenPayloadHex"])
+                self.assertEqual(payload[:len(PAYLOAD)], PAYLOAD)
+                chosen = next(
+                    candidate for candidate in selection["candidates"]
+                    if candidate["status"] == "decoded"
+                    and candidate["modulation"] == expected
+                    and candidate["symbolRate"] == 1_200
+                )
+                self.assertIn(
+                    chosen["demodulation"]["receiveFilter"],
+                    {"integrate-dump", "rrc-0.35"},
+                )
+
     def test_impulse_suppression_recovers_a_qpsk_frame(self):
         samples, truth = synthesize_qpsk(seed=102)
         impaired, impairment = add_impulsive_noise(

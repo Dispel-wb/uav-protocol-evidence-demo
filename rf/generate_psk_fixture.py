@@ -4,6 +4,7 @@ from __future__ import annotations
 import numpy as np
 
 from rf.generate_iq_fixture import PAYLOAD, PREAMBLE
+from rf.pulse_shaping import shape_symbols
 
 
 def synthesize_bpsk(
@@ -16,6 +17,7 @@ def synthesize_bpsk(
     sample_rate: float = 48_000,
     symbol_rate: float = 1_200,
     seed: int = 20261200,
+    rolloff: float | None = None,
 ) -> tuple[np.ndarray, dict]:
     samples_per_symbol = int(round(sample_rate / symbol_rate))
     if samples_per_symbol <= 0 or not np.isclose(
@@ -26,7 +28,10 @@ def synthesize_bpsk(
     framed = PREAMBLE + payload
     bits = np.unpackbits(np.frombuffer(framed, dtype=np.uint8), bitorder="big")
     symbols = np.where(bits > 0, 1.0, -1.0)
-    baseband = np.repeat(symbols, samples_per_symbol)
+    baseband = (
+        shape_symbols(symbols.astype(np.complex64), samples_per_symbol, rolloff)
+        if rolloff is not None else np.repeat(symbols, samples_per_symbol)
+    )
     start = 1_600
     end = start + baseband.size
     total = end + 1_600
@@ -51,6 +56,8 @@ def synthesize_bpsk(
         "preambleHex": PREAMBLE.hex(" ").upper(),
         "payloadHex": payload.hex(" ").upper(),
         "modulation": "BPSK",
+        "pulseShape": "RRC" if rolloff is not None else "rectangular",
+        "rolloff": rolloff,
     }
     return samples, truth
 
@@ -65,6 +72,7 @@ def synthesize_qpsk(
     sample_rate: float = 48_000,
     symbol_rate: float = 1_200,
     seed: int = 20261300,
+    rolloff: float | None = None,
 ) -> tuple[np.ndarray, dict]:
     samples_per_symbol = int(round(sample_rate / symbol_rate))
     if samples_per_symbol <= 0 or not np.isclose(
@@ -78,7 +86,10 @@ def synthesize_qpsk(
     i_axis = np.where(pairs[:, 1] > 0, -1.0, 1.0)
     q_axis = np.where(pairs[:, 0] > 0, -1.0, 1.0)
     symbols = (i_axis + 1j * q_axis) / np.sqrt(2)
-    baseband = np.repeat(symbols, samples_per_symbol)
+    baseband = (
+        shape_symbols(symbols.astype(np.complex64), samples_per_symbol, rolloff)
+        if rolloff is not None else np.repeat(symbols, samples_per_symbol)
+    )
     start = 1_600
     end = start + baseband.size
     total = end + 1_600
@@ -103,5 +114,7 @@ def synthesize_qpsk(
         "preambleHex": PREAMBLE.hex(" ").upper(),
         "payloadHex": payload.hex(" ").upper(),
         "modulation": "QPSK",
+        "pulseShape": "RRC" if rolloff is not None else "rectangular",
+        "rolloff": rolloff,
     }
     return samples, truth

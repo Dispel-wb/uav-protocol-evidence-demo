@@ -3,7 +3,7 @@
   "cases": 20,
   "requiredRangeCases": 15,
   "requiredRangeExact": 15,
-  "allExact": 15,
+  "allExact": 20,
   "wrongModulation": 0,
   "falseValidProtocolFrames": 0,
   "records": [
@@ -130,42 +130,42 @@
     {
       "noiseStd": 0.12,
       "carrierOffsetHz": -500,
-      "chosenModulation": null,
-      "chosenSymbolRate": null,
-      "validProtocolFrames": 0,
-      "exactPayload": false
+      "chosenModulation": "BPSK",
+      "chosenSymbolRate": 1200.0,
+      "validProtocolFrames": 1,
+      "exactPayload": true
     },
     {
       "noiseStd": 0.12,
       "carrierOffsetHz": -250,
       "chosenModulation": "BPSK",
       "chosenSymbolRate": 1200.0,
-      "validProtocolFrames": 0,
-      "exactPayload": false
+      "validProtocolFrames": 1,
+      "exactPayload": true
     },
     {
       "noiseStd": 0.12,
       "carrierOffsetHz": 0,
       "chosenModulation": "BPSK",
       "chosenSymbolRate": 1200.0,
-      "validProtocolFrames": 0,
-      "exactPayload": false
+      "validProtocolFrames": 1,
+      "exactPayload": true
     },
     {
       "noiseStd": 0.12,
       "carrierOffsetHz": 250,
       "chosenModulation": "BPSK",
       "chosenSymbolRate": 1200.0,
-      "validProtocolFrames": 0,
-      "exactPayload": false
+      "validProtocolFrames": 1,
+      "exactPayload": true
     },
     {
       "noiseStd": 0.12,
       "carrierOffsetHz": 500,
-      "chosenModulation": null,
-      "chosenSymbolRate": null,
-      "validProtocolFrames": 0,
-      "exactPayload": false
+      "chosenModulation": "BPSK",
+      "chosenSymbolRate": 1200.0,
+      "validProtocolFrames": 1,
+      "exactPayload": true
     }
   ],
   "boundary": "Deterministic rectangular-pulse BPSK only; thresholds do not represent real oscillator drift, multipath or shaped transmitters."
